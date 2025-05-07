@@ -1,0 +1,40 @@
+package BRP.service;
+
+import BRP.data.AgeGroup;
+import BRP.data.ViewBookSkuInfo;
+import BRP.model.BookSkuManager;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+
+public class BatchAddBookSkuAndBookServiceHandler extends ServiceHandler {
+    @Override
+    public void process(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONObject jData = getRequestData(request);
+        JSONArray jdataList = JsonHelper.getJSONArray(jData, "dataList");
+        List<ViewBookSkuInfo> viewBookSkuInfoList = new ArrayList<ViewBookSkuInfo>();
+        for (int i = 0; i < jdataList.size(); i++) {
+            JSONObject jdata = jdataList.getJSONObject(i);
+            String ISBN = JsonHelper.getString(jdata, "ISBN");
+            ViewBookSkuInfo viewBookSkuInfo = JsonHelper.toJavaObject(ViewBookSkuInfo.class, jdata);
+            viewBookSkuInfo.setISBN(ISBN);
+            List<AgeGroup> lstAgeGroup = JsonHelper.getJavaList(AgeGroup.class, jdata, "ageGroupList");
+            viewBookSkuInfo.setAgeGroupList(lstAgeGroup);
+            List<String> lstBookTagNames = JsonHelper.getStringArray(jdata, "bookTagNameList");
+            viewBookSkuInfo.setBookTagNameList(lstBookTagNames);
+            viewBookSkuInfoList.add(viewBookSkuInfo);
+        }
+        Boolean isOn = JsonHelper.getBoolean(jData, "isOn");
+        Integer companyId = JsonHelper.getInt(jData, "companyId");
+        BookSkuManager.getInstance().batchAddBookSkuAndBook(viewBookSkuInfoList, isOn, companyId);
+        this.writeSuccessResponse(response);
+    }
+}

@@ -1,0 +1,1617 @@
+<ServiceHandlers>
+    <!-- 取得门店菜单列表 -->
+    <ServiceHandler
+            Name="GetCompanyMenuList"
+            Type="BRP.service.GetCompanyMenuListServiceHandler"/>
+    <!--获取平台菜单列表-->
+    <ServiceHandler
+            Name="GetPlatformMenuList"
+            Type="BRP.service.GetPlatformMenuListServiceHandler"/>
+    <!-- 门店登录 -->
+    <ServiceHandler
+            Name="CompanyUserLogin"
+            Type="BRP.service.CompanyUserLoginServiceHandler"/>
+    <!-- 生成会员卡 -->
+    <ServiceHandler
+            Name="AddMemberCard"
+            Type="BRP.service.AddMemberCardServiceHandler"/>
+    <!-- 绑定会员信息 -->
+    <ServiceHandler
+            Name="BindMemberInfo"
+            Type="BRP.service.BindMemberInfoServiceHandler"/>
+    <!-- 修改会员信息 -->
+    <ServiceHandler
+            Name="EditMemberInfo"
+            Type="BRP.service.EditMemberInfoServiceHandler"/>
+    <!-- 预登记会员信息 -->
+    <ServiceHandler
+            Name="SignInMemberInfo"
+            Type="BRP.service.SignInMemberInfoServiceHandler"/>
+    <!-- 配送大区编辑 -->
+    <ServiceHandler
+            Name="EditDeliverArea"
+            Type="BRP.service.EditDeliverAreaServiceHandler"/>
+    <!-- 配送员编辑 -->
+    <ServiceHandler
+            Name="EditDeliverer"
+            Type="BRP.service.EditDelivererServiceHandler">
+    </ServiceHandler>
+    <!-- 配送点排序 -->
+    <ServiceHandler
+            Name="GetSortable"
+            Type="BRP.service.GetSortableServiceHandler">
+    </ServiceHandler>
+    <!-- 可阅读数量日志记录 -->
+    <ServiceHandler
+            Name="EditMemberBorrowQuantityLog"
+            Type="BRP.service.EditMemberBorrowQuantityLogServiceHandler">
+    </ServiceHandler>
+    <!-- 过滤当前配送员的配送线路 -->
+    <ServiceHandler Name="GetFilterViewDeliverLineList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="BRP.model.ViewDeliverLineManager" DataEntityType="BRP.data.ViewDeliverLine"
+                    TableName="view_deliver_line">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="format" Text="id not in (select id from deliver_line where deliverer_id='{0}')">
+                <Arguments>
+                    <Argument ParameterName="delivererId"/>
+                </Arguments>
+            </SearchItem>
+        </SearchItems>
+    </ServiceHandler>
+    <!-- 转移配送点下的会员 -->
+    <ServiceHandler
+            Name="EditMemberTransfer"
+            Type="BRP.service.EditMemberTransferServiceHandler">
+    </ServiceHandler>
+    <ServiceHandler Name="AddBookSku" Type="BRP.service.AddBookSkuServiceHandler"
+                    DataManagerType="BRP.model.BookSkuManager" DataEntityType="BRP.data.BookSku" TableName="book_sku"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateBookSku" Type="BRP.service.UpdateBookSkuServiceHandler"
+                    DataManagerType="BRP.model.BookSkuManager" DataEntityType="BRP.data.BookSku" TableName="book_sku"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--获取年龄段已选标签旧-->
+    <ServiceHandler
+            Name="GetBookTagByAgeGroupId"
+            Type="BRP.service.GetBookTagByAgeGroupIdServiceHandler"/>
+    <!--获取年龄段已选标签新-->
+    <ServiceHandler
+            Name="GetBookTagByAgeGroupIdNew"
+            Type="BRP.service.GetBookTagByAgeGroupIdNewServiceHandler"/>
+    <!--获取年龄段已选SKU列表-->
+    <ServiceHandler
+            Name="GetBookSkuListByAgeGroupId"
+            Type="BRP.service.GetBookSkuListByAgeGroupIdServiceHandler"/>
+    <!--添加年龄段标签旧-->
+    <ServiceHandler
+            Name="AddAgeGroupBookTagByAgeGroupId"
+            Type="BRP.service.AddAgeGroupBookTagByAgeGroupIdServiceHandler"/>
+    <!--添加年龄段标签新-->
+    <ServiceHandler
+            Name="AddAgeGroupBookTagByAgeGroupIdNew"
+            Type="BRP.service.AddAgeGroupBookTagByAgeGroupIdNewServiceHandler"/>
+    <!--批量删除年龄段下SKU-->
+    <ServiceHandler
+            Name="DeleteBookSkuAgeGroupByBookSkuIds"
+            Type="BRP.service.DeleteBookSkuAgeGroupByBookSkuIdsServiceHandler"/>
+    <!--批量向年龄段下添加SKU-->
+    <ServiceHandler
+            Name="AddBookSkuAgeGroupByBookSkuIds"
+            Type="BRP.service.AddBookSkuAgeGroupByBookSkuIdsServiceHandler"/>
+    <!--批量删除标签下SKU-->
+    <ServiceHandler
+            Name="DeleteBookSkuBookTagByBookSkuIds"
+            Type="BRP.service.DeleteBookSkuBookTagByBookSkuIdsServiceHandler"/>
+    <!--批量向标签下添加SKU-->
+    <ServiceHandler
+            Name="AddBookSkuBookTagByBookSkuIds"
+            Type="BRP.service.AddBookSkuBookTagByBookSkuIdsServiceHandler"/>
+    <!--添加门店-->
+    <ServiceHandler Name="AddCompany" Type="BRP.service.AddCompanyServiceHandler" EncryptFields="password"
+                    DataManagerType="BRP.model.CompanyManager" DataEntityType="BRP.data.Company" TableName="company"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+            <UniqueField FieldName="company_name" DataName="companyName" Caption="门店名称"></UniqueField>
+            <UniqueField FieldName="company_no" DataName="companyNo" Caption="门店编号"></UniqueField>
+            <UniqueField FieldName="mobile_phone" DataName="mobilePhone" Caption="联系电话"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--修改门店-->
+    <ServiceHandler Name="UpdateCompany" Type="BRP.service.UpdateCompanyServiceHandler" EncryptFields="password"
+                    DataManagerType="BRP.model.CompanyManager" DataEntityType="BRP.data.Company" TableName="company"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+            <UniqueField FieldName="company_name" DataName="companyName" Caption="门店名称"></UniqueField>
+            <UniqueField FieldName="company_no" DataName="companyNo" Caption="门店编号"></UniqueField>
+            <UniqueField FieldName="mobile_phone" DataName="mobilePhone" Caption="联系电话"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--获取随机数字字符串-->
+    <ServiceHandler
+            Name="CreateRandomNo"
+            Type="BRP.service.CreateRandomNoServiceHandler">
+    </ServiceHandler>
+    <!--启用禁用门店用户-->
+    <ServiceHandler Name="SetCompanyUserEnabled"
+                    Type="BRP.service.SetCompanyUserEnabledServiceHandler"
+                    DataManagerType="BRP.model.CompanyUserManager"/>
+    <!--获取门店组织机构树-->
+    <ServiceHandler Name="GetCompanyOrganizationTree"
+                    Type="BRP.service.GetCompanyOrganizationTreeServiceHandler">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="like" FieldName="name" ParameterName="name"></SearchItem>
+            <SearchItem Operation="like" FieldName="description" ParameterName="description"></SearchItem>
+        </SearchItems>
+    </ServiceHandler>
+    <!-- 取得门店指定用户的角色列表 -->
+    <ServiceHandler Name="GetCompanyRoleListByCompanyUserId"
+                    Type="BRP.service.GetCompanyRoleListByCompanyUserIdServiceHandler">
+    </ServiceHandler>
+    <!--修改门店用户角色-->
+    <ServiceHandler Name="SaveCompanyUserRoles"
+                    Type="BRP.service.SaveCompanyUserRolesServiceHandler"/>
+    <!-- 保存门店角色权限 -->
+    <ServiceHandler Name="SaveCompanyRolePermissions"
+                    Type="BRP.service.SaveCompanyRolePermissionsServiceHandler"
+                    DataManagerType="BRP.model.CompanyRolePermissionManager"
+                    DataEntityType="BRP.data.CompanyRolePermission"/>
+    <!-- 批量导入图书 -->
+    <ServiceHandler
+            Name="UploadBookExcel"
+            Type="BRP.service.UploadBookExcelServiceHandler"/>
+    <!--获取门店角色权限树-->
+    <ServiceHandler Name="GetCompanyRolePermissionTree"
+                    Type="BRP.service.GetCompanyRolePermissionTreeServiceHandler">
+    </ServiceHandler>
+    <!-- 批量添加图书和sku -->
+    <ServiceHandler
+            Name="BatchAddBookSkuAndBook"
+            Type="BRP.service.BatchAddBookSkuAndBookServiceHandler"/>
+    <!-- 取得平台统计信息 -->
+    <ServiceHandler
+            Name="GetPlatformTotal"
+            Type="BRP.service.GetPlatformTotalServiceHandler"/>
+    <!-- 取得平台门店统计信息 -->
+    <ServiceHandler
+            Name="GetPlatformCompanyTotal"
+            Type="BRP.service.GetPlatformCompanyTotalServiceHandler"/>
+    <!-- 修改图书书柜号 -->
+    <ServiceHandler
+            Name="UpdateBookBookcaseName"
+            Type="BRP.service.UpdateBookBookcaseNameServiceHandler"/>
+    <!--修改图书-->
+    <ServiceHandler Name="UpdateBookAndSkuPrice" Type="BRP.service.UpdateBookAndSkuPriceServiceHandler"
+                    DataManagerType="BRP.model.BookManager" DataEntityType="BRP.data.Book" TableName="book"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--获取图书列表-->
+    <ServiceHandler Name="GetViewBookInfoList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookManager" DataEntityType="BRP.data.ViewBook"
+                    TableName="view_book"
+                    Fields="*,( SELECT group_concat( DISTINCT view_book_sku_book_tag.book_tag_name SEPARATOR ', ' ) FROM view_book_sku_book_tag
+	WHERE view_book.book_sku_id = view_book_sku_book_tag.book_sku_id ) AS book_tag_names,
+	(SELECT group_concat( DISTINCT view_book_sku_age_group.age_group_name SEPARATOR ', ' ) FROM view_book_sku_age_group
+	WHERE view_book.book_sku_id = view_book_sku_age_group.book_sku_id) AS age_group_names">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_sku_id" ParameterName="bookSkuId"></SearchItem>
+            <SearchItem Operation="like" FieldName="sn" ParameterName="sn"></SearchItem>
+            <SearchItem Operation="equal" FieldName="borrow_status_code" ParameterName="borrowStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_status_code" ParameterName="bookStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_available" ParameterName="isAvailable"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="bookcase_id" ParameterName="bookcaseId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_damaged" ParameterName="isDamaged"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_name" ParameterName="bookName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_series_id" ParameterName="bookSeriesId"></SearchItem>
+            <SearchItem Operation="like" FieldName="press" ParameterName="press"></SearchItem>
+            <SearchItem Operation="like" FieldName="author" ParameterName="author"></SearchItem>
+            <SearchItem Operation="like" FieldName="ISBN" ParameterName="ISBN"></SearchItem>
+            <SearchItem Operation="equal" FieldName="language_code" ParameterName="languageCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="binding_type_code" ParameterName="bindingTypeCode"></SearchItem>
+            <SearchItem Operation="like" FieldName="introduction" ParameterName="introduction"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_online" ParameterName="isOnline"></SearchItem>
+            <SearchItem Operation="like" FieldName="image_file_name" ParameterName="imageFileName"></SearchItem>
+            <SearchItem Operation="like" FieldName="company_name" ParameterName="companyName"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_series_name" ParameterName="bookSeriesName"></SearchItem>
+            <SearchItem Operation="like" FieldName="language_name" ParameterName="languageName"></SearchItem>
+            <SearchItem Operation="like" FieldName="binding_type_name" ParameterName="bindingTypeName"></SearchItem>
+            <SearchItem Operation="like" FieldName="bookcase_name" ParameterName="bookcaseName"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_status_name" ParameterName="bookStatusName"></SearchItem>
+            <SearchItem Operation="like" FieldName="borrow_status_name" ParameterName="borrowStatusName"></SearchItem>
+            <SearchItem Operation="like" FieldName="offline_approver_name"
+                        ParameterName="offlineApproverName"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_name" ParameterName="memberName"></SearchItem>
+            <SearchItem Operation="format"
+                        Text="book_sku_id in (SELECT book_sku_id FROM book_sku_book_tag WHERE book_tag_id IN ({0}))">
+                <Arguments>
+                    <Argument ParameterName="bookTagSelectValue"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="book_sku_id in (SELECT book_sku_id FROM book_sku_age_group WHERE age_group_id IN ({0}))">
+                <Arguments>
+                    <Argument ParameterName="ageGroupSelectValue"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="(book_name like '%{0}%' or book_series_name like '%{0}%' or ISBN like '%{0}%')">
+                <Arguments>
+                    <Argument ParameterName="searchContent"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="id in (SELECT book_id from member_book_collect where member_id={0})">
+                <Arguments>
+                    <Argument ParameterName="collectMemberId"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="id in (SELECT book_id from member_book_borrow where member_id={0})">
+                <Arguments>
+                    <Argument ParameterName="borrowMemberId"/>
+                </Arguments>
+            </SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--获取图书列表-->
+    <ServiceHandler Name="GetViewBookList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookManager" DataEntityType="BRP.data.ViewBook"
+                    TableName="view_book">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_sku_id" ParameterName="bookSkuId"></SearchItem>
+            <SearchItem Operation="like" FieldName="sn" ParameterName="sn"></SearchItem>
+            <SearchItem Operation="equal" FieldName="borrow_status_code" ParameterName="borrowStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_status_code" ParameterName="bookStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_available" ParameterName="isAvailable"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="bookcase_id" ParameterName="bookcaseId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_name" ParameterName="bookName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_series_id" ParameterName="bookSeriesId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="binding_type_code" ParameterName="bindingTypeCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_online" ParameterName="isOnline"></SearchItem>
+            <SearchItem Operation="like" FieldName="bookcase_name" ParameterName="bookcaseName"></SearchItem>
+
+            <SearchItem Operation="format"
+                        Text="book_sku_id in (SELECT book_sku_id FROM book_sku_book_tag WHERE book_tag_id IN ({0}))">
+                <Arguments>
+                    <Argument ParameterName="bookTagSelectValue"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="book_sku_id in (SELECT book_sku_id FROM book_sku_age_group WHERE age_group_id IN ({0}))">
+                <Arguments>
+                    <Argument ParameterName="ageGroupSelectValue"/>
+                </Arguments>
+            </SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--批量添加图书到书架-->
+    <ServiceHandler
+            Name="BatchAddBookBookcaseId"
+            Type="BRP.service.BatchAddBookBookcaseIdServiceHandler"/>
+    <!--批量添加门店SKU和图书根据ISBN-->
+    <ServiceHandler
+            Name="BatchAddBookSkuAndBookByISBN"
+            Type="BRP.service.BatchAddBookSkuAndBookByISBNServiceHandler"/>
+    <!--获取SKU列表-->
+    <!--<ServiceHandler Name="GetViewBookSkuInfoList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookSkuManager" DataEntityType="BRP.data.ViewBookSku"
+                    TableName="view_book_sku"
+                    Fields="id,book_name,image_file_id,author,press,price,ISBN,company_id,is_online,platform_book_sku_id,
+            create_time,image_file_path,company_name,book_series_name,language_name,binding_type_name,small_image_file_path,
+            (SELECT GROUP_CONCAT(view_book_sku_book_tag.book_tag_name SEPARATOR ',')
+			FROM view_book_sku_book_tag
+			WHERE view_book_sku_book_tag.book_sku_id = view_book_sku.id) AS bookTagNames,
+			(SELECT GROUP_CONCAT(view_book_sku_age_group.age_group_name SEPARATOR ',')
+			FROM view_book_sku_age_group
+			WHERE view_book_sku_age_group.book_sku_id = view_book_sku.id) AS ageGroupNames,
+            (SELECT COUNT(*) FROM book
+        WHERE book.book_sku_id = view_book_sku.id AND book.is_available = 1 AND book.book_status_code='On') > 0 AS isBookAvailable">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_name" ParameterName="bookName"></SearchItem>
+            <SearchItem Operation="like" FieldName="author" ParameterName="author"></SearchItem>
+            <SearchItem Operation="like" FieldName="press" ParameterName="press"></SearchItem>
+            <SearchItem Operation="like" FieldName="ISBN" ParameterName="ISBN"></SearchItem>
+            <SearchItem Operation="equal" FieldName="language_code" ParameterName="languageCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="binding_type_code" ParameterName="bindingTypeCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="remark" ParameterName="remark"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="approver_id" ParameterName="approverId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="approve_time" BeginDateParameterName="approveTimeBegin"
+                        EndDateParameterName="approveTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="approve_status_code"
+                        ParameterName="approveStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_online" ParameterName="isOnline"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_series_id" ParameterName="bookSeriesId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="company_name" ParameterName="companyName"></SearchItem>
+
+            <SearchItem Operation="format"
+                        Text="id in (SELECT book_sku_id FROM book_sku_book_tag WHERE book_tag_id IN ({0}))">
+                <Arguments>
+                    <Argument ParameterName="bookTagSelectValue"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="id in (SELECT book_sku_id FROM book_sku_age_group WHERE age_group_id IN ({0}))">
+                <Arguments>
+                    <Argument ParameterName="ageGroupSelectValue"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="(book_name like '%{0}%' or book_series_name like '%{0}%' or ISBN like '%{0}%' or author like '%{0}%')">
+                <Arguments>
+                    <Argument ParameterName="searchContent"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="id in (SELECT book_sku_id from member_bookmark where member_id={0})">
+                <Arguments>
+                    <Argument ParameterName="collectMemberId"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="id in (SELECT book_sku_id from member_book_subscription where member_id={0})">
+                <Arguments>
+                    <Argument ParameterName="borrowMemberId"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="( SELECT COUNT(*) FROM book WHERE book.book_sku_id = view_book_sku.id AND book.is_available = 1  AND book.book_status_code='On') {0} 0">
+                <Arguments>
+                    <Argument ParameterName="available"/>
+                </Arguments>
+            </SearchItem>
+            <SearchItem Operation="format"
+                        Text="{0}">
+                <Arguments>
+                    <Argument ParameterName="isOnlineQuery"/>
+                </Arguments>
+            </SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>-->
+    <!--增加订单-->
+    <ServiceHandler Name="AddSalesOrder" Type="BRP.service.AddSalesOrderServiceHandler"
+                    DataManagerType="BRP.model.SalesOrderManager" DataEntityType="BRP.data.SalesOrder"
+                    TableName="sales_order" PrimaryKeys="id">
+    </ServiceHandler>
+    <!--修改订单-->
+    <ServiceHandler Name="UpdateSalesOrder" Type="BRP.service.UpdateSalesOrderServiceHandler"
+                    DataManagerType="BRP.model.SalesOrderManager" DataEntityType="BRP.data.SalesOrder"
+                    TableName="sales_order" PrimaryKeys="id">
+    </ServiceHandler>
+    <!--审核门店SKU，添加到总部SKU-->
+    <ServiceHandler Name="ApprovedBookSku"
+                    Type="BRP.service.ApprovedBookSkuServiceHandler"/>
+    <!--获取借还书会员信息-->
+    <ServiceHandler Name="GetBorrowReturnBookInfo"
+                    Type="BRP.service.GetBorrowReturnBookInfoServiceHandler"/>
+    <!-- 配送单一键配送 -->
+    <ServiceHandler Name="UpdateOneClickDeliver"
+                    Type="BRP.service.UpdateOneClickDeliverServiceHandler"/>
+    <!-- 会员注册/登录 -->
+    <ServiceHandler Name="MemberWXLogin"
+                    Type="BRP.service.MemberWXLoginServiceHandler"/>
+    <!-- 总部桌面统计 -->
+    <ServiceHandler Name="GetDesktopStatisticsList"
+                    Type="BRP.service.GetDesktopStatisticsListServiceHandler"/>
+    <!-- 配送员小程序-登录 -->
+    <ServiceHandler Name="DeliverLogin"
+                    Type="BRP.service.DeliverLoginServiceHandler"/>
+    <!-- 配送员小程序-修改密码 -->
+    <ServiceHandler Name="DeliverUpdatePassword"
+                    Type="BRP.service.DeliverUpdatePasswordServiceHandler"/>
+    <!-- 配送员小程序-配送点顺序管理 -->
+    <ServiceHandler Name="GetDeliverPlaceSort"
+                    Type="BRP.service.GetDeliverPlaceSortServiceHandler"/>
+    <!-- 配送员小程序-配送单待配送的数量和拣书单待拣数量 -->
+    <ServiceHandler Name="GetDeliverOrPickNumber"
+                    Type="BRP.service.GetDeliverOrPickNumberServiceHandler"/>
+    <!-- 配送员小程序-送达点我 -->
+    <ServiceHandler Name="DeliverBookOrderReceived"
+                    Type="BRP.service.DeliverBookOrderReceivedServiceHandler"/>
+    <!-- 配送员小程序-异常情况 -->
+    <ServiceHandler Name="DeliverErrorRemark"
+                    Type="BRP.service.DeliverErrorRemarkServiceHandler"/>
+    <!-- 配送员小程序-找到点我 -->
+    <ServiceHandler Name="DeliverBookOrderFindMe"
+                    Type="BRP.service.DeliverBookOrderFindMeServiceHandler"/>
+    <!-- 配送员小程序-统计 -->
+    <ServiceHandler Name="GetDeliverStatistics"
+                    Type="BRP.service.GetDeliverStatisticsServiceHandler"/>
+    <!-- 配送员小程序-配送单 -->
+    <ServiceHandler Name="GetDeliveryBookOrderList"
+                    Type="BRP.service.GetDeliveryBookOrderListServiceHandler"/>
+    <!-- 配送员小程序-拣书单（弃用） -->
+    <ServiceHandler Name="GetPickBookOrderList"
+                    Type="BRP.service.GetPickBookOrderListServiceHandler"/>
+    <!-- 配送员小程序-书架汇总明细 -->
+    <ServiceHandler Name="GetBookCaseDetailList" Type="BRP.service.GetBookCaseDetailListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookOutOrderManager" DataEntityType="BRP.data.ViewBookOutOrder"
+                    TableName="view_book_out_order">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_item_id" ParameterName="bookOrderItemId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="bookcase_id" ParameterName="bookcaseId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_out_order_status_code"
+                        ParameterName="bookOutOrderStatusCode"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_id" ParameterName="bookOrderId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_id" ParameterName="bookId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_borrow_status_code"
+                        ParameterName="bookOrderBorrowStatusCode"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_order_no" ParameterName="bookOrderNo"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="business_date" BeginDateParameterName="businessDateBegin"
+                        EndDateParameterName="businessDateEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_id" ParameterName="memberId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_area_id" ParameterName="deliverAreaId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliverer_id" ParameterName="delivererId"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!-- 配送员小程序-获取登录配送员拣书员信息 -->
+    <ServiceHandler Name="GetDeliverInfo"
+                    Type="BRP.service.GetDeliverInfoServiceHandler"/>
+
+    <!--添加线下借书单-->
+    <ServiceHandler Name="AddBorrowBookOrder" Type="BRP.service.AddBorrowBookOrderServiceHandler"
+                    DataManagerType="BRP.model.BookOrderManager" DataEntityType="BRP.data.BookOrder"
+                    TableName="book_order" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--获取借阅记录列表-->
+    <ServiceHandler Name="GetBookOrderItemInfoList" Type="BRP.service.GetBookOrderItemInfoListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookOrderItemManager" DataEntityType="BRP.data.ViewBookOrderItem"
+                    TableName="view_book_order_item"
+                    Fields="DATE_FORMAT(create_time, '%Y年%m月%d日') as create_date,GROUP_CONCAT(id SEPARATOR ',') as ids"
+                    OrderBy="create_time DESC"
+                    GroupBy="DATE_FORMAT(create_time, '%Y年%m月%d日')">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_id" ParameterName="bookOrderId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_id" ParameterName="bookId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_damage" ParameterName="isDamage"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_type_code"
+                        ParameterName="bookOrderTypeCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_status_code"
+                        ParameterName="deliverStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_returned" ParameterName="isReturned"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="book_return_time" BeginDateParameterName="bookReturnTimeBegin"
+                        EndDateParameterName="bookReturnTimeEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="book_in_stocks_time"
+                        BeginDateParameterName="bookInStocksTimeBegin"
+                        EndDateParameterName="bookInStocksTimeEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_borrow_status_code"
+                        ParameterName="bookOrderBorrowStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_return_status_code"
+                        ParameterName="bookOrderReturnStatusCode"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_order_no" ParameterName="bookOrderNo"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="business_date" BeginDateParameterName="businessDateBegin"
+                        EndDateParameterName="businessDateEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_id" ParameterName="memberId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_offline" ParameterName="isOffline"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliverer_id" ParameterName="delivererId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="deliver_time" BeginDateParameterName="deliverTimeBegin"
+                        EndDateParameterName="deliverTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_sn" ParameterName="bookSn"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_sku_id" ParameterName="bookSkuId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="borrow_status_code" ParameterName="borrowStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="bookcase_id" ParameterName="bookcaseId"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_name" ParameterName="bookName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_type_name"
+                        ParameterName="bookOrderTypeName"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_name" ParameterName="memberName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_area_id" ParameterName="deliverAreaId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_line_id" ParameterName="deliverLineId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_enabled" ParameterName="memberEnabled"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_bookbox_is_activated"
+                        ParameterName="memberBookboxIsActivated"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_id" ParameterName="memberCardId"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_card_no" ParameterName="memberCardNo"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!-- 设置默认商户 -->
+    <ServiceHandler Name="SetDefaultCompany"
+                    Type="BRP.service.SetDefaultCompanyServiceHandler"/>
+    <!--添加线上还书单-->
+    <ServiceHandler Name="AddReturnBookOrder" Type="BRP.service.AddReturnBookOrderServiceHandler"
+                    DataManagerType="BRP.model.BookOrderManager" DataEntityType="BRP.data.BookOrder"
+                    TableName="book_order" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--会员停卡-->
+    <ServiceHandler Name="AddMemberCardDisableLog" Type="BRP.service.AddMemberCardDisableLogServiceHandler"
+                    DataManagerType="BRP.model.MemberCardDisableLogManager"
+                    DataEntityType="BRP.data.MemberCardDisableLog" TableName="member_card_disable_log" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!-- app获取图书列表 -->
+    <ServiceHandler Name="GetBookInfoList"
+                    Type="BRP.service.GetBookInfoListServiceHandler"/>
+    <!--收藏图书-->
+    <ServiceHandler Name="AddMemberBookmark" Type="BRP.service.AddMemberBookmarkServiceHandler"
+                    DataManagerType="BRP.model.MemberBookmarkManager" DataEntityType="BRP.data.MemberBookmark"
+                    TableName="member_bookmark" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="memberId" Caption="会员ID"></RequiredField>
+            <RequiredField DataName="bookSkuId" Caption="图书ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!-- 根据年龄段语言获取标签旧 -->
+    <ServiceHandler Name="GetViewBookTagListByConditionOld"
+                    Type="BRP.service.GetViewBookTagListByConditionOldServiceHandler"/>
+    <!--根据年龄段语言获取标签新-->
+    <ServiceHandler Name="GetViewBookTagListByCondition"
+                    Type="BRP.service.GetViewBookTagListByConditionServiceHandler"/>
+    <!-- 根据excel查询会员卡列表 -->
+    <ServiceHandler Name="GetMemberCardListByExcel"
+                    Type="BRP.service.GetMemberCardListByExcelServiceHandler"/>
+    <!-- 批量增加会员卡时长 -->
+    <ServiceHandler Name="BatchAddActivityServiceTime"
+                    Type="BRP.service.BatchAddActivityServiceTimeServiceHandler"/>
+    <!-- 会员端小程序 办理停卡接口 -->
+    <ServiceHandler Name="UpdateMemberCardStop"
+                    Type="BRP.service.UpdateMemberCardStopServiceHandler"/>
+    <!-- 客服处理-->
+    <ServiceHandler Name="GetRecommendMemberCardInfoListByExcel"
+                    Type="BRP.service.GetRecommendMemberCardInfoListByExcelServiceHandler"/>
+    <!--获取找书出库单-->
+    <ServiceHandler Name="GetBookOutOrderInfoList" Type="BRP.service.GetBookOutOrderInfoListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookOutOrderManager" DataEntityType="BRP.data.ViewBookOutOrder"
+                    TableName="view_book_out_order"
+                    Fields="book_order_id as book_order_id,GROUP_CONCAT(id SEPARATOR ',') as ids"
+                    GroupBy="book_order_id">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_item_id" ParameterName="bookOrderItemId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="bookcase_id" ParameterName="bookcaseId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_out_order_status_code"
+                        ParameterName="bookOutOrderStatusCode"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_id" ParameterName="bookOrderId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_id" ParameterName="bookId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_borrow_status_code"
+                        ParameterName="bookOrderBorrowStatusCode"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_order_no" ParameterName="bookOrderNo"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="business_date" BeginDateParameterName="businessDateBegin"
+                        EndDateParameterName="businessDateEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="deliver_time" BeginDateParameterName="deliverTimeBegin"
+                        EndDateParameterName="deliverTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_id" ParameterName="memberId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_offline" ParameterName="isOffline"></SearchItem>
+            <SearchItem Operation="equal" FieldName="bookpicker_id" ParameterName="bookpickerId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_area_id" ParameterName="deliverAreaId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_line_id" ParameterName="deliverLineId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_place_id" ParameterName="deliverPlaceId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliverer_id" ParameterName="delivererId"></SearchItem>
+            <SearchItem Operation="like" FieldName="card_no" ParameterName="cardNo"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_name" ParameterName="memberName"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!-- 找书出库-->
+    <ServiceHandler Name="BookOutOrderOutStock"
+                    Type="BRP.service.BookOutOrderOutStockServiceHandler"/>
+    <!-- 添加扫码入库-->
+    <ServiceHandler Name="AddScanBookInOrder"
+                    Type="BRP.service.AddScanBookInOrderServiceHandler"/>
+    <!-- 线上还书-->
+    <ServiceHandler Name="AddOnLineReturnBookOrder"
+                    Type="BRP.service.AddOnLineReturnBookOrderServiceHandler"/>
+    <!-- 获取年龄段信息旧-->
+    <ServiceHandler
+            Name="GetAgeGroupInfoList"
+            Type="BRP.service.GetAgeGroupInfoListServiceHandler"/>
+    <!-- 获取年龄段信息新-->
+    <ServiceHandler
+            Name="GetAgeGroupInfoListNew"
+            Type="BRP.service.GetAgeGroupInfoListNewServiceHandler"/>
+    <!--添加找书出库-->
+    <ServiceHandler
+            Name="AddBookOutOrderStockOuting"
+            Type="BRP.service.AddBookOutOrderStockOutingServiceHandler"/>
+    <!--老带新批量增加时长-->
+    <ServiceHandler
+            Name="BatchAddActivityRecommend"
+            Type="BRP.service.BatchAddActivityRecommendServiceHandler"/>
+    <!--根据SKu添加图书-->
+    <ServiceHandler
+            Name="AddBookByBookSkuId"
+            Type="BRP.service.AddBookByBookSkuIdServiceHandler"/>
+    <!--更改用户所借书籍-->
+    <ServiceHandler
+            Name="ChangeMemberBorrowBook"
+            Type="BRP.service.ChangeMemberBorrowBookServiceHandler"/>
+    <!--误点还书恢复-->
+    <ServiceHandler
+            Name="LateReturnBookRecovery"
+            Type="BRP.service.LateReturnBookRecoveryServiceHandler"/>
+    <!--取消用户所借书籍-->
+    <ServiceHandler
+            Name="CancelledMemberBorrowBook"
+            Type="BRP.service.CancelledMemberBorrowBookServiceHandler"/>
+    <!--两个会员换书-->
+    <ServiceHandler
+            Name="SwopMemberBorrowBook"
+            Type="BRP.service.SwopMemberBorrowBookServiceHandler"/>
+    <!--添加线上借书单-->
+    <ServiceHandler
+            Name="AddOnLineBorrowBookOrder"
+            Type="BRP.service.AddOnLineBorrowBookOrderServiceHandler"/>
+    <!--取消线上借书单-->
+    <ServiceHandler
+            Name="CancelledOnlineBorrowBookOrder"
+            Type="BRP.service.CancelledOnlineBorrowBookOrderServiceHandler"/>
+    <!--俱乐部活动消次-->
+    <ServiceHandler
+            Name="MinusMemberSurplusQuantity"
+            Type="BRP.service.MinusMemberSurplusQuantityServiceHandler"/>
+    <!--取消线上还书单-->
+    <ServiceHandler
+            Name="CancelledOnlineReturnBookOrder"
+            Type="BRP.service.CancelledOnlineReturnBookOrderServiceHandler"/>
+    <!--添加会员卡借阅时长-->
+    <ServiceHandler
+            Name="AddMemberBorrowTime"
+            Type="BRP.service.AddMemberBorrowTimeServiceHandler"/>
+    <!--扫码上架、下架图书-->
+    <ServiceHandler
+            Name="ScanBookEnabled"
+            Type="BRP.service.ScanBookEnabledServiceHandler"/>
+
+    <!--添加借阅通知-->
+    <ServiceHandler Name="AddMemberBookSubscription" Type="BRP.service.AddMemberBookSubscriptionServiceHandler"
+                    DataManagerType="BRP.model.MemberBookSubscriptionManager"
+                    DataEntityType="BRP.data.MemberBookSubscription" TableName="member_book_subscription"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption=" ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="memberId" Caption="会员ID"></RequiredField>
+            <RequiredField DataName="bookSkuId" Caption="图书SKUID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption=" ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--批量修改系统参数-->
+    <ServiceHandler Name="BatchUpdateSysSetting"
+                    Type="BRP.service.BatchUpdateSysSettingServiceHandler"/>
+    <!--批量修改系统参数-->
+    <ServiceHandler Name="ChangeCompanyUserPassword"
+                    Type="BRP.service.ChangeCompanyUserPasswordServiceHandler"/>
+    <!--获取会员统计信息-->
+    <ServiceHandler Name="GetMemberInfoTotal"
+                    Type="BRP.service.GetMemberInfoTotalServiceHandler"/>
+    <!--获取14天借阅人数统计信息-->
+    <ServiceHandler Name="GetFourteenBookOrderTotal"
+                    Type="BRP.service.GetFourteenBookOrderTotalServiceHandler"/>
+    <!--年卡会员数据统计信息-->
+    <ServiceHandler Name="GetMemberInfoListTotal"
+                    Type="BRP.service.GetMemberInfoListTotalServiceHandler"/>
+    <!--年卡会员各个年龄段分布统计信息-->
+    <ServiceHandler Name="GetMemberAgeGroupTotal"
+                    Type="BRP.service.GetMemberAgeGroupTotalServiceHandler"/>
+    <!--近一年年卡会员增长统计信息-->
+    <ServiceHandler Name="GetYearMemberCardGrowthTotal"
+                    Type="BRP.service.GetYearMemberCardGrowthTotalServiceHandler"/>
+    <!--图书数据统计信息-->
+    <ServiceHandler Name="GetBookInfoListTotal"
+                    Type="BRP.service.GetBookInfoListTotalServiceHandler"/>
+    <!--图书年龄段统计信息-->
+    <ServiceHandler Name="GetBookAgeGroupListTotal"
+                    Type="BRP.service.GetBookAgeGroupListTotalServiceHandler"/>
+    <!--会员书箱统计信息-->
+    <ServiceHandler Name="GetMemberBookboxTotal"
+                    Type="BRP.service.GetMemberBookboxTotalServiceHandler"/>
+    <!--批量删除存在书柜的书-->
+    <ServiceHandler Name="BatchDeleteBookInBookcase"
+                    Type="BRP.service.BatchDeleteBookInBookcaseServiceHandler"/>
+    <!--添加门店用户-->
+    <ServiceHandler Name="AddCompanyUser" Type="strosoft.app.service.AddServiceHandler" EncryptFields="password"
+                    DataManagerType="BRP.model.CompanyUserManager" DataEntityType="BRP.data.CompanyUser"
+                    TableName="company_user" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+            <UniqueField FieldName="mobile_phone" DataName="mobilePhone" Caption="手机号"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--修改门店用户-->
+    <ServiceHandler Name="UpdateCompanyUser" Type="strosoft.app.service.UpdateServiceHandler" EncryptFields="password"
+                    DataManagerType="BRP.model.CompanyUserManager" DataEntityType="BRP.data.CompanyUser"
+                    TableName="company_user" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+            <UniqueField FieldName="mobile_phone" DataName="mobilePhone" Caption="手机号"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--取消收藏-->
+    <ServiceHandler Name="DeleteMemberBookmark" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataEntityType="BRP.data.MemberBookmark"
+                    TableName="member_bookmark">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--获取会员借阅的书籍-->
+    <ServiceHandler Name="GetMemberBorrowBookList"
+                    Type="BRP.service.GetMemberBorrowBookListServiceHandler"/>
+    <!--取消借阅记录通知-->
+    <ServiceHandler Name="DeleteMemberBookSubscription" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataEntityType="BRP.data.MemberBookSubscription" TableName="member_book_subscription">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption=" ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--获取已借阅本数和以节省买书费用-->
+    <ServiceHandler Name="GetBorrowReport" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookOrderItemManager" DataEntityType="BRP.data.ViewBookOrderItem"
+                    TableName="view_book_order_item"
+                    Fields="count(*) total_count,IFNULL(sum(book_sku_price),0) total_amount">
+        <SearchItems>
+            <SearchItem Operation="format"
+                        Text="member_id={0} and book_order_type_code='Borrow'">
+                <Arguments>
+                    <Argument ParameterName="memberId"/>
+                </Arguments>
+            </SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--查询会员是否有未到期的晚安故事-->
+    <ServiceHandler Name="GetNightStoryOrderCount" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="BRP.model.NightStoryOrderManager" DataEntityType="BRP.data.NightStoryOrder"
+                    TableName="night_story_order" Fields="count(*) count">
+        <SearchItems>
+            <SearchItem Operation="format"
+                        Text="member_id={0} and expire_time>NOW()">
+                <Arguments>
+                    <Argument ParameterName="memberId"/>
+                </Arguments>
+            </SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--批量上下架图书-->
+    <ServiceHandler Name="BatchOnOffBook"
+                    Type="BRP.service.BatchOnOffBookServiceHandler"/>
+    <!--同步名称-->
+    <ServiceHandler Name="BookSkuSynchronousName"
+                    Type="BRP.service.BookSkuSynchronousNameServiceHandler"/>
+    <!--批量修改sku是否可见-->
+    <ServiceHandler Name="BatchUpdateBookSkuIsOnline"
+                    Type="BRP.service.BatchUpdateBookSkuIsOnlineServiceHandler"/>
+    <!--批量修改sku年龄段标签-->
+    <ServiceHandler Name="BatchUpdateBookSkuAgeTag"
+                    Type="BRP.service.BatchUpdateBookSkuAgeTagServiceHandler"/>
+    <!--获取图书借阅记录-->
+    <ServiceHandler Name="GetBookBorrowLogList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookOrderItemManager" DataEntityType="BRP.data.ViewBookOrderItem"
+                    TableName="view_book_order_item"
+                    Fields="*,
+(SELECT create_time FROM book_in_order WHERE book_in_order.book_order_item_id = view_book_order_item.id)
+AS in_stocks_time">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_id" ParameterName="bookOrderId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_id" ParameterName="bookId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_damage" ParameterName="isDamage"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_type_code"
+                        ParameterName="bookOrderTypeCode"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_borrow_status_code"
+                        ParameterName="bookOrderBorrowStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_return_status_code"
+                        ParameterName="bookOrderReturnStatusCode"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_order_no" ParameterName="bookOrderNo"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="business_date" BeginDateParameterName="businessDateBegin"
+                        EndDateParameterName="businessDateEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_id" ParameterName="memberId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_offline" ParameterName="isOffline"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_sn" ParameterName="bookSn"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_sku_id" ParameterName="bookSkuId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="borrow_status_code" ParameterName="borrowStatusCode"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_name" ParameterName="bookName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_type_name"
+                        ParameterName="bookOrderTypeName"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_name" ParameterName="memberName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_enabled" ParameterName="memberEnabled"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_bookbox_is_activated"
+                        ParameterName="memberBookboxIsActivated"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_card_no" ParameterName="memberCardNo"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--合并sku-->
+    <ServiceHandler Name="CombineBookSku"
+                    Type="BRP.service.CombineBookSkuServiceHandler"/>
+    <!--生成图书条形码-->
+    <ServiceHandler Name="GetBookSnBarCode"
+                    Type="BRP.service.GetBookSnBarCodeServiceHandler"/>
+    <!--添加标记-->
+    <ServiceHandler Name="AddBookDamage" Type="BRP.service.AddBookDamageServiceHandler"
+                    DataManagerType="BRP.model.BookDamageManager" DataEntityType="BRP.data.BookDamage"
+                    TableName="book_damage" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--添加赔付记录-->
+    <ServiceHandler Name="AddBookCompensation" Type="BRP.service.AddBookCompensationServiceHandler"
+                    DataManagerType="BRP.model.BookCompensationManager" DataEntityType="BRP.data.BookCompensation"
+                    TableName="book_compensation" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--添加结算-->
+    <ServiceHandler Name="AddRetailOrder" Type="BRP.service.AddRetailOrderServiceHandler"
+                    DataManagerType="BRP.model.RetailOrderManager" DataEntityType="BRP.data.RetailOrder"
+                    TableName="retail_order" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+
+    <!--添加“看过”晚安故事列表-->
+    <ServiceHandler Name="AddMemberBrowsedStoryVideo"
+                    Type="BRP.service.AddMemberBrowsedStoryVideoServiceHandler"
+                    DataManagerType="BRP.model.MemberBrowsedStoryVideoManager"
+                    DataEntityType="BRP.data.MemberBrowsedStoryVideo" TableName="member_browsed_story_video"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="memberId" Caption="会员ID"></RequiredField>
+            <RequiredField DataName="storyVideoId" Caption="晚安故事ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--添加“收藏”晚安故事列表-->
+    <ServiceHandler Name="MemberCollectStoryVideo" Type="BRP.service.MemberCollectStoryVideoServiceHandler"
+                    DataManagerType="BRP.model.MemberCollectStoryVideoManager"
+                    DataEntityType="BRP.data.MemberCollectStoryVideo" TableName="member_collect_story_video"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="memberId" Caption="会员ID"></RequiredField>
+            <RequiredField DataName="storyVideoId" Caption="晚安故事ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--添加“喜欢”晚安故事列表-->
+    <ServiceHandler Name="MemberLikeStoryVideo" Type="BRP.service.MemberLikeStoryVideoServiceHandler"
+                    DataManagerType="BRP.model.MemberLikeStoryVideoManager"
+                    DataEntityType="BRP.data.MemberLikeStoryVideo" TableName="member_like_story_video"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="memberId" Caption="会员ID"></RequiredField>
+            <RequiredField DataName="storyVideoId" Caption="晚安故事ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--查询会员已付费晚安故事-->
+    <ServiceHandler Name="GetViewStoryVideoList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="BRP.model.ViewStoryVideoManager" DataEntityType="BRP.data.ViewStoryVideo"
+                    TableName="view_story_video">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="like" FieldName="title" ParameterName="title"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="push_date" BeginDateParameterName="pushDateBegin"
+                        EndDateParameterName="pushDateEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="push_time" BeginDateParameterName="pushTimeBegin"
+                        EndDateParameterName="pushTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_pay" ParameterName="isPay"></SearchItem>
+            <SearchItem Operation="like" FieldName="introduction" ParameterName="introduction"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="format"
+                        Text="push_date BETWEEN (SELECT subscribe_time from night_story_order where member_id={0} and NOW() BETWEEN subscribe_time and expire_time)
+and (SELECT expire_time from night_story_order where member_id={0} and NOW() BETWEEN subscribe_time and expire_time)">
+                <Arguments>
+                    <Argument ParameterName="memberId"/>
+                </Arguments>
+            </SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--添加精彩推荐-->
+    <ServiceHandler Name="AddHomeNewBook" Type="BRP.service.AddHomeNewBookServiceHandler"
+                    DataManagerType="BRP.model.HomeNewBookManager" DataEntityType="BRP.data.HomeNewBook"
+                    TableName="home_new_book" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--精彩推荐-->
+    <ServiceHandler Name="AddHomeRecommend" Type="BRP.service.AddHomeRecommendServiceHandler"
+                    DataManagerType="BRP.model.HomeRecommendManager" DataEntityType="BRP.data.HomeRecommend"
+                    TableName="home_recommend" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--订阅晚安故事-->
+    <ServiceHandler Name="BuyNightStoryOrder" Type="BRP.service.BuyNightStoryOrderServiceHandler"
+                    DataManagerType="BRP.model.NightStoryOrderManager" DataEntityType="BRP.data.NightStoryOrder"
+                    TableName="night_story_order" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--获取"新书上架"按标签分组列表-->
+    <ServiceHandler Name="GetHomeNewBookInfoList" Type="BRP.service.GetHomeNewBookInfoListServiceHandler"
+                    DataManagerType="BRP.model.HomeNewBookInfoManager" DataEntityType="BRP.data.HomeNewBookInfo"
+                    TableName="home_new_book_info">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="like" FieldName="name" ParameterName="name"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_sku_id" ParameterName="bookSkuId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="enabled" ParameterName="enabled"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="company_name" ParameterName="companyName"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_sku_book_name" ParameterName="bookSkuBookName"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_sku_ISBN" ParameterName="bookSkuISBN"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_tag_name" ParameterName="bookTagName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_series_id" ParameterName="bookSeriesId"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_series_name" ParameterName="bookSeriesName"></SearchItem>
+            <SearchItem Operation="format"
+                        Text="book_sku_book_name like '%{0}%' or book_series_name like '%{0}%' or book_sku_ISBN like '%{0}%'">
+                <Arguments>
+                    <Argument ParameterName="searchParameter"/>
+                </Arguments>
+            </SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--获取"BookSku"按标签分组列表-->
+    <ServiceHandler Name="GetBookSkuTagGroupInfoList" Type="BRP.service.GetBookSkuTagGroupInfoListServiceHandler"
+                    DataManagerType="BRP.model.BookSkuTagGroupInfoManager" DataEntityType="BRP.data.BookSkuTagGroupInfo"
+                    TableName="book_sku_tag_group_info">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="book_sku_id" ParameterName="bookSkuId"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_name" ParameterName="bookName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_tag_id" ParameterName="bookTagId"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_tag_name" ParameterName="bookTagName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="like" FieldName="ISBN" ParameterName="ISBN"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_series_name" ParameterName="bookSeriesName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="age_group_id" ParameterName="ageGroupId"></SearchItem>
+            <!--            <SearchItem Operation="format"
+                                    Text="book_tag_id in (SELECT book_tag_id from age_group_book_tag where age_group_id={0})">
+                            <Arguments>
+                                <Argument ParameterName="ageGroupId"/>
+                            </Arguments>
+                        </SearchItem>-->
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--添加随机生成的各个年龄段的N本图书-->
+    <ServiceHandler Name="AddHomeAgeGroupAndAllRandomBook"
+                    Type="BRP.service.AddHomeAgeGroupAndAllRandomBookServiceHandler"/>
+    <!--书袋加1-->
+    <ServiceHandler Name="AddMemberBookPocket"
+                    Type="BRP.service.AddMemberBookPocketServiceHandler"/>
+
+    <!-- 增加会员积分 -->
+    <ServiceHandler Name="EditMemberScore"
+                    Type="BRP.service.EditMemberScoreServiceHandler"/>
+    <!--获取"必读书单"按‘系列’分组列表-->
+    <ServiceHandler Name="GetRequiredBookInfoList" Type="BRP.service.GetRequiredBookInfoListServiceHandler"
+                    DataManagerType="BRP.model.ViewRequiredBookManager" DataEntityType="BRP.data.ViewRequiredBook"
+                    TableName="view_required_book">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_sku_id" ParameterName="bookSkuId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="required_book_category_id"
+                        ParameterName="requiredBookCategoryId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="ISBN" ParameterName="ISBN"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_name" ParameterName="bookName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_series_id" ParameterName="bookSeriesId"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_series_name" ParameterName="bookSeriesName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!-- 增加会员积分 -->
+    <ServiceHandler Name="CompletionCompanySetting"
+                    Type="BRP.service.CompletionCompanySettingServiceHandler"/>
+    <!-- 批量修改商户系统参数 -->
+    <ServiceHandler Name="UpdateCompanySettingInfo"
+                    Type="BRP.service.UpdateCompanySettingInfoServiceHandler"/>
+    <!-- 批量增减会员积分 -->
+    <ServiceHandler Name="BatchUpdateMemberScore"
+                    Type="BRP.service.BatchUpdateMemberScoreServiceHandler"/>
+    <!--获取借还书订单列表-->
+    <ServiceHandler Name="GetBookOrderInfoList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookOrderManager" DataEntityType="BRP.data.ViewBookOrder"
+                    TableName="view_book_order"
+                    Fields="*,
+(select count(*) from book_order_item where book_order_id = view_book_order.id and book_order_type_code='Borrow')
+as borrow_count,
+(select count(*) from book_order_item where book_order_id = view_book_order.id and book_order_type_code='Return')
+as return_count">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_id" ParameterName="memberId"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_order_no" ParameterName="bookOrderNo"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliverer_id" ParameterName="delivererId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="business_date" BeginDateParameterName="businessDateBegin"
+                        EndDateParameterName="businessDateEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_borrow_status_code"
+                        ParameterName="bookOrderBorrowStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_return_status_code"
+                        ParameterName="bookOrderReturnStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_offline" ParameterName="isOffline"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="deliver_time" BeginDateParameterName="deliverTimeBegin"
+                        EndDateParameterName="deliverTimeEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="delivered_time" BeginDateParameterName="deliveredTimeBegin"
+                        EndDateParameterName="deliveredTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="bookpicker_id" ParameterName="bookpickerId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_name" ParameterName="memberName"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_mobile_phone" ParameterName="memberMobilePhone"></SearchItem>
+            <SearchItem Operation="equal" FieldName="distance_code" ParameterName="distanceCode"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="member_birthday" BeginDateParameterName="memberBirthdayBegin"
+                        EndDateParameterName="memberBirthdayEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_id" ParameterName="memberCardId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_no" ParameterName="memberCardNo"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_status_code"
+                        ParameterName="memberCardStatusCode"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--客服处理借还书订单-->
+    <ServiceHandler Name="CustomerProcessingBookOrder"
+                    Type="BRP.service.CustomerProcessingBookOrderServiceHandler"/>
+    <!-- 配送点排序 -->
+    <ServiceHandler
+            Name="GetMemberCardBatchNo"
+            Type="BRP.service.GetMemberCardBatchNoServiceHandler">
+    </ServiceHandler>
+
+    <!--获取配送单-->
+    <ServiceHandler Name="GetOldDeliveryOrderInfoList" Type="BRP.service.GetOldDeliveryOrderInfoListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookOrderItemManager" DataEntityType="BRP.data.ViewBookOrderItem"
+                    TableName="view_book_order_item"
+                    Fields="book_order_id as book_order_id,GROUP_CONCAT(id SEPARATOR ',') as ids"
+                    GroupBy="book_order_id">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_id" ParameterName="bookOrderId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_id" ParameterName="bookId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_damage" ParameterName="isDamage"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_type_code"
+                        ParameterName="bookOrderTypeCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_status_code"
+                        ParameterName="deliverStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_returned" ParameterName="isReturned"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="book_return_time" BeginDateParameterName="bookReturnTimeBegin"
+                        EndDateParameterName="bookReturnTimeEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="book_in_stocks_time"
+                        BeginDateParameterName="bookInStocksTimeBegin"
+                        EndDateParameterName="bookInStocksTimeEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_borrow_status_code"
+                        ParameterName="bookOrderBorrowStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_return_status_code"
+                        ParameterName="bookOrderReturnStatusCode"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_order_no" ParameterName="bookOrderNo"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="business_date" BeginDateParameterName="businessDateBegin"
+                        EndDateParameterName="businessDateEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_id" ParameterName="memberId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_offline" ParameterName="isOffline"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliverer_id" ParameterName="delivererId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="bookpicker_id" ParameterName="bookpickerId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="deliver_time" BeginDateParameterName="deliverTimeBegin"
+                        EndDateParameterName="deliverTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_sn" ParameterName="bookSn"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_sku_id" ParameterName="bookSkuId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="borrow_status_code" ParameterName="borrowStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="bookcase_id" ParameterName="bookcaseId"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_name" ParameterName="bookName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_type_name"
+                        ParameterName="bookOrderTypeName"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_name" ParameterName="memberName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_area_id" ParameterName="deliverAreaId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_line_id" ParameterName="deliverLineId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_place_id" ParameterName="deliverPlaceId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_enabled" ParameterName="memberEnabled"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_bookbox_is_activated"
+                        ParameterName="memberBookboxIsActivated"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_id" ParameterName="memberCardId"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_card_no" ParameterName="memberCardNo"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_status_code"
+                        ParameterName="memberCardStatusCode"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--取得图书收藏实体-->
+    <ServiceHandler Name="GetMemberBookmarkByMemberIdAndBookSkuId"
+                    Type="BRP.service.GetMemberBookmarkByMemberIdAndBookSkuIdServiceHandler"/>
+    <!--查询 年龄段列表-->
+    <ServiceHandler Name="GetViewClubActivityList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="BRP.model.ViewClubActivityManager" DataEntityType="BRP.data.ViewClubActivity"
+                    TableName="view_club_activity">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="like" FieldName="name" ParameterName="name"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="expiry_date" BeginDateParameterName="expiryDateBegin"
+                        EndDateParameterName="expiryDateEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="club_activity_category_code"
+                        ParameterName="clubActivityCategoryCode"></SearchItem>
+            <SearchItem Operation="like" FieldName="content" ParameterName="content"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="company_name" ParameterName="companyName"></SearchItem>
+            <SearchItem Operation="like" FieldName="club_activity_category_name"
+                        ParameterName="clubActivityCategoryName"></SearchItem>
+            <SearchItem Operation="format"
+                        Text="id in (SELECT club_activity_id from club_activity_member where member_id={0})">
+                <Arguments>
+                    <Argument ParameterName="memberId"/>
+                </Arguments>
+            </SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!-- 会员卡书箱信息登记 -->
+    <ServiceHandler Name="UpdateBookcaseInfo"
+                    Type="BRP.service.UpdateBookcaseInfoServiceHandler"/>
+    <!-- 会员续费 -->
+    <ServiceHandler Name="AddMemberCardRenewLog"
+                    Type="BRP.service.AddMemberCardRenewLogServiceHandler"/>
+    <!--PC确认配送-->
+    <ServiceHandler Name="ConfirmDelivery"
+                    Type="BRP.service.ConfirmDeliveryServiceHandler"/>
+    <!--PC确认入库-->
+    <ServiceHandler Name="ConfirmInStocks"
+                    Type="BRP.service.ConfirmInStocksServiceHandler"/>
+    <!--添加公众号微信openid-->
+    <ServiceHandler Name="AddMemberWXOpenID"
+                    Type="BRP.service.AddMemberWXOpenIDServiceHandler"/>
+    <!--获取会员权限-->
+    <ServiceHandler Name="GetMemberPermission"
+                    Type="BRP.service.GetMemberPermissionServiceHandler"/>
+    <!--测试模板消息-->
+    <ServiceHandler Name="TestSendWxTemplateMessage"
+                    Type="BRP.service.TestSendWxTemplateMessageServiceHandler"/>
+    <!--修改借还书订单-->
+    <ServiceHandler Name="UpdateBookOrderInfo" Type="BRP.service.UpdateBookOrderInfoServiceHandler"
+                    DataManagerType="BRP.model.BookOrderManager" DataEntityType="BRP.data.BookOrder"
+                    TableName="book_order" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--删除借还书单明细Item-->
+    <ServiceHandler Name="DeleteBookOrderItemInfo"
+                    Type="BRP.service.DeleteBookOrderItemInfoServiceHandler"/>
+
+    <!-- 注销书箱-->
+    <ServiceHandler Name="CancelBookBox"
+                    Type="BRP.service.CancelBookBoxServiceHandler"/>
+
+    <!--批量修改借还书单配送时间配送员-->
+    <ServiceHandler Name="BatchUpdateBookOrder"
+                    Type="BRP.service.BatchUpdateBookOrderServiceHandler"/>
+    <!--获取法定节假日-->
+    <ServiceHandler Name="GetTianHoliday"
+                    Type="BRP.service.GetTianHolidayServiceHandler"/>
+    <!--根据标签获取SKU列表-->
+    <ServiceHandler Name="GetBookSkuListByBookTagId"
+                    Type="BRP.service.GetBookSkuListByBookTagIdServiceHandler"/>
+    <!--获取小程序首页新书展示-->
+    <ServiceHandler Name="GetHomeNewBookShowList"
+                    Type="BRP.service.GetHomeNewBookShowListServiceHandler"/>
+    <!--获取门店营业状态-->
+    <ServiceHandler Name="GetCompanyOpenStatus"
+                    Type="BRP.service.GetCompanyOpenStatusServiceHandler"/>
+    <!--添加退款单-->
+    <ServiceHandler Name="AddRefundOrder" Type="BRP.service.AddRefundOrderServiceHandler"
+                    DataManagerType="BRP.model.RefundOrderManager" DataEntityType="BRP.data.RefundOrder"
+                    TableName="refund_order" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--解除停卡-->
+    <ServiceHandler Name="RelieveStopMemberCard"
+                    Type="BRP.service.RelieveStopMemberCardServiceHandler"/>
+    <!--获取会员借阅记录统计-->
+    <ServiceHandler Name="GetMemberBorrowBookTotal"
+                    Type="BRP.service.GetMemberBorrowBookTotalServiceHandler"/>
+    <!--获取图书借阅统计-->
+    <ServiceHandler Name="GetBookBorrowTotal"
+                    Type="BRP.service.GetBookBorrowTotalServiceHandler"/>
+    <!--可借阅通知统计-->
+    <ServiceHandler Name="GetBorrowNoticeTotal"
+                    Type="BRP.service.GetBorrowNoticeTotalServiceHandler"/>
+    <!--图书库存不足统计-->
+    <ServiceHandler Name="GetBookStocksLogTotal"
+                    Type="BRP.service.GetBookStocksLogTotalServiceHandler"/>
+    <!--获取拣书员统计-->
+    <ServiceHandler Name="GetBookpickerTotal"
+                    Type="BRP.service.GetBookpickerTotalServiceHandler"/>
+    <!--获取配送员统计-->
+    <ServiceHandler Name="GetDelivererTotal"
+                    Type="BRP.service.GetDelivererTotalServiceHandler"/>
+    <!--配送端拣书单走势-->
+    <ServiceHandler Name="GetBookOutOrderStatistics"
+                    Type="BRP.service.GetBookOutOrderStatisticsServiceHandler"/>
+    <!--导入总部sku-->
+    <ServiceHandler Name="UploadPlatformBookSkuExcel"
+                    Type="BRP.service.UploadPlatformBookSkuExcelServiceHandler"/>
+    <!--添加详情报错-->
+    <ServiceHandler Name="AddBookSkuRevise" Type="BRP.service.AddBookSkuReviseServiceHandler"
+                    DataManagerType="BRP.model.BookSkuReviseManager" DataEntityType="BRP.data.BookSkuRevise"
+                    TableName="book_sku_revise" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="id" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateBookSkuRevise" Type="BRP.service.UpdateBookSkuReviseServiceHandler"
+                    DataManagerType="BRP.model.BookSkuReviseManager" DataEntityType="BRP.data.BookSkuRevise"
+                    TableName="book_sku_revise" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="id"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--结算-->
+    <ServiceHandler Name="SettlementOrderSettling"
+                    Type="BRP.service.SettlementOrderSettlingServiceHandler"/>
+    <!--同步信息-->
+    <ServiceHandler Name="SynchronizationPlatformBookSku"
+                    Type="BRP.service.SynchronizationPlatformBookSkuServiceHandler"/>
+    <!--书箱发货完成-->
+    <ServiceHandler Name="SalesOrderFinished" Type="BRP.service.SalesOrderFinishedServiceHandler"
+                    DataManagerType="BRP.model.SalesOrderManager" DataEntityType="BRP.data.SalesOrder"
+                    TableName="sales_order" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+            <UniqueField FieldName="sales_order_no" DataName="salesOrderNo" Caption="订单编号"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--领取书箱-->
+    <ServiceHandler Name="MemberGetBookBox"
+                    Type="BRP.service.MemberGetBookBoxServiceHandler"/>
+    <!--修改标记-->
+    <ServiceHandler Name="UpdateBookDamage" Type="BRP.service.UpdateBookDamageServiceHandler"
+                    DataManagerType="BRP.model.BookDamageManager" DataEntityType="BRP.data.BookDamage"
+                    TableName="book_damage" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--默认门店同步总部SKU-->
+    <ServiceHandler Name="SynchronizationCompanyBookSku"
+                    Type="BRP.service.SynchronizationCompanyBookSkuServiceHandler"/>
+    <!--小程序获取SKU详情-->
+    <ServiceHandler Name="GetBookSkuInfo"
+                    Type="BRP.service.GetBookSkuInfoServiceHandler"/>
+    <!--获取SKU列表-->
+    <ServiceHandler Name="GetBookSkuInfoList"
+                    Type="BRP.service.GetBookSkuInfoListServiceHandler"/>
+    <!--同步默认门店-->
+    <ServiceHandler Name="SynchronizationAddCompanyBookSku"
+                    Type="BRP.service.SynchronizationAddCompanyBookSkuServiceHandler"/>
+    <!--获取SKU列表-->
+    <ServiceHandler Name="GetViewBookSkuInfoList"
+                    Type="BRP.service.GetViewBookSkuInfoListServiceHandler"/>
+    <!--批量添加默认门店图书-->
+    <ServiceHandler Name="BatchAddAllBook"
+                    Type="BRP.service.BatchAddAllBookServiceHandler"/>
+    <!--获取图书列表-->
+    <ServiceHandler Name="GetNewBookInfoList"
+                    Type="BRP.service.GetNewBookInfoListServiceHandler"/>
+    <!--批量添加必读书单-->
+    <ServiceHandler Name="BatchAddRequiredBook"
+                    Type="BRP.service.BatchAddRequiredBookServiceHandler"/>
+    <!--获取预登记和注销会员数量-->
+    <ServiceHandler Name="GetSignInAndCancelMemberCount"
+                    Type="BRP.service.GetSignInAndCancelMemberCountServiceHandler"/>
+    <!--会员注销-->
+    <ServiceHandler Name="UpdateMemberCancel"
+                    Type="BRP.service.UpdateMemberCancelServiceHandler"/>
+    <!--会员标签-->
+    <ServiceHandler Name="CombineBookTag"
+                    Type="BRP.service.CombineBookTagServiceHandler"/>
+    <!--批量修改图书标签-->
+    <ServiceHandler Name="UploadPlatformBookTagExcel"
+                    Type="BRP.service.UploadPlatformBookTagExcelServiceHandler"/>
+    <!--批量修改图书标签-->
+    <ServiceHandler Name="AddPlatformBookTag"
+                    Type="BRP.service.AddPlatformBookTagServiceHandler"/>
+    <!--默认门店同步总部SKU标签-->
+    <ServiceHandler Name="SynchronizationBookTag"
+                    Type="BRP.service.SynchronizationBookTagServiceHandler"/>
+    <!--检查会员是否借阅过这本书-->
+    <ServiceHandler Name="CheckMemberIsBorrowed"
+                    Type="BRP.service.CheckMemberIsBorrowedServiceHandler"/>
+    <!--获取员工编号-->
+    <ServiceHandler Name="CreateCompanyUserNo"
+                    Type="BRP.service.CreateCompanyUserNoServiceHandler"/>
+    <!--批量修改结算单-->
+    <ServiceHandler Name="BatchSettlementOrderSettling"
+                    Type="BRP.service.BatchSettlementOrderSettlingServiceHandler"/>
+    <!--添加书柜-->
+    <ServiceHandler Name="AddBookcase" Type="BRP.service.AddBookcaseServiceHandler"
+                    DataManagerType="BRP.model.BookcaseManager" DataEntityType="BRP.data.Bookcase" TableName="bookcase"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <!--获取guid-->
+    <ServiceHandler Name="SetGUID"
+                    Type="BRP.service.SetGUIDServiceHandler"/>
+    <!--根据门店删除会员-->
+    <ServiceHandler Name="DeleteMemberByCompanyId"
+                    Type="BRP.service.DeleteMemberByCompanyIdServiceHandler"/>
+    <!--修改书柜-->
+    <ServiceHandler Name="UpdateBookcase" Type="BRP.service.UpdateBookcaseServiceHandler"
+                    DataManagerType="BRP.model.BookcaseManager" DataEntityType="BRP.data.Bookcase" TableName="bookcase"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--解锁超级管理员-->
+    <ServiceHandler Name="UnlockCompanyNumber"
+                    Type="BRP.service.UnlockCompanyNumberServiceHandler"/>
+    <!--合并书柜-->
+    <ServiceHandler Name="CombineBookcase"
+                    Type="BRP.service.CombineBookcaseServiceHandler"/>
+    <!--平台删除会员-->
+    <ServiceHandler Name="CancelMember" Type="BRP.service.CancelMemberServiceHandler"
+                    DataManagerType="BRP.model.MemberManager" DataEntityType="BRP.data.Member" TableName="member"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+            <UniqueField FieldName="wx_open_id" DataName="wxOpenId" Caption="微信OpenID"></UniqueField>
+            <UniqueField FieldName="wxa_open_id" DataName="wxaOpenId" Caption="微信OpenID"></UniqueField>
+            <UniqueField FieldName="mobile_phone" DataName="mobilePhone" Caption="联系电话"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <!--获取拣书大区统计-->
+    <ServiceHandler Name="GetBookOutOrderAreaTotal"
+                    Type="BRP.service.GetBookOutOrderAreaTotalServiceHandler"/>
+    <!--获取配送大区统计-->
+    <ServiceHandler Name="GetDeliverOrderAreaTotal"
+                    Type="BRP.service.GetDeliverOrderAreaTotalServiceHandler"/>
+
+    <ServiceHandler Name="GetNewDeliveryOrderInfoList" Type="BRP.service.GetNewDeliveryOrderInfoListServiceHandler"
+                    DataManagerType="BRP.model.ViewBookOrderManager" DataEntityType="BRP.data.ViewBookOrder"
+                    TableName="view_book_order">
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_id" ParameterName="memberId"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_order_no" ParameterName="bookOrderNo"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliverer_id" ParameterName="delivererId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="business_date" BeginDateParameterName="businessDateBegin"
+                        EndDateParameterName="businessDateEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_borrow_status_code"
+                        ParameterName="bookOrderBorrowStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_return_status_code"
+                        ParameterName="bookOrderReturnStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_offline" ParameterName="isOffline"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="deliver_time" BeginDateParameterName="deliverTimeBegin"
+                        EndDateParameterName="deliverTimeEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="delivered_time" BeginDateParameterName="deliveredTimeBegin"
+                        EndDateParameterName="deliveredTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="bookpicker_id" ParameterName="bookpickerId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_name" ParameterName="memberName"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_mobile_phone" ParameterName="memberMobilePhone"></SearchItem>
+            <SearchItem Operation="equal" FieldName="distance_code" ParameterName="distanceCode"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="member_birthday" BeginDateParameterName="memberBirthdayBegin"
+                        EndDateParameterName="memberBirthdayEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_area_id" ParameterName="deliverAreaId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_line_id" ParameterName="deliverLineId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="deliver_place_id" ParameterName="deliverPlaceId"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_address" ParameterName="memberAddress"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_borrow_status_name"
+                        ParameterName="bookOrderBorrowStatusName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_order_return_status_name"
+                        ParameterName="bookOrderReturnStatusName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_id" ParameterName="memberCardId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_no" ParameterName="memberCardNo"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="effective_date" BeginDateParameterName="effectiveDateBegin"
+                        EndDateParameterName="effectiveDateEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="expire_date" BeginDateParameterName="expireDateBegin"
+                        EndDateParameterName="expireDateEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_status_code"
+                        ParameterName="memberCardStatusCode"></SearchItem>
+            <SearchItem Operation="like" FieldName="deliver_line_name" ParameterName="deliverLineName"></SearchItem>
+            <SearchItem Operation="like" FieldName="deliverer_name" ParameterName="delivererName"></SearchItem>
+            <SearchItem Operation="like" FieldName="deliver_mobile_phone"
+                        ParameterName="deliverMobilePhone"></SearchItem>
+            <SearchItem Operation="like" FieldName="bookpicker_name" ParameterName="bookpickerName"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetDeliveryOrderInfoList" Type="BRP.service.GetDeliveryOrderInfoListServiceHandler"/>
+    <!--删除系列-->
+    <ServiceHandler Name="DeleteBookSeries"
+                    Type="BRP.service.DeleteBookSeriesServiceHandler"/>
+    <!--删除系列-->
+    <ServiceHandler Name="DeleteBookcase"
+                    Type="BRP.service.DeleteBookcaseServiceHandler"/>
+    <!--获取会员积分排行泪飙-->
+    <ServiceHandler Name="GetMemberScoreRanking"
+                    Type="BRP.service.GetMemberScoreRankingServiceHandler"/>
+    <!--获取会员卡列表-->
+    <ServiceHandler Name="GetMemberCardListByInfo"
+                    Type="BRP.service.GetMemberCardListByInfoServiceHandler"/>
+</ServiceHandlers>

@@ -1,0 +1,118 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+import java.math.BigDecimal;
+public class Activity extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer companyId;//门店ID;
+    private  String name;//活动名称;
+    private  String activityTypeCode;//活动类型;
+    private  Timestamp createTime;//创建时间;
+    private  Timestamp updateTime;//更新时间;
+    private  BigDecimal renewalPrice;//活动收费;
+    private  Integer buyDays;//购买天数;
+    private  Integer giftDays;//赠送天数;
+    private  Integer loanableNum;//可借本数;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setCompanyId(Integer companyId)    
+    {
+        this.companyId = companyId;
+    }
+    public  Integer getCompanyId()    
+    {
+        return companyId;
+    }
+    public  void setName(String name)    
+    {
+        this.name = name;
+    }
+    public  String getName()    
+    {
+        return name;
+    }
+    public  void setActivityTypeCode(String activityTypeCode)    
+    {
+        this.activityTypeCode = activityTypeCode;
+    }
+    public  String getActivityTypeCode()    
+    {
+        return activityTypeCode;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setUpdateTime(Timestamp updateTime)    
+    {
+        this.updateTime = updateTime;
+    }
+    public  Timestamp getUpdateTime()    
+    {
+        return updateTime;
+    }
+    public  void setRenewalPrice(BigDecimal renewalPrice)    
+    {
+        this.renewalPrice = renewalPrice;
+    }
+    public  BigDecimal getRenewalPrice()    
+    {
+        return renewalPrice;
+    }
+    public  void setBuyDays(Integer buyDays)    
+    {
+        this.buyDays = buyDays;
+    }
+    public  Integer getBuyDays()    
+    {
+        return buyDays;
+    }
+    public  void setGiftDays(Integer giftDays)    
+    {
+        this.giftDays = giftDays;
+    }
+    public  Integer getGiftDays()    
+    {
+        return giftDays;
+    }
+    public  void setLoanableNum(Integer loanableNum)    
+    {
+        this.loanableNum = loanableNum;
+    }
+    public  Integer getLoanableNum()    
+    {
+        return loanableNum;
+    }
+    public  Activity copy()    
+    {
+        Activity entity = null;
+        try        
+        {
+            entity = (Activity) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<title>思卓客户关系管理</title>
+<meta http-equiv="Content-Language" content="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="../../js/jquery.js" type="text/javascript"></script>
+	<script src="../../js/json2.js" type="text/javascript"></script>
+	<script src="../../js/jquery.uploader.js" type="text/javascript"></script>
+	<script src="../../js/config.js" type="text/javascript"></script>
+
+	<style>
+.photo {
+	max-width: 50px;
+	max-height: 50px;
+}
+</style>
+	<script>
+		$(function() {
+			//alert($("#imgAutoUpload").size());
+			$("#imgAutoUpload").uploadify({
+				isImage : true,
+				fileUploadID : "imgAutoUploadFileUpload",
+				uploading : function() {
+					showProgressBar();
+				},
+				success : function(result) {
+					hideProgressBar();
+					alert(JSON.stringify(result));
+					$("#hfImageID").val(result.data.ID);
+					$("#hfFilePath").val(result.data.FilePath);
+				},
+				fail : function(result) {
+					hideProgressBar();
+				}
+			});
+			$("#imgUpload").uploadify({
+				fileUploadID : "imgUploadFileUpload",
+				autoUpload : false,
+				success : function(result) {
+					alert(result);
+				}
+			});
+
+			$("#btnUpload").click(function() {
+				//alert("btnUpload");
+				var fileUploadID = "imgUploadFileUpload";
+				$.uploader.uploadFile(fileUploadID, {
+					success : function(result) {
+						alert(JSON.stringify(result));
+					}
+				})
+			});
+			$("#imgMultipleUpload").uploadify({
+				fileUploadID : "imgUploadFileMultipleUpload",
+				multiple : true,
+				success : function(arrResult) {
+					alert(JSON.stringify(arrResult));
+					for ( var i = 0; i < arrResult.length; i++) {
+						var result = arrResult[i];
+						alert(JSON.stringify(result));
+					}
+					//$("#hfImageID").val(result.data.ID);
+					//$("#hfFilePath").val(result.data.FilePath);
+				}
+			});
+		});
+		function showProgressBar() {
+			$("#divProgressBar").show();
+		}
+		function hideProgressBar() {
+			$("#divProgressBar").hide();
+		}
+	</script>
+</head>
+<body>
+	<div>自动上传</div>
+	<div>
+		<img src="img/blank.jpg" class="photo" id="imgAutoUpload" /> <input
+			type="hidden" id="hfImageID" /> <input type="hidden" id="hfFilePath" />
+		<input type="file" id="imgAutoUploadFileUpload" style="display: none" />
+	</div>
+	<hr />
+	<div>手动上传</div>
+	<img src="img/blank.jpg" class="photo" id="imgUpload" />
+	<input type="button" value="上传" id="btnUpload" />
+	<input type="file" id="imgUploadFileUpload" style="display: none" />
+	<hr />
+	<div>多文件上传</div>
+	<img src="img/blank.jpg" class="photo" id="imgMultipleUpload" />
+	<input type="file" id="imgUploadFileMultipleUpload"
+		style="display: none" multiple />
+	<div id="divProgressBar" style="display: none;">
+		<img src="img/progressbar.jpg" style="width:300px;height:30px;" />
+	</div>
+</body>
+</html>

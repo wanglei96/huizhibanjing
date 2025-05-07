@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SysRoleList.html</title>
+	
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    
+    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+	<script type="text/javascript" src="../../js/jquery.js"></script>
+	<script type="text/javascript" src="../../js/common.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script type="text/javascript" src="../../js/json2.js"></script>
+	<script>
+		$(document).ready(function(){
+			var data = new Object();
+			data.tableName = "sys_menu",
+			call("GetSysMenuList",data, function(result){
+			//alert(JSON.stringify(result.data));
+				outputList(result.data);
+			});
+				
+		});
+		function outputList(dataList) {
+			$("#tableList tr:gt(0)").remove();
+			for ( var i = 0; i < dataList.length; i++) {
+				var dataItem = dataList[i];
+				outputListItem(dataItem);
+			}
+		}
+		function outputListItem(dataItem) {
+		
+			var htmlTr = "<tr>";
+			htmlTr += "<td>" + dataItem.id + "</td>";
+			htmlTr += "<td>" + dataItem.menuName + "</td>";
+			htmlTr += "<td>" + dataItem.menuValue+ "</td>";
+			htmlTr += "<td>"; 
+				htmlTr += "<a href='javascript:void(0)' onclick='selectSysMenu("+dataItem.id+")'>查看</a>";
+				htmlTr += "<a href='javascript:void(0)' onclick='selectSysMenu("+dataItem.id+")'>修改</a>";
+			    htmlTr += "<a href='javascript:void(0)' onclick='deleteSysMenu("+dataItem.id+")'>删除</a>";					
+			htmlTr += "</td>";
+			htmlTr += "</tr>";
+			console.log(htmlTr);
+			$("#tableList").append(htmlTr);
+		}
+		
+	
+		
+		$(function(){
+			//弹出新增页面
+			$("#btnAdd").click(function(){	
+				$("#save").show();
+				$("#btnUpdateSysMenu").hide();
+			});
+			//新增
+			$("#btnSaveSysMenu").click(function(){
+				var textMenuName = $("#textMenuName").val();
+				
+				var textMenuValue = $("#textMenuValue").val();
+				
+				var data = new Object();
+				data.tableName = "sys_menu";
+				data.textMenuName = textMenuName;
+				data.textMenuValue = textMenuValue;
+				call("AddSysMenu",data,function(result){
+					window.location.href="SysMenuList.html";
+				});		
+			});
+		});
+		
+		//删除
+		function deleteSysMenu(id){
+			var id = id;
+		//	alert(id);
+			var data = new Object();
+			data.tableName="sys_menu";
+			data.id=id;
+			call("DeleteSysMenu",data,function(result){
+				window.location.href="SysMenuList.html";
+			});	
+		}
+		
+		//查看
+		function selectSysMenu(id){
+			var id =id;
+			var data = new Object();
+			data.tableName = "sys_menu";
+			data.id = id;
+			call("SelectSysMenu",data,function(result){
+				$("#save").show();
+				$("#btnSaveSysMenu").hide();
+		
+				$("#textMenuName").val(result.data.menuName);
+				$("#textMenuValue").val(result.data.menuValue);
+				$("#hid").val(result.data.id);
+			});	
+		}
+		
+		function updateSysMenu(){
+			var id = $("#hid").val();
+			var textMenuName = $("#textMenuName").val();
+			var textMenuValue = $("#textMenuValue").val();
+			var data = new Object();
+			data.tableName = "sys_menu";
+			data.id=id;
+			data.textMenuName = textMenuName;
+			data.textMenuValue = textMenuValue;
+			call("UpdateSysMenu", data, function(result) {
+			//	alert(JSON.stringify(result.data));
+				window.location.href="SysMenuList.html";
+			});
+		} 
+	</script>
+  </head>
+  
+  <body>
+ 	 <div class="title_bar">测试页面</div>
+ 	<div class="command_bar" width="500" >
+		<input id="btnAdd" value="新增" type="button"/>
+		<input type="button" id="" onclick="javascript:history.go(-1);" value="返回"/>
+	</div>
+	<div class="grid_panel">
+			<table id="tableList" width="500">
+				<tr>
+					<td>id</td>
+					<td>name</td>
+					<td>vaue</td>
+					<td>操作</td>
+				</tr>
+			</table>
+	</div>
+	<div clas s="total_panel" ></div>
+	
+	<!--新增、查看、修改 -->
+	<div align="" id ="save" style="display:none ;"> 
+    	<table  width="500" border="1" cellpadding="0" cellspacing="0">
+        	<tr>
+            	<td colspan="2" align="center">新增</td>
+            </tr>
+            <tr>	
+            	<td align="right">name：</td>
+                <td> <input type="text" name="textMenuName" id="textMenuName" value=""/></td>
+            </tr>
+             <tr>	
+            	<td align="right">value：</td>
+                <td> <input type="text" name="textMenuValue" id="textMenuValue" value=""/></td>
+            </tr>
+            <tr>
+            	<td align="center" colspan="2">
+            		<input type="hidden" id="hid" value=""/>
+                	<input type="button" id="btnSaveSysMenu"  value="提交"/>
+                	<input type="button" id="btnUpdateSysMenu"  onclick="updateSysMenu()" value="修改"/>
+                    <input type="button" id="" onclick="javascript:history.go(0);" value="取消"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "video-menu": "/components/tsp-video/tsp-menu/tsp-menu-v"
+  }
+}

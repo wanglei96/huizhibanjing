@@ -1,0 +1,200 @@
+package BRP.data;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import java.util.*;
+import BRP.data.ViewClubActivity;
+import java.io.IOException;
+import strosoft.app.common.ViewDataMaster;
+import strosoft.app.data.DataEntity;
+public class ViewClubActivityMaster extends ViewDataMaster 
+{
+    public  List<ViewClubActivity> getList()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewClubActivity> list = null;
+        try        
+        {
+            list = getList(sqlSession);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewClubActivity> getList(SqlSession sqlSession)    
+    {
+        List<ViewClubActivity> list = sqlSession.selectList("ViewClubActivity.selectViewClubActivitys");
+        return list;
+    }
+    public  List<ViewClubActivity> getList(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewClubActivity> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewClubActivity> getList(SqlSession sqlSession,String condition)    
+    {
+        List<ViewClubActivity> list = sqlSession.selectList("ViewClubActivity.selectViewClubActivityByCondition",condition);
+        return list;
+    }
+    public  List<ViewClubActivity> getList(String condition,String orderBy)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewClubActivity> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition,orderBy);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewClubActivity> getList(SqlSession sqlSession,String condition,String orderBy)    
+    {
+        String conditionAndOrderBy = condition +" order by "+orderBy;
+        List<ViewClubActivity> list = sqlSession.selectList("ViewClubActivity.selectViewClubActivityByCondition",conditionAndOrderBy);
+        return list;
+    }
+    public  List<ViewClubActivity> getList(int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewClubActivity> list = null;
+        try        
+        {
+            list = getList(sqlSession,pageIndex,pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+        finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewClubActivity> getList(SqlSession sqlSession,int pageIndex,int pageSize)    
+    {
+        String sql = String.format("select * from view_club_activity limit %s, %s", pageSize * pageIndex, pageSize);
+        List<ViewClubActivity> list = sqlSession.selectList("ViewClubActivity.selectViewClubActivityBySql", sql);
+        return list;
+    }
+    public  List<ViewClubActivity> getListPage(String condition,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewClubActivity> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewClubActivity> getList(SqlSession sqlSession,String condition,int pageIndex,int pageSize)    
+    {
+        String sql = condition + " limit " + pageSize * pageIndex + "," + pageSize;
+        List<ViewClubActivity> list = sqlSession.selectList("ViewClubActivity.selectViewClubActivityByCondition",sql);
+        return list;
+    }
+    public  List<ViewClubActivity> getList(String condition,String orderBy,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewClubActivity> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, orderBy, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewClubActivity> getList(SqlSession sqlSession,String condition,String orderBy,int pagesize,int pageindex)    
+    {
+        String sql = condition +" order by "+orderBy+" limit "+pagesize*(pageindex-1)+","+pagesize;
+        List<ViewClubActivity> list = sqlSession.selectList("ViewClubActivity.selectViewClubActivityByCondition",sql);
+        return list;
+    }
+    public  Integer getCount(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer count = null;
+        try        
+        {
+            count = getCount(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return count;
+    }
+    public  Integer getCount(SqlSession sqlSession,String condition)    
+    {
+        Integer rows = sqlSession.selectOne("ViewClubActivity.selectCountByCondition",condition);
+        return rows;
+    }
+    public  ViewClubActivity createEntity()    
+    {
+        return new ViewClubActivity();
+    }
+    public  DataEntity createDataEntity()    
+    {
+        return new ViewClubActivity();
+    }
+}

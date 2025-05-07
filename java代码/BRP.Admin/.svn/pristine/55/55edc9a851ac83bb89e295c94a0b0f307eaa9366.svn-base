@@ -1,0 +1,200 @@
+package BRP.data;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import java.util.*;
+import BRP.data.ViewCompanyChannel;
+import java.io.IOException;
+import strosoft.app.common.ViewDataMaster;
+import strosoft.app.data.DataEntity;
+public class ViewCompanyChannelMaster extends ViewDataMaster 
+{
+    public  List<ViewCompanyChannel> getList()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewCompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewCompanyChannel> getList(SqlSession sqlSession)    
+    {
+        List<ViewCompanyChannel> list = sqlSession.selectList("ViewCompanyChannel.selectViewCompanyChannels");
+        return list;
+    }
+    public  List<ViewCompanyChannel> getList(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewCompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewCompanyChannel> getList(SqlSession sqlSession,String condition)    
+    {
+        List<ViewCompanyChannel> list = sqlSession.selectList("ViewCompanyChannel.selectViewCompanyChannelByCondition",condition);
+        return list;
+    }
+    public  List<ViewCompanyChannel> getList(String condition,String orderBy)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewCompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition,orderBy);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewCompanyChannel> getList(SqlSession sqlSession,String condition,String orderBy)    
+    {
+        String conditionAndOrderBy = condition +" order by "+orderBy;
+        List<ViewCompanyChannel> list = sqlSession.selectList("ViewCompanyChannel.selectViewCompanyChannelByCondition",conditionAndOrderBy);
+        return list;
+    }
+    public  List<ViewCompanyChannel> getList(int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewCompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession,pageIndex,pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+        finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewCompanyChannel> getList(SqlSession sqlSession,int pageIndex,int pageSize)    
+    {
+        String sql = String.format("select * from view_company_channel limit %s, %s", pageSize * pageIndex, pageSize);
+        List<ViewCompanyChannel> list = sqlSession.selectList("ViewCompanyChannel.selectViewCompanyChannelBySql", sql);
+        return list;
+    }
+    public  List<ViewCompanyChannel> getListPage(String condition,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewCompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewCompanyChannel> getList(SqlSession sqlSession,String condition,int pageIndex,int pageSize)    
+    {
+        String sql = condition + " limit " + pageSize * pageIndex + "," + pageSize;
+        List<ViewCompanyChannel> list = sqlSession.selectList("ViewCompanyChannel.selectViewCompanyChannelByCondition",sql);
+        return list;
+    }
+    public  List<ViewCompanyChannel> getList(String condition,String orderBy,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewCompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, orderBy, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewCompanyChannel> getList(SqlSession sqlSession,String condition,String orderBy,int pagesize,int pageindex)    
+    {
+        String sql = condition +" order by "+orderBy+" limit "+pagesize*(pageindex-1)+","+pagesize;
+        List<ViewCompanyChannel> list = sqlSession.selectList("ViewCompanyChannel.selectViewCompanyChannelByCondition",sql);
+        return list;
+    }
+    public  Integer getCount(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer count = null;
+        try        
+        {
+            count = getCount(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return count;
+    }
+    public  Integer getCount(SqlSession sqlSession,String condition)    
+    {
+        Integer rows = sqlSession.selectOne("ViewCompanyChannel.selectCountByCondition",condition);
+        return rows;
+    }
+    public  ViewCompanyChannel createEntity()    
+    {
+        return new ViewCompanyChannel();
+    }
+    public  DataEntity createDataEntity()    
+    {
+        return new ViewCompanyChannel();
+    }
+}

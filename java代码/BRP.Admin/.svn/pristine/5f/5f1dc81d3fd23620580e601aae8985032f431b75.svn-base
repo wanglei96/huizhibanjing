@@ -1,0 +1,90 @@
+package BRP.service;
+
+import BRP.data.ActivityRecommend;
+import BRP.data.ActivityRecommendError;
+import BRP.data.ActivityRecommendMember;
+import BRP.data.MemberCardServiceTimeLog;
+import BRP.model.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+
+public class BatchAddActivityRecommendServiceHandler extends ServiceHandler {
+    @Override
+    public void process(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONObject requestData = getRequestData(request);
+        Integer days = JsonHelper.getInt(requestData, "days");
+        Integer activityId = JsonHelper.getInt(requestData, "activityId");
+        Integer companyId = JsonHelper.getInt(requestData, "companyId");
+
+        JSONArray jsonArray =JsonHelper.getJSONArray(requestData, "memberCardIdArr");
+        List<ActivityRecommendError> lstActivityRecommendError =
+                JsonHelper.getJavaList(ActivityRecommendError.class, requestData, "exceptionMemberCardList");
+        //推荐人ID集合,后面用来批量增肌时长
+        List<String> referrerIdList = new ArrayList<>();
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ActivityRecommendMember> lstActivityRecommendMember = new ArrayList<>();
+        try {
+            ActivityRecommend newActivityRecommend = new ActivityRecommend();
+            newActivityRecommend.setActivityId(activityId);
+            newActivityRecommend.setCompanyId(companyId);
+            newActivityRecommend.setDays(days);
+            Integer newActivityRecommendId = ActivityRecommendManager.getInstance().add(sqlSession, newActivityRecommend);
+            List<MemberCardServiceTimeLog> newLstMemberCardServiceTimeLog = new ArrayList<>();
+            if (jsonArray != null && jsonArray.size() > 0) {
+                for(int i = 0; i < jsonArray.size(); i++){
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    ActivityRecommendMember activityRecommendMember = JsonHelper.toJavaObject(ActivityRecommendMember.class, jsonObject);
+                    activityRecommendMember.setActivityRecommendId(newActivityRecommendId);
+                    lstActivityRecommendMember.add(activityRecommendMember);
+                    referrerIdList.add(activityRecommendMember.getReferrerCardId().toString());
+                    referrerIdList.add(activityRecommendMember.getNewMemberCardId().toString());
+                    MemberCardServiceTimeLog newMemberLog = new MemberCardServiceTimeLog();
+                    newMemberLog.setActivityId(activityId);
+                    newMemberLog.setAddTime(DateHelper.getCurrentTimestamp());
+                    newMemberLog.setMemberId(JsonHelper.getInt(jsonObject, "newMemberId"));
+                    newMemberLog.setDays(days);
+                    newMemberLog.setMemberCardServiceTimeTypeCode("ActivityRecommend");
+                    newMemberLog.setMemberCardServiceTimeGiftTypeCode("ActivityRecommend");
+                    MemberCardServiceTimeLog newReferrerLog = new MemberCardServiceTimeLog();
+                    newReferrerLog.setActivityId(activityId);
+                    newReferrerLog.setAddTime(DateHelper.getCurrentTimestamp());
+                    newReferrerLog.setMemberId(JsonHelper.getInt(jsonObject, "referrerId"));
+                    newReferrerLog.setDays(days);
+                    newReferrerLog.setMemberCardServiceTimeTypeCode("ActivityRecommend");
+                    newReferrerLog.setMemberCardServiceTimeGiftTypeCode("ActivityRecommend");
+                    newLstMemberCardServiceTimeLog.add(newMemberLog);
+                    newLstMemberCardServiceTimeLog.add(newReferrerLog);
+                }
+            }
+            if (lstActivityRecommendError != null && lstActivityRecommendError.size() > 0){
+                for (ActivityRecommendError item : lstActivityRecommendError){
+                    item.setActivityRecommendId(newActivityRecommendId);
+                }
+            }
+            ActivityRecommendMemberManager.getInstance().addList(sqlSession, lstActivityRecommendMember);
+            ActivityRecommendErrorManager.getInstance().addList(sqlSession, lstActivityRecommendError);
+            MemberCardServiceTimeLogManager.getInstance().addList(sqlSession, newLstMemberCardServiceTimeLog);
+            //批量增加曾加会员卡失效日期
+            MemberCardManager.getInstance().delayExpireDate(sqlSession, referrerIdList, days);
+
+            MyBatisManager.getInstance().commitSession(sqlSession);
+            writeSuccessResponse(response);
+        } catch (Exception e) {
+            MyBatisManager.getInstance().rollbackSession(sqlSession);
+
+            throw new RuntimeException(e);
+        } finally {
+            MyBatisManager.getInstance().closeSession(sqlSession);
+        }
+    }
+}

@@ -1,0 +1,313 @@
+[
+  {
+    "menuId": "001",
+    "name": "Dashboard",
+    "icon": "House",
+    "url": "/dashboard",
+    "menuType": 0,
+    "sort": 1,
+    "component": "",
+    "children": [
+      {
+        "menuId": "00101",
+        "name": "工作台",
+        "url": "/dashboard/workplace",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/dashboard/workplace/IndexView.vue",
+        "icon": "DataBoard"
+      },
+      {
+        "menuId": "00102",
+        "name": "分析页",
+        "url": "/dashboard/analysis",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/dashboard/analysis/IndexView.vue",
+        "icon": "Histogram"
+      },
+      {
+        "menuId": "00103",
+        "name": "监控页",
+        "url": "/dashboard/monitor",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/dashboard/monitor/IndexView.vue",
+        "icon": "VideoCamera"
+      }
+    ]
+  },
+  {
+    "menuId": "002",
+    "name": "系统管理",
+    "icon": "Setting",
+    "url": "/system",
+    "menuType": 0,
+    "sort": 1,
+    "component": "",
+    "children": [
+      {
+        "menuId": "00201",
+        "name": "用户管理",
+        "url": "/system/user",
+        "menuType": 0,
+        "sort": 1,
+        "icon": "User"
+      },
+      {
+        "menuId": "00202",
+        "name": "角色管理",
+        "url": "/system/role",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/role/IndexView.vue",
+        "icon": "MessageBox"
+      },
+      {
+        "menuId": "00203",
+        "name": "菜单管理",
+        "url": "/system/menu",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/menu/IndexView.vue",
+        "icon": "Operation"
+      },
+      {
+        "menuId": "00204",
+        "name": "部门管理",
+        "url": "/system/dept",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/dept/IndexView.vue",
+        "icon": "OfficeBuilding"
+      },
+      {
+        "menuId": "00205",
+        "name": "字典管理",
+        "url": "/system/dictionary",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/dictionary/IndexView.vue",
+        "icon": "Document"
+      },
+      {
+        "menuId": "00206",
+        "name": "系统日志",
+        "url": "/system/log",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/log/IndexView.vue",
+        "icon": "Memo"
+      }
+    ]
+  },
+  {
+    "menuId": "003",
+    "name": "表单页面",
+    "icon": "Eleme",
+    "url": "/form",
+    "menuType": 0,
+    "sort": 1,
+    "component": "",
+    "children": [
+      {
+        "menuId": "00301",
+        "name": "基础表单",
+        "url": "/form/basic",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/form/basic/IndexView.vue",
+        "icon": "CollectionTag"
+      },
+      {
+        "menuId": "00302",
+        "name": "复杂表单",
+        "url": "/form/advanced",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/form/advanced/IndexView.vue",
+        "icon": "CollectionTag"
+      },
+      {
+        "menuId": "00303",
+        "name": "分步表单",
+        "url": "/form/step",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/form/step/IndexView.vue",
+        "icon": "CollectionTag"
+      }
+    ]
+  },
+  {
+    "menuId": "004",
+    "name": "列表页面",
+    "icon": "Tickets",
+    "url": "/list",
+    "menuType": 0,
+    "sort": 1,
+    "component": "",
+    "children": [
+      {
+        "menuId": "00401",
+        "name": "基础列表",
+        "url": "/list/basic",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/list/basic/IndexView.vue",
+        "icon": "Document"
+      },
+      {
+        "menuId": "00402",
+        "name": "复杂列表",
+        "url": "/list/advanced",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/list/advanced/IndexView.vue",
+        "icon": "DocumentCopy"
+      },
+      {
+        "menuId": "00403",
+        "name": "卡片列表",
+        "url": "card",
+        "menuType": 0,
+        "sort": 1,
+        "icon": "Postcard",
+        "component": "",
+        "children": [
+          {
+            "menuId": "0040301",
+            "name": "项目列表",
+            "url": "/list/card/project",
+            "menuType": 0,
+            "sort": 1,
+            "component": "/system/list/card/project/IndexView.vue",
+            "icon": "Memo"
+          },
+          {
+            "menuId": "0040302",
+            "name": "应用列表",
+            "url": "/list/card/application",
+            "menuType": 0,
+            "sort": 1,
+            "component": "/system/list/card/application/IndexView.vue",
+            "icon": "MessageBox"
+          },
+          {
+            "menuId": "0040303",
+            "name": "文章列表",
+            "url": "/list/card/article",
+            "menuType": 0,
+            "sort": 1,
+            "component": "/system/list/card/article/IndexView.vue",
+            "icon": "Tickets"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "menuId": "005",
+    "name": "结果页面",
+    "url": "/result",
+    "menuType": 0,
+    "sort": 1,
+    "component": "",
+    "icon": "Reading",
+    "children": [
+      {
+        "menuId": "00501",
+        "name": "成功页面",
+        "url": "/result/success",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/result/success/IndexView.vue",
+        "icon": "Camera"
+      },
+      {
+        "menuId": "00502",
+        "name": "失败页面",
+        "url": "/result/fail",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/result/fail/IndexView.vue",
+        "icon": "Monitor"
+      }
+    ]
+  },
+  {
+    "menuId": "006",
+    "name": "异常页面",
+    "url": "/exception",
+    "menuType": 0,
+    "sort": 1,
+    "component": "",
+    "icon": "Warning",
+    "children": [
+      {
+        "menuId": "00601",
+        "name": "HTTP 403",
+        "url": "/exception/403",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/exception/403/IndexView.vue",
+        "icon": "Camera"
+      },
+      {
+        "menuId": "00602",
+        "name": "HTTP 404",
+        "url": "/exception/404",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/exception/404/IndexView.vue",
+        "icon": "Camera"
+      },
+      {
+        "name": "HTTP 500",
+        "url": "/exception/500",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/exception/500/IndexView.vue",
+        "icon": "Monitor"
+      }
+    ]
+  },
+  {
+    "menuId": "007",
+    "name": "个人中心",
+    "url": "/personal",
+    "menuType": 0,
+    "sort": 1,
+    "component": "",
+    "icon": "User",
+    "children": [
+      {
+        "menuId": "00701",
+        "name": "个人资料",
+        "url": "/personal/profile",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/personal/profile/IndexView.vue",
+        "icon": "Camera"
+      },
+      {
+        "menuId": "00702",
+        "name": "站内消息",
+        "url": "/personal/message",
+        "menuType": 0,
+        "sort": 1,
+        "component": "/system/personal/message/IndexView.vue",
+        "icon": "Camera"
+      }
+    ]
+  },
+  {
+    "menuId": "008",
+    "name": "获取授权",
+    "url": "/authorization",
+    "menuType": 0,
+    "sort": 1,
+    "component": "/system/authorization/IndexView.vue",
+    "icon": "Eleme"
+  }
+]

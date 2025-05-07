@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>管理员登录</title>
+
+<link rel="stylesheet" type="text/css" href="../themes/icon.css" />
+<link href="../css/login.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="../themes/custom/easyui.css"
+	type="text/css" />
+<!-- <link rel="stylesheet" href="../css/main.css" type="text/css" /> -->
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/json2.js"></script>
+<script type="text/javascript" src="../js/jquery.query.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/config.js"></script>
+<script type="text/javascript" src="../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../js/vector.js"></script>
+<script>
+	$(function() {
+		var victor = new Victor("container", "output");
+		$("#spanSystemName").text(config.systemName);
+		$("#spanCopyright").text(config.copyright);
+		//回车提交事件
+		document.onkeydown = function(e) {
+			console.log(e)
+			// 获得键盘按下事件,支持ie，ff，google，safari，opera
+			var event = window.event ? window.event : e;
+			if (event.keyCode == 13) {
+				$("#btnLogin").click();
+			}
+		}
+	});
+	/*
+	回车登录
+	 */
+
+	function login() {
+		var data = new Object();
+		data.loginName = $("#txtLoginName").val();
+		data.password = $("#txtPassword").val();
+		call("Login", data, function(result) {
+			$.cookie("token", result.data.token, {
+				expires : 9999,
+				path : '/'
+			});
+			$.cookie("sysUserId", result.data.sysUser.id, {
+				expires : 9999,
+				path : '/'
+			});
+			$.cookie("trueName", result.data.sysUser.trueName, {
+				expires : 9999,
+				path : '/'
+			});
+			$.cookie("loginName", result.data.sysUser.loginName, {
+				expires : 9999,
+				path : '/'
+			});
+			$.cookie("sysOrganizationName",
+					result.data.sysUser.sysOrganizationName, {
+						expires : 9999,
+						path : '/'
+					});
+			window.location.href = "main/Index.htm";
+		});
+
+	}
+</script>
+</head>
+<body class="LoginBg">
+
+	<div id="container">
+		<div id="output"></div>
+	</div>
+	<div id="logo">
+		<img src="../img/login/logo.png"></img> <span id="spanSystemName"
+			class="spanSystemName"></span>
+
+	</div>
+
+	<div class="loginMain">
+		<div class="loginBox">
+			<div style="width: auto 0; margin: 0 100px"></div>
+			<div class="login_u1">
+				<ul>
+					<li><input id="txtLoginName" name="TbAccount" type="text"
+						id="TbAccount" class="login_int1" placeholder="用户名" />
+					</li>
+					<li><input id="txtPassword" name="TbPassword" type="password"
+						id="TbPassword" class="login_int1" placeholder="密码" />
+					</li>
+
+					<li><input type="button" name="LoginSubmit" id="btnLogin"
+						class="login_submit" style="width: 322px" value="登录"
+						onclick="login()">
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="loginFooter">
+			<span id="spanCopyright"></span>
+			<script>
+				document.write(new Date().getFullYear());
+			</script>
+		</div>
+	</div>
+
+</body>
+</html>

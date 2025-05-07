@@ -1,0 +1,95 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.model.*;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.poi.ss.formula.functions.T;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.Tracer;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+
+public class DeleteBookOrderItemInfoServiceHandler extends ServiceHandler {
+    @Override
+    public void process(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONObject jData = getRequestData(request);
+        Integer bookOrderItemId = JsonHelper.getInt(jData, "bookOrderItemId");
+        Integer memberId = JsonHelper.getInt(jData, "memberId");
+        Integer bookId = JsonHelper.getInt(jData, "bookId");
+        String bookOrderTypeCode = JsonHelper.getString(jData, "bookOrderTypeCode");
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+            if (bookOrderTypeCode.equals(BookOrderTypeCodes.Return)) {
+                this.deleteReturnItem(sqlSession, bookOrderItemId, memberId, bookId, bookOrderTypeCode);
+            } else if (bookOrderTypeCode.equals(BookOrderTypeCodes.Borrow)) {
+                this.deleteBorrowItem(sqlSession, bookOrderItemId, memberId, bookId, bookOrderTypeCode);
+            }
+            writeSuccessResponse(response);
+            MyBatisManager.getInstance().commitSession(sqlSession);
+        } catch (Exception e) {
+            MyBatisManager.getInstance().rollbackSession(sqlSession);
+            throw new RuntimeException(e);
+        } finally {
+            MyBatisManager.getInstance().closeSession(sqlSession);
+        }
+
+    }
+
+    private void deleteBorrowItem(SqlSession sqlSession, Integer bookOrderItemId, Integer memberId, Integer bookId, String bookOrderTypeCode) throws Exception {
+        //修改图书信息
+        Book theBook = BookManager.getInstance().getEntity(sqlSession, bookId);
+        theBook.setMemberId(null);
+        theBook.setIsAvailable(true);
+        theBook.setBorrowStatusCode(BorrowStatusCodes.In);
+        BookManager.getInstance().update(sqlSession, theBook);
+        //获取会员卡
+        /*MemberCard theMemberCard = MemberCardManager.getInstance().getEntityByMemberId(sqlSession, memberId);
+        if (theMemberCard != null) {
+            //修改会员卡可借数量
+            if (theMemberCard.getBorrowableQuantity() == null) {
+                theMemberCard.setBorrowableQuantity(0);
+            }
+            theMemberCard.setBorrowableQuantity(theMemberCard.getBorrowableQuantity() + 1);
+            MemberCardManager.getInstance().update(sqlSession, theMemberCard);
+        }*/
+        //删除出库单
+        BookOutOrderManager.getInstance().deleteByBookOrderItemId(sqlSession, bookOrderItemId);
+        //删除还书单
+        BookOrderItemManager.getInstance().delete(sqlSession, bookOrderItemId);
+    }
+
+    private void deleteReturnItem(SqlSession sqlSession, Integer bookOrderItemId, Integer memberId, Integer bookId, String bookOrderTypeCode) throws Exception {
+        //获取会员卡
+        /*MemberCard theMemberCard = MemberCardManager.getInstance().getEntityByMemberId(sqlSession, memberId);
+        if (theMemberCard.getBorrowableQuantity() <= 0) {
+            throw new Exception("会员已借书数量超过上限！不能删除还书");
+        }*/
+        //获取会员卡
+        ViewMemberCard theViewMemberCard = ViewMemberCardManager.getInstance().getEntityByMemberId(sqlSession, memberId);
+        //获取会员卡已借阅数量
+        Integer borrowedQuantity = ViewBookOrderItemManager.getInstance().getBorrowedQuantity(sqlSession, memberId);
+        //获取会员卡总借阅数量
+        Integer allQuantity = theViewMemberCard.getMaxBorrowableQuantity().intValue() + theViewMemberCard.getExtendQuantity().intValue();
+
+        if (borrowedQuantity >= allQuantity) {
+            throw new Exception("会员已借书数量超过上限！不能删除还书");
+        }
+        //修改图书信息
+        Book theBook = BookManager.getInstance().getEntity(sqlSession, bookId);
+        theBook.setMemberId(memberId);
+        theBook.setBorrowStatusCode(BorrowStatusCodes.Out);
+        BookManager.getInstance().update(sqlSession, theBook);
+
+        //修改会员卡可借数量
+        /*theMemberCard.setBorrowableQuantity(theMemberCard.getBorrowableQuantity() - 1);
+        MemberCardManager.getInstance().update(sqlSession, theMemberCard);*/
+        //删除还书单
+        BookOrderItemManager.getInstance().delete(sqlSession, bookOrderItemId);
+    }
+}

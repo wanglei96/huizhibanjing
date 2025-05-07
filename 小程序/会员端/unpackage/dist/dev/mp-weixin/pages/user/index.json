@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "我的",
+  "navigationBarBackgroundColor": "#5EAC59",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "uni-popup": "/components/uni-popup/uni-popup",
+    "uni-popup-dialog": "/components/uni-popup-dialog/uni-popup-dialog",
+    "popup": "/components/uni-popup/uni-popup",
+    "popupdialog": "/components/uni-popup-dialog/uni-popup-dialog",
+    "transition": "/components/uni-transition/uni-transition"
+  }
+}

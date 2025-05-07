@@ -1,0 +1,321 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.data.MemberScoreType;
+import BRP.model.*;
+import net.sf.json.JSONObject;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.util.StringUtils;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
+
+/*
+ * 绑定会员信息
+ */
+public class BindMemberInfoServiceHandler extends ServiceHandler {
+
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+
+        SqlSession sqlSession = null;
+        try {
+            sqlSession = MyBatisManager.getInstance().openSession();
+            JSONObject jData = this.getRequestData(request);
+            // 会员信息
+            Integer id = JsonHelper.getInt(jData, "id"); // 会员卡id
+            Integer companyId = JsonHelper.getInt(jData, "companyId"); // 门店id
+            Integer companyUserId = JsonHelper.getInt(jData, "companyUserId"); // 登录用户id
+            Integer memberId = JsonHelper.getInt(jData, "memberId"); // 会员id
+            String memberName = JsonHelper.getString(jData, "memberName"); // 会员姓名
+            String birthday = JsonHelper.getString(jData, "birthdayText"); // 出生日期
+            String mobilePhone = JsonHelper.getString(jData, "mobilePhone"); // 联系方式
+            Boolean gender = JsonHelper.getBoolean(jData, "gender"); // 性别
+            String school = JsonHelper.getString(jData, "school"); // 学校
+            Integer gradeId = JsonHelper.getInt(jData, "gradeId"); // 年级
+            Integer classId = JsonHelper.getInt(jData, "classId"); // 班级
+            String entranceGuard = JsonHelper.getString(jData, "entranceGuard"); // 门禁
+            Integer deliverAreaId = JsonHelper.getInt(jData, "deliverAreaId"); // 配送大区
+            Integer deliverLineId = JsonHelper.getInt(jData, "deliverLineId"); // 配送线路
+            String address = JsonHelper.getString(jData, "address"); // 地址
+            Integer delivererId = JsonHelper.getInt(jData, "delivererId"); // 配送员
+            String longitude = JsonHelper.getString(jData, "longitude"); // 经度
+            String latitude = JsonHelper.getString(jData, "latitude"); // 维度
+            Integer deliverPlaceId = JsonHelper.getInt(jData, "deliverPlaceId"); // 配送点
+            String distanceCode = JsonHelper.getString(jData, "distanceCode"); // 距离远近
+            // 会员卡信息
+            Integer referrerId = JsonHelper.getInt(jData, "referrerId"); // 推荐人ID
+            String referrerRemark = JsonHelper.getString(jData, "referrerRemark"); // 推荐人备注
+            Integer memberCardTypeId = JsonHelper.getInt(jData, "memberCardTypeId"); // 会员卡类型
+            String paymentMethodCode = JsonHelper.getString(jData, "paymentMethodCode"); // 支付方式
+            BigDecimal membershipAmount = JsonHelper.getDecimal(jData, "membershipAmount"); // 会员费
+            BigDecimal bookboxAmount = JsonHelper.getDecimal(jData, "bookboxAmount"); // 书箱费
+            Boolean isBookboxAmount = JsonHelper.getBoolean(jData, "isBookboxAmount"); // 是否开通书箱
+            BigDecimal securityDepositPrice = JsonHelper.getDecimal(jData, "securityDepositPrice"); // 押金
+            Boolean isSecurityDepositPrice = JsonHelper.getBoolean(jData, "isSecurityDepositPrice"); // 是否开通押金
+            Integer employeeId = JsonHelper.getInt(jData, "employeeId"); // 办理人
+            String bookboxNo = JsonHelper.getString(jData, "bookboxNo"); // 书箱号
+            String effectiveDateText = JsonHelper.getString(jData, "effectiveDateText"); // 生效日期
+            String expireDateText = JsonHelper.getString(jData, "expireDateText"); // 失效日期
+            Integer days = JsonHelper.getInt(jData, "days"); // 会员卡总天数
+            Boolean isSpecial = JsonHelper.getBoolean(jData, "isSpecial"); // 是否特殊会员卡
+            String remark = JsonHelper.getString(jData, "remark"); // 备注
+            String bookboxPlace = JsonHelper.getString(jData, "bookboxPlace"); // 书箱位置
+
+
+            // 会员卡日期时间跨度校验
+            /*if (days != null && !StringUtils.isEmpty(effectiveDateText) && !StringUtils.isEmpty(expireDateText)) {
+                // 计算会员卡日期相差的天数
+                LocalDate effectiveDate = LocalDate.parse(effectiveDateText.substring(0, 10));
+                LocalDate expireDate = LocalDate.parse(expireDateText.substring(0, 10));
+                long daysDiff = ChronoUnit.DAYS.between(effectiveDate, expireDate);
+                if (daysDiff > days) {
+                    this.writeErrorResponse(response, "会员卡日期时间跨度应小于会员卡总天数");
+                    return;
+                }
+            }*/
+            // 构建会员卡对象
+            MemberCard memberCard = MemberCardManager.getInstance().getEntity(sqlSession, id);
+            if (!StringUtils.isEmpty(memberId)) {
+                memberCard.setMemberId(memberId);
+            }
+            if (!StringUtils.isEmpty(referrerId)) {
+                memberCard.setReferrerId(referrerId);
+            }
+            if (!StringUtils.isEmpty(referrerRemark) && !referrerRemark.equals("null")) {
+                memberCard.setReferrerRemark(referrerRemark);
+            }
+            if (!StringUtils.isEmpty(memberCardTypeId)) {
+                memberCard.setMemberCardTypeId(memberCardTypeId);
+            }
+            if (!StringUtils.isEmpty(paymentMethodCode)) {
+                memberCard.setPaymentMethodCode(paymentMethodCode);
+            }
+            if (!StringUtils.isEmpty(membershipAmount)) {
+                memberCard.setMembershipAmount(membershipAmount);
+            }
+            if (!StringUtils.isEmpty(employeeId)) {
+                memberCard.setEmployeeId(employeeId);
+            }
+            if (!StringUtils.isEmpty(effectiveDateText) && !StringUtils.isEmpty(expireDateText)) {
+                memberCard.setEffectiveDate(DateHelper.toTimestamp(effectiveDateText));
+                memberCard.setExpireDate(DateHelper.toTimestamp(expireDateText));
+            } else {
+                // 开卡时间没选，默认应为当天
+                memberCard.setEffectiveDate(new Timestamp(System.currentTimeMillis()));
+                LocalDateTime currentTime = LocalDateTime.now();
+                LocalDateTime newTime = currentTime.plusDays(days);
+                Timestamp expireDate = Timestamp.valueOf(newTime);
+                memberCard.setExpireDate(expireDate);
+            }
+            if (!StringUtils.isEmpty(isSpecial)) {
+                memberCard.setIsSpecial(isSpecial);
+            }
+            if (!StringUtils.isEmpty(remark) && !remark.equals("null")) {
+                memberCard.setRemark(remark);
+            }
+            // 根据会员卡id获取会员卡批次的可借图书次数
+            MemberCardBatch memberCardBatch = MemberCardBatchManager.getInstance().getEntity(sqlSession, memberCard.getMemberCardBatchId());
+            memberCard.setIsOnlineReading(memberCardBatch.getIsOnlineReading());
+            memberCard.setIsUnlimited(memberCardBatch.getIsUnlimited());
+            memberCard.setMaxBorrowQuantity(memberCardBatch.getBorrowQuantity());
+            memberCard.setDisabled(false); // 会员卡默认启用
+            memberCard.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+            if (memberCard.getEmployeeTime() == null) {
+                memberCard.setEmployeeTime(new Timestamp(System.currentTimeMillis()));//办理时间
+            }
+            //获取会员卡类型
+            MemberCardType memberCardType = MemberCardTypeManager.getInstance().getEntityById(sqlSession, memberCardTypeId);
+            memberCard.setBorrowableQuantity(memberCardType.getMaxQuantity());
+            memberCard.setMaxBorrowableQuantity(memberCardType.getMaxQuantity());
+            memberCard.setMemberCardStatusCode("Normal");
+            // 构建会员对象
+            Member member = null;
+            if (!StringUtils.isEmpty(memberId)) {
+                member = MemberManager.getInstance().getEntity(sqlSession, memberId);
+            } else {
+                member = new Member();
+            }
+            if (!StringUtils.isEmpty(companyId)) {
+                member.setCompanyId(companyId);
+            }
+            if (!StringHelper.isNullOrEmpty(memberName)) {
+                member.setName(memberName);
+            }
+            if (!StringHelper.isNullOrEmpty(birthday)) {
+                member.setBirthday(DateHelper.toTimestamp(birthday));
+            }
+            if (!StringHelper.isNullOrEmpty(mobilePhone)) {
+                member.setMobilePhone(mobilePhone);
+            }
+            if (!StringUtils.isEmpty(gender)) {
+                member.setGender(gender);
+            }
+            if (!StringHelper.isNullOrEmpty(school)) {
+                member.setSchool(school);
+            }
+            if (!StringUtils.isEmpty(gradeId)) {
+                member.setGradeId(gradeId);
+            }
+            if (!StringUtils.isEmpty(classId)) {
+                member.setClassId(classId);
+            }
+            if (!StringHelper.isNullOrEmpty(entranceGuard)) {
+                member.setEntranceGuard(entranceGuard);
+            }
+            if (!StringUtils.isEmpty(deliverAreaId)) {
+                member.setDeliverAreaId(deliverAreaId);
+            }
+            if (!StringUtils.isEmpty(deliverLineId)) {
+                member.setDeliverLineId(deliverLineId);
+            }
+            if (!StringHelper.isNullOrEmpty(address)) {
+                member.setAddress(address);
+            }
+            if (!StringUtils.isEmpty(delivererId)) {
+                member.setDelivererId(delivererId);
+            }
+            if(!StringHelper.isNullOrEmpty(bookboxPlace)){
+                member.setBookboxPlace(bookboxPlace);
+            }
+           /* if (!StringUtils.isEmpty(longitude) && !longitude.equals("null")) {
+                member.setLongitude(Double.valueOf(longitude));
+            }
+            if (!StringUtils.isEmpty(latitude) && !latitude.equals("null")) {
+                member.setLatitude(Double.valueOf(latitude));
+            }*/
+            if (!StringUtils.isEmpty(deliverPlaceId)) {
+                member.setDeliverPlaceId(deliverPlaceId);
+            }
+            /*if (!StringUtils.isEmpty(distanceCode) && !distanceCode.equals("null")) {
+                member.setDistanceCode(distanceCode);
+            }*/
+            if (!StringHelper.isNullOrEmpty(distanceCode)) {
+                member.setDistanceCode(distanceCode);
+            }
+            if (!StringHelper.isNullOrEmpty(paymentMethodCode)) {
+                member.setPaymentMethodCode(paymentMethodCode);
+            }
+            if (!StringHelper.isNullOrEmpty(bookboxNo)) {
+                member.setBookboxNo(bookboxNo);
+            }
+            // 为true且书箱费用大于0自动开通书箱
+            if (isBookboxAmount != null) {
+                if (isBookboxAmount) {
+                    if (!StringUtils.isEmpty(bookboxAmount)) {
+                        member.setBookboxAmount(bookboxAmount);
+                        if (bookboxAmount.compareTo(BigDecimal.ZERO) > 0) {
+                            member.setMemberBookboxStatusCode("WaitReady");
+                        }
+                    }
+                }
+            }
+            // 会员默认未注销状态
+            member.setIsCancel(false);
+            // 书箱默认不激活
+            member.setIsActivated(false);
+            // 会员书箱状态编码
+            member.setMemberBookboxStatusCode("WaitReady");
+            // 加入会员 会员积分+100
+            MemberScoreType memberScoreType = MemberScoreTypeManager.getInstance().getEntity(sqlSession, "NewMember");
+            if (member.getScore() != null) {
+                member.setScore(member.getScore() + memberScoreType.getScore());
+            } else {
+                member.setScore(memberScoreType.getScore());
+            }
+
+            // 绑定会员信息（会员id不为空 修改会员信息，否则新增会员信息）
+            if (memberId != null) {
+                member.setIsSign(false); // 绑定了会员卡取消预登记会员状态
+                member.setUpdateTime(new Timestamp(System.currentTimeMillis())); // 修改时间
+                MemberManager.getInstance().update(sqlSession, member);
+                // 如果当前会员有会员卡将会员卡禁用
+                String sql = "update member_card set disabled = 1 where member_id = " + memberId;
+                MyBatisManager.getInstance().executeUpdate(sqlSession, sql);
+            } else {
+                //判断手机号是否存在
+                Member theMember = MemberManager.getInstance().getEntityByMobilePhone(sqlSession, mobilePhone);
+                if (theMember != null) {
+                    this.writeErrorResponse(response, "该手机号已存在");
+                    return;
+                }
+                // 默认启用
+                member.setEnabled(true);
+                member.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                memberId = MemberManager.getInstance().add(sqlSession, member);
+            }
+
+            // 给会员卡绑定会员
+            memberCard.setMemberId(memberId);
+            // 添加会员积分记录
+            MemberScore newMemberScore = new MemberScore();
+            newMemberScore.setMemberId(memberId);
+            newMemberScore.setScoreTime(DateHelper.getCurrentTimestamp());
+            newMemberScore.setMemberScoreTypeCode("NewMember");
+            newMemberScore.setScore(memberScoreType.getScore());
+            MemberScoreManager.getInstance().add(sqlSession, newMemberScore);
+            /*MemberCommunicaLog memberCommunicaLog = new MemberCommunicaLog();
+            memberCommunicaLog.setMemberId(memberId);
+            memberCommunicaLog.setMemberCommunicaLogTypeCode("MemberScore");
+            memberCommunicaLog.setContent(memberScoreType.getDescription());
+            memberCommunicaLog.setMemberCommunicaLogMethodCode("System");
+            memberCommunicaLog.setCompanyUserId(companyUserId);
+            memberCommunicaLog.setCommunicaTime(new Timestamp(System.currentTimeMillis()));
+            memberCommunicaLog.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            MemberCommunicaLogManager.getInstance().add(sqlSession, memberCommunicaLog);*/
+            // 绑定会员卡信息
+            MemberCardManager.getInstance().update(sqlSession, memberCard);
+            //添加pay_order账单
+            PayOrder newPayOrder = new PayOrder();
+            newPayOrder.setCompanyId(companyId);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            newPayOrder.setMemberId(memberCard.getMemberId());
+            newPayOrder.setPayOrderNo(sdf.format(new Date()));
+            Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+            newPayOrder.setBusinessDate(currentTimestamp);
+            newPayOrder.setPayTime(currentTimestamp);
+            newPayOrder.setOperatorId(memberCard.getEmployeeId());
+            newPayOrder.setPaymentMethodCode(memberCard.getPaymentMethodCode());
+            newPayOrder.setIsFinished(true);
+            newPayOrder.setIsPaid(true);
+            // 书箱费用不为空，才会生成账单
+            if (isBookboxAmount != null && isBookboxAmount) {
+                newPayOrder.setAmount(memberCard.getMembershipAmount().add(member.getBookboxAmount()));
+                newPayOrder.setPaymentItemCode("MemberBookcaseFee");
+            } else {
+                newPayOrder.setAmount(memberCard.getMembershipAmount());
+                newPayOrder.setPaymentItemCode("MembershipFee");
+            }
+            PayOrderManager.getInstance().add(sqlSession, newPayOrder);
+            // 押金费 生成账单
+            if (isSecurityDepositPrice) {
+                /*PayOrder payOrder = new PayOrder();
+                BeanUtils.copyProperties(payOrder,newPayOrder);*/
+                newPayOrder.setId(null);
+                newPayOrder.setPayOrderNo(sdf.format(new Date()));
+                newPayOrder.setAmount(securityDepositPrice);
+                newPayOrder.setPaymentItemCode("DepositFee");
+                PayOrderManager.getInstance().add(sqlSession, newPayOrder);
+            }
+
+            sqlSession.commit();
+            this.writeSuccessResponse(response);
+        } catch (Exception e) {
+            sqlSession.rollback();
+            e.printStackTrace();
+        } finally {
+            sqlSession.close();
+        }
+    }
+}

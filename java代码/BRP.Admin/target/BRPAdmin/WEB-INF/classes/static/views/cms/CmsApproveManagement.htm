@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>内容审核主界面</title>
+<link rel="stylesheet" type="text/css" href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/management.js"></script>
+<script type="text/javascript">
+	managementContext.dataName="CmsContent";
+	managementContext.tableName="cms_content";
+	managementContext.managementPermission="CmsApproveManagement";
+	
+	managementContext.customTableColumns =  [{
+					field : 'title',
+					title : '内容标题',
+					fixed : true,
+					width : 350,
+					align : 'left'
+				},{
+					field : 'sub_title',
+					title : '副标题',
+					fixed : true,
+					width : 350,
+					align : 'center'
+				}, {
+					field : 'cms_channel_name',
+					title : '所属栏目',
+					fixed : true,
+					width : 250,
+					align : 'left'
+				},{
+					field : 'source',
+					title : '来源',
+					fixed : true,
+					width : 250,
+					align : 'center'
+				},{
+					field : 'publish_date',
+					title : '创建时间',
+					width : 150,
+					align : 'left'
+				},{
+					field : 'cms_content_status_name',
+					title : '状态',
+					width : 150,
+					align : 'left'
+				}];
+	/*
+	 * 绑定控件
+	 */
+	function bindControls() {
+		bindControlsBase();
+		//绑定栏目控件
+		bindIdNameComboTree("cmbSearchCmsChannelId", "cms_channel");
+		//绑定内容状态控件
+		bindCodeNameComboBox("cmbSearchCmsContentStatusCode", "cms_content_status");
+		//绑定弹出框内容状态控件
+		bindCodeNameComboBox("cmbCmsContentStatusCode", "cms_content_status");
+	}
+	 
+
+</script>
+
+</head>
+
+<body>
+<div class="easyui-layout" style="width:100%;" fit="true">
+			<div id="content" region="center" style="padding:1px;">
+				<div id="divToolPanel" class="toolbar_panel" id="divToolbar">
+					<a href="#"
+						class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+						onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a id="lnkRefreshPage" href="#"
+						class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+						onclick="refreshPage()">刷新</a>
+				</div>
+				<div id="divSearchPanel" class="search_panel easyui-panel">
+					<div class="search_item">
+						<span class="search_item_caption">所属栏目:</span> <input
+							id="cmbSearchCmsChannelId"
+							class="search_item_textbox easyui-combobox">
+					</div>
+					<div class="search_item">
+						<span class="search_item_caption">标题:</span> <input
+							id="cmbSearchTitle"
+							class="search_item_textbox easyui-combobox">
+					</div>
+					<div class="search_item">
+						<span class="search_item_caption">状态:</span> <input
+							id="cmbSearchCmsContentStatusCode"
+							class="search_item_textbox easyui-combobox">
+					</div>
+					<div class="search_item_command">
+						<a href="#" class="easyui-linkbutton" plain="true"
+							iconCls="icon-search" onclick="query()">查询</a>
+					</div>
+				</div>
+				<div id="divTableGrid">
+					<table id="tableGrid" class="easyui-datagrid" style="height:auto;"
+						fitColumns="true" pagination="true" singleSelect="false">
+						
+					</table>
+				</div>
+	
+			</div>
+
+			<div id="divDetailDialog" class="easyui-dialog" style="width:400px"
+			closed="true" buttons="#divDetailCommandBar">
+			<form id="formDetail" method="post" novalidate
+				style="margin:0;padding:20px 50px">
+				<div style="margin-bottom:10px">
+					<input id="txtTitle" name="txtTitle" class="easyui-textbox"
+						label="标题" labelPosition="top" style="width:100%">
+				</div>
+				<div style="margin-bottom:10px">
+					<input id="txtAuthor" name="txtAuthor" class="easyui-textbox"
+						label="作者:" labelPosition="top" style="width:100%">
+				</div>
+				<div style="margin-bottom:10px">
+					<input id="txtSource" name="txtSource" class="easyui-textbox"
+						label="来源:" labelPosition="top" style="width:100%">
+				</div>
+				<div style="margin-bottom:10px">
+					<input id="txtPublishDate" name="txtPublishDate" class="easyui-textbox"
+						label="创建时间:" labelPosition="top" style="width:100%">
+				</div>
+				<div style="margin-bottom:10px">
+						<input id="cmbCmsContentStatusCode" name="cmbCmsContentStatusCode"
+							class="easyui-combobox" label="内容状态"
+							labelPosition="left" style="width:100%;">
+				</div>
+			</form>
+		</div>
+		<div id="divDetailCommandBar" class="detail_commandbar">
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+				iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">审核</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+				iconCls="icon-cancel"
+				onclick="javascript:$('#divDetailDialog').dialog('close')"
+				style="width:90px">取消</a>
+		</div>
+			
+	</div>
+
+</body>
+</html>

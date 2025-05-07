@@ -1,0 +1,200 @@
+package BRP.data;
+import BRP.data.ViewSalesOrder;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import java.util.*;
+import java.io.IOException;
+import strosoft.app.common.ViewDataMaster;
+import strosoft.app.data.DataEntity;
+public class ViewSalesOrderMaster extends ViewDataMaster 
+{
+    public  List<ViewSalesOrder> getList()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewSalesOrder> list = null;
+        try        
+        {
+            list = getList(sqlSession);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewSalesOrder> getList(SqlSession sqlSession)    
+    {
+        List<ViewSalesOrder> list = sqlSession.selectList("ViewSalesOrder.selectViewSalesOrders");
+        return list;
+    }
+    public  List<ViewSalesOrder> getList(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewSalesOrder> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewSalesOrder> getList(SqlSession sqlSession,String condition)    
+    {
+        List<ViewSalesOrder> list = sqlSession.selectList("ViewSalesOrder.selectViewSalesOrderByCondition",condition);
+        return list;
+    }
+    public  List<ViewSalesOrder> getList(String condition,String orderBy)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewSalesOrder> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition,orderBy);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewSalesOrder> getList(SqlSession sqlSession,String condition,String orderBy)    
+    {
+        String conditionAndOrderBy = condition +" order by "+orderBy;
+        List<ViewSalesOrder> list = sqlSession.selectList("ViewSalesOrder.selectViewSalesOrderByCondition",conditionAndOrderBy);
+        return list;
+    }
+    public  List<ViewSalesOrder> getList(int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewSalesOrder> list = null;
+        try        
+        {
+            list = getList(sqlSession,pageIndex,pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+        finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewSalesOrder> getList(SqlSession sqlSession,int pageIndex,int pageSize)    
+    {
+        String sql = String.format("select * from view_sales_order limit %s, %s", pageSize * pageIndex, pageSize);
+        List<ViewSalesOrder> list = sqlSession.selectList("ViewSalesOrder.selectViewSalesOrderBySql", sql);
+        return list;
+    }
+    public  List<ViewSalesOrder> getListPage(String condition,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewSalesOrder> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewSalesOrder> getList(SqlSession sqlSession,String condition,int pageIndex,int pageSize)    
+    {
+        String sql = condition + " limit " + pageSize * pageIndex + "," + pageSize;
+        List<ViewSalesOrder> list = sqlSession.selectList("ViewSalesOrder.selectViewSalesOrderByCondition",sql);
+        return list;
+    }
+    public  List<ViewSalesOrder> getList(String condition,String orderBy,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<ViewSalesOrder> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, orderBy, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<ViewSalesOrder> getList(SqlSession sqlSession,String condition,String orderBy,int pageIndex,int pageSize)    
+    {
+        String sql = condition +" order by " + orderBy + " limit " + pageSize * pageIndex + " , " + pageSize;
+        List<ViewSalesOrder> list = sqlSession.selectList("ViewSalesOrder.selectViewSalesOrderByCondition",sql);
+        return list;
+    }
+    public  Integer getCount(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer count = null;
+        try        
+        {
+            count = getCount(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return count;
+    }
+    public  Integer getCount(SqlSession sqlSession,String condition)    
+    {
+        Integer rows = sqlSession.selectOne("ViewSalesOrder.selectCountByCondition",condition);
+        return rows;
+    }
+    public  ViewSalesOrder createEntity()    
+    {
+        return new ViewSalesOrder();
+    }
+    public  DataEntity createDataEntity()    
+    {
+        return new ViewSalesOrder();
+    }
+}

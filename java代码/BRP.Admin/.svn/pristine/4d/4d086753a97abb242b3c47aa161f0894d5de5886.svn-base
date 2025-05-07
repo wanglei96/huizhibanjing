@@ -1,0 +1,189 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+public class ViewActivityServiceTime extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer companyId;//门店ID;
+    private  Integer activityId;//活动ID;
+    private  String activityFreeTypeCode;//赠送类型编码;
+    private  Integer memberCardId;//会员卡ID;
+    private  Integer days;//天数;
+    private  String remark;//备注;
+    private  Timestamp expireDate;//失效日期;
+    private  Timestamp createTime;//创建时间;
+    private  Timestamp updateTime;//更新时间;
+    private  String companyName;//门店名称;
+    private  String activityName;//活动名称;
+    private  String memberCardCardNo;//会员卡号;
+    private  Timestamp memberCardEffectiveDate;
+    private  Timestamp memberCardExpireDate;
+    private  String memberName;//名称;
+    private  String referrerName;//名称;
+    private  String activityFreeTypeName;//赠送类型;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setCompanyId(Integer companyId)    
+    {
+        this.companyId = companyId;
+    }
+    public  Integer getCompanyId()    
+    {
+        return companyId;
+    }
+    public  void setActivityId(Integer activityId)    
+    {
+        this.activityId = activityId;
+    }
+    public  Integer getActivityId()    
+    {
+        return activityId;
+    }
+    public  void setActivityFreeTypeCode(String activityFreeTypeCode)    
+    {
+        this.activityFreeTypeCode = activityFreeTypeCode;
+    }
+    public  String getActivityFreeTypeCode()    
+    {
+        return activityFreeTypeCode;
+    }
+    public  void setMemberCardId(Integer memberCardId)    
+    {
+        this.memberCardId = memberCardId;
+    }
+    public  Integer getMemberCardId()    
+    {
+        return memberCardId;
+    }
+    public  void setDays(Integer days)    
+    {
+        this.days = days;
+    }
+    public  Integer getDays()    
+    {
+        return days;
+    }
+    public  void setRemark(String remark)    
+    {
+        this.remark = remark;
+    }
+    public  String getRemark()    
+    {
+        return remark;
+    }
+    public  void setExpireDate(Timestamp expireDate)    
+    {
+        this.expireDate = expireDate;
+    }
+    public  Timestamp getExpireDate()    
+    {
+        return expireDate;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setUpdateTime(Timestamp updateTime)    
+    {
+        this.updateTime = updateTime;
+    }
+    public  Timestamp getUpdateTime()    
+    {
+        return updateTime;
+    }
+    public  void setCompanyName(String companyName)    
+    {
+        this.companyName = companyName;
+    }
+    public  String getCompanyName()    
+    {
+        return companyName;
+    }
+    public  void setActivityName(String activityName)    
+    {
+        this.activityName = activityName;
+    }
+    public  String getActivityName()    
+    {
+        return activityName;
+    }
+    public  void setMemberCardCardNo(String memberCardCardNo)    
+    {
+        this.memberCardCardNo = memberCardCardNo;
+    }
+    public  String getMemberCardCardNo()    
+    {
+        return memberCardCardNo;
+    }
+    public  void setMemberCardEffectiveDate(Timestamp memberCardEffectiveDate)    
+    {
+        this.memberCardEffectiveDate = memberCardEffectiveDate;
+    }
+    public  Timestamp getMemberCardEffectiveDate()    
+    {
+        return memberCardEffectiveDate;
+    }
+    public  void setMemberCardExpireDate(Timestamp memberCardExpireDate)    
+    {
+        this.memberCardExpireDate = memberCardExpireDate;
+    }
+    public  Timestamp getMemberCardExpireDate()    
+    {
+        return memberCardExpireDate;
+    }
+    public  void setMemberName(String memberName)    
+    {
+        this.memberName = memberName;
+    }
+    public  String getMemberName()    
+    {
+        return memberName;
+    }
+    public  void setReferrerName(String referrerName)    
+    {
+        this.referrerName = referrerName;
+    }
+    public  String getReferrerName()    
+    {
+        return referrerName;
+    }
+    public  void setActivityFreeTypeName(String activityFreeTypeName)    
+    {
+        this.activityFreeTypeName = activityFreeTypeName;
+    }
+    public  String getActivityFreeTypeName()    
+    {
+        return activityFreeTypeName;
+    }
+    public  ViewActivityServiceTime copy()    
+    {
+        ViewActivityServiceTime entity = null;
+        try        
+        {
+            entity = (ViewActivityServiceTime) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

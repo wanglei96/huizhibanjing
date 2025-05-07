@@ -1,0 +1,934 @@
+package BRP.model;
+
+import BRP.data.*;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.common.MySqlConditionBuilder;
+import strosoft.app.util.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class BookSkuManager extends BookSkuMaster {
+    private static BookSkuManager _instance;
+
+    private BookSkuManager() {
+        this.setTableName("book_sku");
+        this.setTypeName("BookSku");
+    }
+
+    public static BookSkuManager getInstance() {
+        if (_instance == null) {
+            _instance = new BookSkuManager();
+        }
+        return _instance;
+    }
+
+    /**
+     * 导入BookExcle
+     *
+     * @param path
+     * @param companyId
+     * @return
+     * @throws Exception
+     */
+    public List<ViewBookSkuInfo> batchUploadBookExcel(String path, Integer companyId) throws Exception {
+        File file = new File(path);
+        FileInputStream fis = new FileInputStream(file);
+        Workbook wb = null;
+        String[] split = file.getName().split("\\.");
+        if ("xls".equals(split[1])) {
+            wb = new HSSFWorkbook(fis);
+        } else if ("xlsx".equals(split[1])) {
+            wb = new XSSFWorkbook(fis);
+        }
+        List<AgeGroup> ageGroupList = AgeGroupManager.getInstance().getList();
+        List<ViewBookSkuInfo> newViewBookSkuInfoList = new ArrayList<>();
+        Sheet sheet = wb.getSheetAt(0);
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {// 循环Excel文件的i=1行开始
+            ViewBookSkuInfo newViewBookSkuInfo = new ViewBookSkuInfo();
+            Row row = sheet.getRow(i);
+            if (isEmptyRow(row)) {
+                // 行为空，表示文件结束
+                break;
+            }
+            // 书名
+            Cell bookName = row.getCell(0);
+            String strBookName = getCellValueByCell(bookName);
+            newViewBookSkuInfo.setBookName(strBookName);
+            // 系列
+            Cell bookSeries = row.getCell(1);
+            String strBookSeries = getCellValueByCell(bookSeries);
+            newViewBookSkuInfo.setBookSeriesName(strBookSeries);
+            // 作者
+            Cell author = row.getCell(2);
+            String strAuthor = getCellValueByCell(author);
+            newViewBookSkuInfo.setAuthor(strAuthor);
+            // 出版社
+            Cell press = row.getCell(3);
+            String strPress = getCellValueByCell(press);
+            newViewBookSkuInfo.setPress(strPress);
+            //价格
+            Cell price = row.getCell(4);
+            String strPrice = getCellValueByCell(price);
+            BigDecimal decPrice = new BigDecimal(strPrice).setScale(2,
+                    BigDecimal.ROUND_HALF_UP);
+            newViewBookSkuInfo.setPrice(decPrice);
+            //分类
+            Cell language = row.getCell(5);
+            String strLanguage = getCellValueByCell(language);
+            if ("1".equals(strLanguage)) {
+                newViewBookSkuInfo.setLanguageCode(LanguageCodes.Chinese);
+                newViewBookSkuInfo.setLanguageName("中文");
+            } else {
+                newViewBookSkuInfo.setLanguageCode(LanguageCodes.English);
+                newViewBookSkuInfo.setLanguageName("英文");
+            }
+            //备注
+            Cell bindingType = row.getCell(6);
+            String strBindingType = getCellValueByCell(bindingType);
+            if ("精装".equals(strBindingType)) {
+                newViewBookSkuInfo.setBindingTypeCode(BindingTypeCodes.Hardcover);
+                newViewBookSkuInfo.setBindingTypeName("精装");
+            } else if ("简装".equals(strBindingType)) {
+                newViewBookSkuInfo.setBindingTypeCode(BindingTypeCodes.ConveniencePackage);
+                newViewBookSkuInfo.setBindingTypeName("简装");
+            }
+            //ISBN
+            Cell ISBN = row.getCell(7);
+            String strISBN = getCellValueByCell(ISBN);
+            newViewBookSkuInfo.setISBN(strISBN);
+            //本数
+            Cell bookCount = row.getCell(8);
+            String strBookCount = getCellValueByCell(bookCount);
+            Integer intBookCount = Integer.parseInt(strBookCount);
+            newViewBookSkuInfo.setBookCount(intBookCount);
+            newViewBookSkuInfo.setCompanyId(companyId);
+            List<AgeGroup> newAgeGroupList = new ArrayList<AgeGroup>();
+            //0-2
+            Cell twoAge = row.getCell(9);
+            String strTwoAge = getCellValueByCell(twoAge);
+            if (!StringHelper.isNullOrEmpty(strTwoAge)) {
+                AgeGroup theTwoAge = getAgeGroupByName(ageGroupList, "0-2岁");
+                newAgeGroupList.add(theTwoAge);
+            }
+            //3-6
+            Cell threeAge = row.getCell(10);
+            String strThreeAge = getCellValueByCell(threeAge);
+            if (!StringHelper.isNullOrEmpty(strThreeAge)) {
+                AgeGroup theThreeAge = getAgeGroupByName(ageGroupList, "3-6岁");
+                newAgeGroupList.add(theThreeAge);
+            }
+            //7-10
+            Cell sevenAge = row.getCell(11);
+            String strSevenAge = getCellValueByCell(sevenAge);
+            if (!StringHelper.isNullOrEmpty(strSevenAge)) {
+                AgeGroup theSevenAge = getAgeGroupByName(ageGroupList, "7-10岁");
+                newAgeGroupList.add(theSevenAge);
+            }
+            //11-14
+            Cell elevenAge = row.getCell(12);
+            String strElevenAge = getCellValueByCell(elevenAge);
+            if (!StringHelper.isNullOrEmpty(strElevenAge)) {
+                AgeGroup theElevenAge = getAgeGroupByName(ageGroupList, "11-14岁");
+                newAgeGroupList.add(theElevenAge);
+            }
+            //标签
+            Cell bookTag = row.getCell(13);
+            String strbookTag = getCellValueByCell(bookTag);
+            if (!StringHelper.isNullOrEmpty(strbookTag)) {
+                List<String> strTagList = Arrays.stream(strbookTag.split("\\s*(,|，)\\s*"))
+                        .collect(Collectors.toList());
+                newViewBookSkuInfo.setBookTagNameList(strTagList);
+            }
+            newViewBookSkuInfo.setAgeGroupList(newAgeGroupList);
+            newViewBookSkuInfoList.add(newViewBookSkuInfo);
+        }
+        return newViewBookSkuInfoList;
+    }
+
+
+    /**
+     * 根据年龄组名获取年龄组
+     *
+     * @param ageGroupList 年龄组列表
+     * @param name         年龄组名
+     * @return 年龄组
+     */
+    public AgeGroup getAgeGroupByName(List<AgeGroup> ageGroupList, String name) {
+        for (AgeGroup ageGroup : ageGroupList) {
+            if (ageGroup.getName().equals(name)) {
+                return ageGroup;
+            }
+        }
+        return null;
+    }
+
+    // 获取单元格各类型值，返回字符串类型
+    public String getCellValueByCell(Cell cell) {
+        // 判断是否为null或空串
+        if (cell == null || cell.toString().trim().equals("")) {
+            return "";
+        }
+        String cellValue = "";
+        int cellType = cell.getCellType();
+        switch (cellType) {
+            case Cell.CELL_TYPE_NUMERIC: // 数字
+                short format = cell.getCellStyle().getDataFormat();
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    SimpleDateFormat sdf = null;
+                    if (format == 20 || format == 32) {
+                        sdf = new SimpleDateFormat("HH:mm");
+                    } else if (format == 14 || format == 31 || format == 57 || format == 58) {
+                        // 处理自定义日期格式：m月d日(通过判断单元格的格式id解决，id的值是58)
+                        sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        double value = cell.getNumericCellValue();
+                        Date date = DateUtil.getJavaDate(value);
+                        cellValue = sdf.format(date);
+                    } else {// 日期
+                        sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    }
+                    try {
+                        cellValue = sdf.format(cell.getDateCellValue());// 日期
+                    } catch (Exception e) {
+                        try {
+                            throw new Exception("exception on get date data !".concat(e.toString()));
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+                    } finally {
+                        sdf = null;
+                    }
+                } else {
+                    BigDecimal bd = new BigDecimal(cell.getNumericCellValue());
+                    cellValue = bd.toPlainString();// 数值 用BigDecimal包装再获取plainString，可以防止获取到科学计数值
+                }
+                break;
+            case Cell.CELL_TYPE_STRING: // 字符串
+                cellValue = cell.getStringCellValue();
+                break;
+            case Cell.CELL_TYPE_BOOLEAN: // Boolean
+                cellValue = cell.getBooleanCellValue() + "";
+                ;
+                break;
+            case Cell.CELL_TYPE_FORMULA: // 公式
+                cellValue = cell.getCellFormula();
+                break;
+            default:
+                cellValue = "";
+                break;
+        }
+        // 返回单元格值并去除首尾空格和去除空格
+        return cellValue.trim();
+    }
+
+    /**
+     * 判断行是否为空
+     */
+    public static boolean isEmptyRow(Row row) {
+        for (Cell cell : row) {
+            if (cell.getCellTypeEnum() != CellType.BLANK) {
+                // 单元格非空
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 批量添加SKU和Book
+     */
+    public void batchAddBookSkuAndBook(List<ViewBookSkuInfo> viewBookSkuInfoList, boolean isOn, Integer companyId) throws IOException {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+            List<Book> newBookList = new ArrayList<Book>();
+            Company company = CompanyManager.getInstance().getEntity(sqlSession, companyId);
+            //获取门店所有的SKU
+            List<BookSku> bookSkuList = BookSkuManager.getInstance().getListByCompanyId(sqlSession, companyId);
+            Long newNo = BookManager.getInstance().generateBookSn(sqlSession, company.getCompanyNo());
+            //1000 1001
+            List<BookSkuBookTag> lstBookSkuBookTag = new ArrayList<>();
+            List<BookSkuAgeGroup> lstBookSkuAgeGroup = new ArrayList<>();
+            for (ViewBookSkuInfo viewBookSkuInfo : viewBookSkuInfoList) {
+                boolean foundMatch = false;
+                Integer oldBookSkuId = null;
+                for (BookSku bookSku : bookSkuList) {
+                    if (viewBookSkuInfo.getISBN().equals(bookSku.getISBN())
+                            && viewBookSkuInfo.getBookName().equals(bookSku.getBookName())) {
+                        foundMatch = true;
+                        oldBookSkuId = bookSku.getId();
+                        break;
+                    }
+                }
+                if (foundMatch) {
+                    for (int i = 0; i < viewBookSkuInfo.getBookCount(); i++) {
+                        Book newBook = new Book();
+                        String bookSn = company.getCompanyNo() + "-" + newNo;
+                        newBook.setSn(bookSn);
+                        newBook.setBookSkuId(oldBookSkuId);
+                        newBook.setCompanyId(companyId);
+                        newBook.setIsAvailable(true);
+                        newBook.setBorrowStatusCode(BorrowStatusCodes.In);
+                        if (isOn) {
+                            newBook.setBookStatusCode(BookStatusCodes.On);
+                        } else {
+                            newBook.setBookStatusCode(BookStatusCodes.Off);
+                        }
+                        newNo++;
+                        newBookList.add(newBook);
+                    }
+                    continue;
+                }
+                if (viewBookSkuInfo.getBookSeriesId() == null && !StringHelper.isNullOrEmpty(viewBookSkuInfo.getBookSeriesName())) {
+                    //获取系类ID
+                    Integer bookSeriesId = BookSeriesManager.getInstance().getBookSeriesIdByName(sqlSession, viewBookSkuInfo.getBookSeriesName(), companyId);
+                    viewBookSkuInfo.setBookSeriesId(bookSeriesId);
+                }
+                BookSku newBookSku = (BookSku) ClassHelper.copyObject(BookSku.class, viewBookSkuInfo);
+                newBookSku.setCompanyId(companyId);
+                newBookSku.setIsOnline(true);
+                int bookSkuId = BookSkuManager.getInstance().add(sqlSession, newBookSku);
+                if (viewBookSkuInfo.getAgeGroupList() != null) {
+                    List<AgeGroup> ageGroupList = viewBookSkuInfo.getAgeGroupList();
+                    for (AgeGroup ageGroup : ageGroupList) {
+                        BookSkuAgeGroup newBookSkuAgeGroup = new BookSkuAgeGroup();
+                        newBookSkuAgeGroup.setBookSkuId(bookSkuId);
+                        newBookSkuAgeGroup.setAgeGroupId(ageGroup.getId());
+                        lstBookSkuAgeGroup.add(newBookSkuAgeGroup);
+                    }
+                }
+                if (viewBookSkuInfo.getBookTagNameList() != null) {
+                    for (String strTag : viewBookSkuInfo.getBookTagNameList()) {
+                        //获取标签ID
+                        Integer bookTagId = BookTagManager.getInstance().getBookTagByNameCompanyId(sqlSession, companyId, strTag);
+                        BookSkuBookTag newBookSkuBookTag = new BookSkuBookTag();
+                        newBookSkuBookTag.setBookTagId(bookTagId);
+                        newBookSkuBookTag.setBookSkuId(bookSkuId);
+                        lstBookSkuBookTag.add(newBookSkuBookTag);
+                    }
+                }
+                //添加Book
+                for (int i = 0; i < viewBookSkuInfo.getBookCount(); i++) {
+                    Book newBook = new Book();
+                    //Long randomNo = newNo + i;
+                    String bookSn = company.getCompanyNo() + "-" + newNo;
+                    newBook.setSn(bookSn);
+                    newBook.setBookSkuId(bookSkuId);
+                    newBook.setCompanyId(companyId);
+                    newBook.setIsAvailable(true);
+                    newBook.setBorrowStatusCode(BorrowStatusCodes.In);
+                    if (isOn) {
+                        newBook.setBookStatusCode(BookStatusCodes.On);
+                    } else {
+                        newBook.setBookStatusCode(BookStatusCodes.Off);
+                    }
+                    newNo++;
+                    newBookList.add(newBook);
+                }
+            }
+            BookManager.getInstance().addList(sqlSession, newBookList);
+            BookSkuAgeGroupManager.getInstance().addList(sqlSession, lstBookSkuAgeGroup);
+            BookSkuBookTagManager.getInstance().addList(sqlSession, lstBookSkuBookTag);
+            MyBatisManager.getInstance().commitSession(sqlSession);
+        } catch (Exception e) {
+            MyBatisManager.getInstance().rollbackSession(sqlSession);
+            throw new RuntimeException(e);
+        } finally {
+            MyBatisManager.getInstance().closeSession(sqlSession);
+        }
+    }
+
+    /**
+     * 批量添加门店SKU和图书根据ISBN
+     *
+     * @param viewBookSkuInfoList
+     * @param companyId
+     */
+    public void batchAddBookSkuAndBookByISBN(List<ViewBookSkuInfo> viewBookSkuInfoList, Integer companyId, Boolean isOn) throws IOException {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+            List<Book> newBookList = new ArrayList<Book>();
+            List<BookSkuAgeGroup> newBookSkuAgeGroupList = new ArrayList<BookSkuAgeGroup>();
+            List<BookSkuBookTag> newBookSkuBookTagList = new ArrayList<BookSkuBookTag>();
+            Company company = CompanyManager.getInstance().getEntity(sqlSession, companyId);
+            Long newNo = BookManager.getInstance().generateBookSn(sqlSession, company.getCompanyNo());
+            for (ViewBookSkuInfo viewBookSkuInfo : viewBookSkuInfoList) {
+                if (viewBookSkuInfo.getIsExist()) {
+                    //根据ISBN查询sku
+                    BookSku bookSku = BookSkuManager.getInstance().getEntityByISBNAndCompany(sqlSession, viewBookSkuInfo, companyId);
+                    for (int i = 0; i < viewBookSkuInfo.getBookCount(); i++) {
+                        Book newBook = new Book();
+                        String bookSn = company.getCompanyNo() + "-" + newNo;
+                        newBook.setSn(bookSn);
+                        if (bookSku != null) {
+                            newBook.setBookSkuId(bookSku.getId());
+                        }
+                        newBook.setCompanyId(companyId);
+                        newBook.setIsAvailable(true);
+                        if (isOn) {
+                            newBook.setBookStatusCode(BookStatusCodes.On);
+                        } else {
+                            newBook.setBookStatusCode(BookStatusCodes.Off);
+                        }
+                        newBook.setBorrowStatusCode(BorrowStatusCodes.In);
+                        newBookList.add(newBook);
+                        newNo++;
+                    }
+                } else {
+                    //获取sku下的年龄段
+                    List<BookSkuAgeGroup> bookSkuAgeGroupList = BookSkuAgeGroupManager.getInstance().getListByBookSkuId(sqlSession, viewBookSkuInfo.getId());
+                    //获取sku下的标签
+                    List<ViewBookSkuBookTag> bookSkuBookTagList =
+                            ViewBookSkuBookTagManager.getInstance().getListByBookSkuId(sqlSession, viewBookSkuInfo.getId());
+                    viewBookSkuInfo.setId(null);
+                    BookSku newBookSku = (BookSku) ClassHelper.copyObject(BookSku.class, viewBookSkuInfo);
+                    //添加系列
+                    if (viewBookSkuInfo.getBookSeriesName() != null) {
+                        //获取系列
+                        Integer bookSeriesId = BookSeriesManager.getInstance().getBookSeriesIdByName(sqlSession, viewBookSkuInfo.getBookSeriesName(), companyId);
+                        newBookSku.setBookSeriesId(bookSeriesId);
+                    }
+                    //添加门店
+                    newBookSku.setCompanyId(companyId);
+                    newBookSku.setIsOnline(true);
+                    int bookSkuId = BookSkuManager.getInstance().add(sqlSession, newBookSku);
+                    //添加年龄段
+                    if (bookSkuAgeGroupList != null && bookSkuAgeGroupList.size() > 0) {
+                        for (BookSkuAgeGroup bookSkuAgeGroup : bookSkuAgeGroupList) {
+                            bookSkuAgeGroup.setId(null);
+                            bookSkuAgeGroup.setBookSkuId(bookSkuId);
+                            newBookSkuAgeGroupList.add(bookSkuAgeGroup);
+                        }
+                    }
+                    //添加标签
+                    if (bookSkuBookTagList.size() > 0) {
+                        for (ViewBookSkuBookTag viewBookSkuBookTag : bookSkuBookTagList) {
+                            Integer bookTagId = BookTagManager.getInstance().getBookTagByNameCompanyId(
+                                    sqlSession, companyId, viewBookSkuBookTag);
+                            BookSkuBookTag bookSkuBookTag = new BookSkuBookTag();
+                            bookSkuBookTag.setBookSkuId(bookSkuId);
+                            bookSkuBookTag.setBookTagId(bookTagId);
+                            newBookSkuBookTagList.add(bookSkuBookTag);
+                        }
+                    }
+                    //添加图书
+                    for (int i = 0; i < viewBookSkuInfo.getBookCount(); i++) {
+                        Book newBook = new Book();
+                        String bookSn = company.getCompanyNo() + "-" + newNo;
+                        newBook.setSn(bookSn);
+                        newBook.setBookSkuId(bookSkuId);
+                        newBook.setCompanyId(companyId);
+                        newBook.setIsAvailable(true);
+                        if (isOn) {
+                            newBook.setBookStatusCode(BookStatusCodes.On);
+                        } else {
+                            newBook.setBookStatusCode(BookStatusCodes.Off);
+                        }
+                        newBook.setBorrowStatusCode(BorrowStatusCodes.In);
+                        newBookList.add(newBook);
+                        newNo++;
+                    }
+                }
+            }
+            BookSkuBookTagManager.getInstance().addList(sqlSession, newBookSkuBookTagList);
+            BookSkuAgeGroupManager.getInstance().addList(sqlSession, newBookSkuAgeGroupList);
+            BookManager.getInstance().addList(sqlSession, newBookList);
+            MyBatisManager.getInstance().commitSession(sqlSession);
+        } catch (Exception e) {
+            MyBatisManager.getInstance().rollbackSession(sqlSession);
+            throw new RuntimeException(e);
+        } finally {
+            MyBatisManager.getInstance().closeSession(sqlSession);
+        }
+    }
+
+    /**
+     * 根据isbn和门店ID，获取BookSku对象
+     *
+     * @param sqlSession
+     * @param viewBookSkuInfo
+     * @param companyId
+     * @return
+     */
+    private BookSku getEntityByISBNAndCompany(SqlSession sqlSession, ViewBookSkuInfo viewBookSkuInfo, Integer companyId) {
+        String condition = String.format("ISBN='%s' and press='%s' and book_name='%s' and company_id=%d",
+                viewBookSkuInfo.getISBN(), viewBookSkuInfo.getPress(), viewBookSkuInfo.getBookName(), companyId);
+        List<BookSku> bookSkuList = this.getList(sqlSession, condition);
+        if (bookSkuList.size() > 0) {
+            return bookSkuList.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * 审核门店添加的sku，添加到总部sku库
+     *
+     * @param bookSkuId
+     * @param approverId
+     * @param approveComment
+     */
+    public void ApprovedBookSku(Integer bookSkuId, Integer approverId, String approveComment) throws IOException {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+            BookSku bookSku = BookSkuManager.getInstance().getEntity(sqlSession, bookSkuId);
+            bookSku.setId(null);
+            bookSku.setCompanyId(null);
+            bookSku.setApproverId(approverId);
+            bookSku.setApproveTime(DateHelper.getCurrentTimestamp());
+            bookSku.setApproveComment(approveComment);
+            bookSku.setApproveStatusCode("Approved");
+            bookSku.setBookSeriesId(null);
+            int newBookSkuId = this.add(sqlSession, bookSku);
+            List<BookSkuAgeGroup> bookSkuAgeGroupList = BookSkuAgeGroupManager.getInstance().getListByBookSkuId(sqlSession, bookSkuId);
+            if (bookSkuAgeGroupList != null && bookSkuAgeGroupList.size() > 0) {
+                for (BookSkuAgeGroup bookSkuAgeGroup : bookSkuAgeGroupList) {
+                    bookSkuAgeGroup.setId(null);
+                    bookSkuAgeGroup.setBookSkuId(newBookSkuId);
+                }
+                BookSkuAgeGroupManager.getInstance().addList(sqlSession, bookSkuAgeGroupList);
+            }
+            /*List<BookSkuBookTag> bookSkuBookTagList = BookSkuBookTagManager.getInstance().getListByBookSkuId(sqlSession, bookSkuId);
+            if (bookSkuBookTagList != null && bookSkuBookTagList.size() > 0) {
+                for (BookSkuBookTag bookSkuBookTag : bookSkuBookTagList) {
+                    bookSkuBookTag.setId(null);
+                    bookSkuBookTag.setBookSkuId(newBookSkuId);
+                }
+                BookSkuBookTagManager.getInstance().addList(sqlSession, bookSkuBookTagList);
+            }*/
+            MyBatisManager.getInstance().commitSession(sqlSession);
+        } catch (Exception e) {
+            MyBatisManager.getInstance().rollbackSession(sqlSession);
+            throw new RuntimeException(e);
+        } finally {
+            MyBatisManager.getInstance().closeSession(sqlSession);
+        }
+    }
+
+    public void addCompanyBookTag(SqlSession sqlSession, ViewBookSkuBookTag bookSkuBookTag,
+                                  List<Integer> newBookTagIdList, Integer companyId) {
+        BookTag newBookTag = new BookTag();
+        newBookTag.setName(bookSkuBookTag.getBookTagName());
+        newBookTag.setLanguageCode(bookSkuBookTag.getLanguageCode());
+        newBookTag.setFrontName(bookSkuBookTag.getFrontName());
+        newBookTag.setIsVisible(bookSkuBookTag.getIsVisible());
+        newBookTag.setCompanyId(companyId);
+        Integer newBookTagId = BookTagManager.getInstance().add(sqlSession, newBookTag);
+        newBookTagIdList.add(newBookTagId);
+    }
+
+    /**
+     * 修改sku是否全部借出
+     *
+     * @param session
+     * @param bookSkuId
+     */
+    public void updateIsAvailable(SqlSession session, Integer bookSkuId) throws IOException {
+        String condition = String.format("book_sku_id = %s and is_available is true", bookSkuId);
+        Integer count = BookManager.getInstance().getCount(session, condition);
+        Integer isOut = 1;
+        if (count > 0) {
+            isOut = 0;
+        }
+        String sql = String.format("update book_sku set is_out = %s where id = %s", isOut, bookSkuId);
+        MyBatisManager.getInstance().executeUpdate(session, sql);
+    }
+
+    /**
+     * 批量修改sku的年龄组和标签
+     *
+     * @param lstBookSkuIds
+     * @param lstAgeGroupIds
+     * @param lstBookTagIds
+     */
+    public void batchUpdateBookSkuAgeTag(List<Integer> lstBookSkuIds, List<Integer> lstAgeGroupIds, List<Integer> lstBookTagIds) throws IOException {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+            //根据SKUID删除SKU年龄段
+            String strBookSkuIds = lstBookSkuIds.stream().map(Object::toString).collect(Collectors.joining(","));
+            String condition = String.format("book_sku_id in (%s)", strBookSkuIds);
+            BookSkuAgeGroupManager.getInstance().deleteByCondition(sqlSession, condition);
+            BookSkuBookTagManager.getInstance().deleteByCondition(sqlSession, condition);
+            if (lstAgeGroupIds != null && lstAgeGroupIds.size() > 0) {
+                List<BookSkuAgeGroup> lstNewBookSkuAgeGroupList = new ArrayList<BookSkuAgeGroup>();
+                for (Integer bookSkuId : lstBookSkuIds) {
+                    for (Integer ageGroupId : lstAgeGroupIds) {
+                        BookSkuAgeGroup bookSkuAgeGroup = new BookSkuAgeGroup();
+                        bookSkuAgeGroup.setBookSkuId(bookSkuId);
+                        bookSkuAgeGroup.setAgeGroupId(ageGroupId);
+                        lstNewBookSkuAgeGroupList.add(bookSkuAgeGroup);
+                    }
+                }
+                BookSkuAgeGroupManager.getInstance().addList(sqlSession, lstNewBookSkuAgeGroupList);
+            }
+
+            if (lstBookTagIds != null && lstBookTagIds.size() > 0) {
+                List<BookSkuBookTag> lstNewBookSkuBookTagList = new ArrayList<BookSkuBookTag>();
+                for (Integer bookSkuId : lstBookSkuIds) {
+                    for (Integer bookTagId : lstBookTagIds) {
+                        BookSkuBookTag bookSkuBookTag = new BookSkuBookTag();
+                        bookSkuBookTag.setBookSkuId(bookSkuId);
+                        bookSkuBookTag.setBookTagId(bookTagId);
+                        lstNewBookSkuBookTagList.add(bookSkuBookTag);
+                    }
+                }
+                BookSkuBookTagManager.getInstance().addList(sqlSession, lstNewBookSkuBookTagList);
+            }
+
+            MyBatisManager.getInstance().commitSession(sqlSession);
+        } catch (Exception e) {
+            MyBatisManager.getInstance().rollbackSession(sqlSession);
+            throw new RuntimeException(e);
+        } finally {
+            MyBatisManager.getInstance().closeSession(sqlSession);
+        }
+    }
+
+    /**
+     * 合并SKU
+     *
+     * @param keepSkuId
+     * @param deleteSkuIds
+     */
+    public void combineBookSku(Integer keepSkuId, List<Integer> deleteSkuIds) throws IOException {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+            String strDeleteSkuIds = deleteSkuIds.stream().map(Object::toString).collect(Collectors.joining(","));
+            String sql = String.format("update book set book_sku_id = %d where book_sku_id in (%s)", keepSkuId, strDeleteSkuIds);
+            MyBatisManager.getInstance().executeUpdate(sqlSession, sql);
+            this.batchDelete(sqlSession, deleteSkuIds);
+            MyBatisManager.getInstance().commitSession(sqlSession);
+        } catch (Exception e) {
+            MyBatisManager.getInstance().rollbackSession(sqlSession);
+            throw new RuntimeException(e);
+        } finally {
+            MyBatisManager.getInstance().closeSession(sqlSession);
+        }
+
+    }
+
+    /**
+     * 获取图书借阅统计
+     *
+     * @param companyId
+     * @param bookName
+     * @param createTimeBegin
+     * @param createTimeEnd
+     * @param orderBy
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    public ArrayList<LinkedHashMap<String, Object>> getBookBorrowTotal(Integer companyId, String bookName, String createTimeBegin, String createTimeEnd, String orderBy, Integer pageIndex, Integer pageSize) throws Exception {
+        String sqlLimit = "";
+        if (pageSize > 0) {
+            sqlLimit = " limit " + String.valueOf(pageIndex * pageSize) + "," + pageSize;
+        }
+        String sql = String.format(
+                "SELECT \n" +
+                        "    vbs.*, \n" +
+                        "    IFNULL(borrow_counts.borrow_count, 0) AS borrow_count,\n" +
+                        "    IFNULL(book_counts.book_count, 0) AS book_count\n" +
+                        "FROM \n" +
+                        "    view_book_sku vbs\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT \n" +
+                        "        book_sku_id, \n" +
+                        "        COUNT(*) AS borrow_count\n" +
+                        "    FROM \n" +
+                        "        view_book_order_item\n" +
+                        "    WHERE \n" +
+                        "        book_order_type_code = 'Borrow' %s\n" +
+                        "    GROUP BY \n" +
+                        "        book_sku_id\n" +
+                        ") AS borrow_counts ON vbs.id = borrow_counts.book_sku_id\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT \n" +
+                        "        book_sku_id, \n" +
+                        "        COUNT(*) AS book_count\n" +
+                        "    FROM \n" +
+                        "        book\n" +
+                        "    GROUP BY \n" +
+                        "        book_sku_id\n" +
+                        ") AS book_counts ON vbs.id = book_counts.book_sku_id\n" +
+                        "WHERE \n" +
+                        "    vbs.company_id = %d %s ORDER BY %s %s;",
+                (!StringHelper.isNullOrEmpty(createTimeBegin) && !StringHelper.isNullOrEmpty(createTimeEnd))
+                        ? "AND create_time BETWEEN '" + createTimeBegin + "' AND '" + createTimeEnd + "'"
+                        : "",
+                companyId,
+                (!StringHelper.isNullOrEmpty(bookName)) ? "AND book_name LIKE '%" + bookName + "%'" : "",
+                orderBy, sqlLimit);
+        ArrayList<LinkedHashMap<String, Object>> alData = MyBatisManager.getInstance().executeHashMapList(sql);
+        return alData;
+    }
+
+    public ArrayList<LinkedHashMap<String, Object>> getBorrowNoticeTotal(Integer companyId, String bookName, String createTimeBegin, String createTimeEnd, String orderBy, Integer pageIndex, Integer pageSize) throws Exception {
+        String sqlLimit = "";
+        if (pageSize > 0) {
+            sqlLimit = " limit " + String.valueOf(pageIndex * pageSize) + "," + pageSize;
+        }
+        String sql = String.format(
+                "SELECT \n" +
+                        "    vbs.id,vbs.book_name,vbs.book_series_name,vbs.author,vbs.press,vbs.binding_type_name,\n" +
+                        "    IFNULL(subscription_counts.subscription_count, 0) AS subscription_count,\n" +
+                        "    IFNULL(book_counts.book_count, 0) AS book_count\n" +
+                        "FROM \n" +
+                        "    view_book_sku vbs\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT \n" +
+                        "        book_sku_id, \n" +
+                        "        COUNT(*) AS subscription_count\n" +
+                        "    FROM \n" +
+                        "        member_book_subscription  %s\n" +
+                        "\t\tGROUP BY \n" +
+                        "        book_sku_id\n" +
+                        ") AS subscription_counts ON vbs.id = subscription_counts.book_sku_id\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT \n" +
+                        "        book_sku_id, \n" +
+                        "        COUNT(*) AS book_count\n" +
+                        "    FROM \n" +
+                        "        book\n" +
+                        "    GROUP BY \n" +
+                        "        book_sku_id\n" +
+                        ") AS book_counts ON vbs.id = book_counts.book_sku_id\n" +
+                        "WHERE \n" +
+                        "    vbs.company_id = %d %s ORDER BY %s %s;",
+                (!StringHelper.isNullOrEmpty(createTimeBegin) && !StringHelper.isNullOrEmpty(createTimeEnd))
+                        ? " where create_time BETWEEN '" + createTimeBegin + "' AND '" + createTimeEnd + "'"
+                        : "",
+                companyId,
+                (!StringHelper.isNullOrEmpty(bookName)) ? "AND book_name LIKE '%" + bookName + "%'" : "",
+                orderBy, sqlLimit);
+        ArrayList<LinkedHashMap<String, Object>> alData = MyBatisManager.getInstance().executeHashMapList(sql);
+        return alData;
+    }
+
+    /**
+     * 获取库存不足统计
+     *
+     * @param companyId
+     * @param bookName
+     * @param createTimeBegin
+     * @param createTimeEnd
+     * @param orderBy
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    public ArrayList<LinkedHashMap<String, Object>> getBookStocksLogTotal(Integer companyId, String bookName, String createTimeBegin, String createTimeEnd, String orderBy, Integer pageIndex, Integer pageSize) throws Exception {
+        String sqlLimit = "";
+        if (pageSize > 0) {
+            sqlLimit = " limit " + String.valueOf(pageIndex * pageSize) + "," + pageSize;
+        }
+        String sql = String.format(
+                "SELECT \n" +
+                        "    vbs.id,vbs.book_name,vbs.book_series_name,vbs.author,vbs.press,vbs.binding_type_name,\n" +
+                        "    IFNULL(understock_counts.understock_count, 0) AS understock_count,\n" +
+                        "    IFNULL(book_counts.book_count, 0) AS book_count\n" +
+                        "FROM \n" +
+                        "    view_book_sku vbs\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT \n" +
+                        "        book_sku_id, \n" +
+                        "        COUNT(*) AS understock_count\n" +
+                        "    FROM \n" +
+                        "        book_stocks_log  %s\n" +
+                        "\t\tGROUP BY \n" +
+                        "        book_sku_id\n" +
+                        ") AS understock_counts ON vbs.id = understock_counts.book_sku_id\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT \n" +
+                        "        book_sku_id, \n" +
+                        "        COUNT(*) AS book_count\n" +
+                        "    FROM \n" +
+                        "        book\n" +
+                        "    GROUP BY \n" +
+                        "        book_sku_id\n" +
+                        ") AS book_counts ON vbs.id = book_counts.book_sku_id\n" +
+                        "WHERE \n" +
+                        "    vbs.company_id = %d %s ORDER BY %s %s;",
+                (!StringHelper.isNullOrEmpty(createTimeBegin) && !StringHelper.isNullOrEmpty(createTimeEnd))
+                        ? " where create_time BETWEEN '" + createTimeBegin + "' AND '" + createTimeEnd + "'"
+                        : "",
+                companyId,
+                (!StringHelper.isNullOrEmpty(bookName)) ? "AND book_name LIKE '%" + bookName + "%'" : "",
+                orderBy, sqlLimit);
+        ArrayList<LinkedHashMap<String, Object>> alData = MyBatisManager.getInstance().executeHashMapList(sql);
+        return alData;
+    }
+
+    public String getBookSkuCondition(BookSkuContext context) {
+        MySqlConditionBuilder conditionBuilder = new MySqlConditionBuilder();
+        conditionBuilder.add(context.getCondition());
+        conditionBuilder.addEqualCondition("company_id", context.getCompanyId());
+        conditionBuilder.addEqualCondition("book_series_id", context.getBookSeriesId());
+        conditionBuilder.addLikeCondition("book_name", context.getBookName());
+        conditionBuilder.addLikeCondition("author", context.getAuthor());
+        conditionBuilder.addLikeCondition("ISBN", context.getISBN());
+        conditionBuilder.add(context.getIsOnlineQuery());
+        if (context.getBookTagSelectValue() != null) {
+            conditionBuilder.add(String.format(
+                    "id in (SELECT book_sku_id FROM book_sku_book_tag WHERE book_tag_id =%s)", context.getBookTagSelectValue()));
+        }
+        if (context.getAgeGroupSelectValue() != null) {
+            conditionBuilder.add(String.format(
+                    "id in (SELECT book_sku_id FROM book_sku_age_group WHERE age_group_id =%s)", context.getAgeGroupSelectValue()));
+        }
+        return conditionBuilder.toString();
+    }
+
+    public ArrayList<LinkedHashMap<String, Object>> getBookSkuInfoList(BookSkuContext context, String sqlWhere) throws Exception {
+        String sqlLimit = "";
+        int pageSize = context.getPageSize();
+        int pageIndex = context.getPageIndex();
+        if (pageSize > 0) {
+            sqlLimit = " limit " + String.valueOf(pageIndex * pageSize) + "," + pageSize;
+        }
+        String sqlOrderBy = "";
+        if (context.getOrderBy() != null && !context.getOrderBy().equals("")) {
+            sqlOrderBy = " order by  " + context.getOrderBy();
+        }
+        String sql = String.format("SELECT \n" +
+                "    bs.id,\n" +
+                "    bs.book_name as bookName,\n" +
+                "    bs.author,\n" +
+                "    bs.press,\n" +
+                "    bs.price,\n" +
+                "    bs.ISBN,\n" +
+                "    bs.is_online as isOnline,\n" +
+                "\t\tbs.image_file_id as imageFileId,\n" +
+                "\t\tbs.company_id as companyId,\n" +
+                "\t\tbs.platform_book_sku_id as platformBookSkuId,\n" +
+                "\t\tbs.binding_type_code as bindingTypeCode,\n" +
+                "\t\tbs.book_series_id as bookSeriesId,\n" +
+                "\t\tbs.language_code as languageCode,\n" +
+                "    bs.create_time as createTime,\n" +
+                "\t\timage_file.path AS imageFilePath,\n" +
+                "\t\tcompany.company_name AS companyName,\n" +
+                "\t\tbook_series.name AS bookSeriesName,\n" +
+                "\t\tlanguage.name AS languageName,\n" +
+                "\t\tbinding_type.name AS bindingTypeName,\n" +
+                "\t\timage_file.small_image_file_path AS smallImageFilePath,\n" +
+                "GROUP_CONCAT(DISTINCT bt.name SEPARATOR ',') AS bookTagNames,\n" +
+                "    GROUP_CONCAT(DISTINCT ag.name SEPARATOR ',') AS ageGroupNames\n" +
+                "FROM \n" +
+                "    (SELECT id,book_name,author,press,price,ISBN,is_online,image_file_id,company_id,platform_book_sku_id,\n" +
+                "binding_type_code,book_series_id,language_code,create_time FROM book_sku %s %s %s) AS bs\n" +
+                "LEFT JOIN \n" +
+                "\t\tsys_upload_file image_file ON bs.image_file_id = image_file.id \n" +
+                "LEFT JOIN \n" +
+                "\t\tcompany ON bs.company_id = company.id \n" +
+                "LEFT JOIN \n" +
+                "\t\tbook_series ON bs.book_series_id = book_series.id \n" +
+                "LEFT JOIN \n" +
+                "\t\tlanguage ON bs.language_code = language.code \n" +
+                "LEFT JOIN \n" +
+                "\t\tbinding_type ON bs.binding_type_code = binding_type.code \t\t\n" +
+                "LEFT JOIN \n" +
+                "    book_sku_book_tag bsbt ON bsbt.book_sku_id = bs.id\n" +
+                "LEFT JOIN \n" +
+                "    book_tag bt ON bt.id = bsbt.book_tag_id\n" +
+                "LEFT JOIN \n" +
+                "    book_sku_age_group bsag ON bsag.book_sku_id = bs.id\n" +
+                "LEFT JOIN \n" +
+                "    age_group ag ON ag.id = bsag.age_group_id \n" +
+                "GROUP BY \n" +
+                "bs.id, bs.book_name, bs.author, bs.press, bs.price,\n" +
+                "    bs.ISBN, bs.is_online, bs.create_time, bs.image_file_id,\n" +
+                "    bs.company_id, bs.platform_book_sku_id, bs.binding_type_code,\n" +
+                "    bs.book_series_id, bs.language_code, image_file.path, \n" +
+                "    company.company_name, book_series.name, language.name, \n" +
+                "    binding_type.name, image_file.small_image_file_path \n" +
+                "ORDER BY bs.create_time desc,bs.book_series_id,bs.book_name", sqlWhere, sqlOrderBy, sqlLimit);
+        return MyBatisManager.getInstance().executeHashMapList(sql);
+    }
+
+    public ArrayList<LinkedHashMap<String, Object>> getViewBookSkuInfoList(Integer pageIndex, Integer pageSize, String sqlWhere, String orderBy) throws Exception {
+        String sqlLimit = "";
+        if (pageSize > 0) {
+            sqlLimit = " limit " + String.valueOf(pageIndex * pageSize) + "," + pageSize;
+        }
+        String sqlOrderBy = "";
+        if (orderBy != null && !orderBy.equals("")) {
+            sqlOrderBy = "," + orderBy;
+        }
+        String sql = String.format("SELECT \n" +
+                        "    bs.*,\n" +
+                        "    image_file.path AS image_file_path,\n" +
+                        "    company.company_name AS company_name,\n" +
+                        "    language.name AS language_name,\n" +
+                        "    binding_type.name AS binding_type_name,\n" +
+                        "    image_file.small_image_file_path AS small_image_file_path,\n" +
+                        "    GROUP_CONCAT(DISTINCT bt.name SEPARATOR ',') AS bookTagNames,\n" +
+                        "    GROUP_CONCAT(DISTINCT ag.name SEPARATOR ',') AS ageGroupNames\n" +
+                        "FROM (\n" +
+                        "    SELECT \n" +
+                        "        book_sku.id AS id,\n" +
+                        "        book_sku.book_name AS book_name,\n" +
+                        "        book_sku.author AS author,\n" +
+                        "        book_sku.press AS press,\n" +
+                        "        book_sku.price AS price,                         \n" +
+                        "        book_sku.ISBN AS ISBN,\n" +
+                        "        book_sku.is_online AS is_online,\n" +
+                        "        book_sku.image_file_id AS image_file_id,\n" +
+                        "        book_sku.company_id AS company_id,\n" +
+                        "        book_sku.platform_book_sku_id AS platform_book_sku_id,\n" +
+                        "        book_sku.binding_type_code AS binding_type_code,\n" +
+                        "        book_sku.book_series_id AS book_series_id,\n" +
+                        "        book_sku.language_code AS language_code,\n" +
+                        "        book_sku.create_time AS create_time,\n" +
+                        "        book_series.name AS book_series_name,\n" +
+                        "        COUNT(b.id) > 0 AS isBookAvailable\n" +
+                        "    FROM \n" +
+                        "        book_sku\n" +
+                        "    LEFT JOIN \n" +
+                        "        book_series ON book_sku.book_series_id = book_series.id\n" +
+                        "    LEFT JOIN \n" +
+                        "        book b ON b.book_sku_id = book_sku.id AND b.is_available = 1 AND b.book_status_code = 'On' \n" +
+                        " %s   GROUP BY \n" +
+                        "        book_sku.id, book_sku.book_name, book_sku.author, book_sku.press, book_sku.price,\n" +
+                        "\t\t\t\tbook_sku.ISBN, book_sku.is_online, book_sku.create_time, book_sku.image_file_id,\n" +
+                        "\t\t\t\tbook_sku.company_id, book_sku.platform_book_sku_id, book_sku.binding_type_code,\n" +
+                        "\t\t\t\tbook_sku.book_series_id, book_sku.language_code,book_series.name\n" +
+                        "\t\tORDER BY isBookAvailable DESC %s %s\n" +
+                        ") AS bs\n" +
+                        "LEFT JOIN \n" +
+                        "    sys_upload_file image_file ON bs.image_file_id = image_file.id \n" +
+                        "LEFT JOIN \n" +
+                        "    company ON bs.company_id = company.id\n" +
+                        "LEFT JOIN \n" +
+                        "    language ON bs.language_code = language.code \n" +
+                        "LEFT JOIN \n" +
+                        "    binding_type ON bs.binding_type_code = binding_type.code \n" +
+                        "LEFT JOIN \n" +
+                        "    book_sku_book_tag bsbt ON bsbt.book_sku_id = bs.id\n" +
+                        "LEFT JOIN \n" +
+                        "    book_tag bt ON bt.id = bsbt.book_tag_id\n" +
+                        "LEFT JOIN \n" +
+                        "    book_sku_age_group bsag ON bsag.book_sku_id = bs.id\n" +
+                        "LEFT JOIN \n" +
+                        "    age_group ag ON ag.id = bsag.age_group_id\n" +
+                        "GROUP BY\n" +
+                        "bs.id, bs.book_name, bs.author, bs.press, bs.price,\n" +
+                        "bs.ISBN, bs.is_online, bs.create_time, bs.image_file_id,\n" +
+                        "bs.company_id, bs.platform_book_sku_id, bs.binding_type_code,\n" +
+                        "bs.book_series_id, bs.language_code, image_file.path, \n" +
+                        "company.company_name, bs.book_series_name, language.name, \n" +
+                        "binding_type.name, image_file.small_image_file_path\n" +
+                        "ORDER BY bs.isBookAvailable DESC",
+                sqlWhere, sqlOrderBy, sqlLimit);
+        return MyBatisManager.getInstance().executeHashMapList(sql);
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "分类",
+  "navigationBarBackgroundColor": "#5EAC59",
+  "navigationBarTextStyle": "white",
+  "disableScroll": true,
+  "usingComponents": {
+    "uni-search-bar": "/components/uni-search-bar/uni-search-bar"
+  }
+}

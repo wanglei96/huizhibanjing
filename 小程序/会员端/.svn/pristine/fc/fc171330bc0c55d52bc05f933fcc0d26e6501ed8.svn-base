@@ -1,0 +1,273 @@
+<template>
+	<view class="container">
+		<view class="" style="height: 10px;"></view>
+		<view class="contentPanel" :style="{'height':windowHeight+'px'}">
+			<view class="logo-box">
+				<image class="" :src="logoImage" mode="widthFix" style="width: 320rpx;"></image> 
+				<!-- <text>慧至半径童书馆</text> -->
+			</view>
+			<button class="button_blue" open-type="getPhoneNumber" @getphonenumber="phoneNumberChanged">手机号快捷登录</button>
+			<button class="back-btn" @tap="back">取消</button>
+			<view class="treaty-box">
+				<view class="treaty-box-bottom-top">
+					<checkbox-group @change="agreeTreaty">
+						<view class="label-box">
+							<checkbox value="0" :checked="isAgreeTreaty" style="transform:scale(0.7)" />
+							<text class="f26">我已阅读并同意</text>
+						</view>
+					</checkbox-group>
+				</view>
+				<view class="treaty-box-bottom">
+					<view @click="clickToExplain('2')">
+						<text class="f26">《用户协议》</text>
+					</view>
+					<text>和</text>
+					<view @click="clickToExplain('1')">
+						<text class="f26">《隐私政策》</text>
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="" style="height: 40px;"></view> 
+	</view>
+</template>
+<script>
+	import config from "@/js/config.js";
+	import common from "@/js/common.js";
+	import WXBizDataCrypt from "@/js/WXBizDataCrypt.js";
+	let windowHeight = uni.getSystemInfoSync().windowHeight - 80; // 屏幕 高度
+	export default {
+		data() {
+			return {
+				windowHeight, // 状态栏 高度
+				logoImage: '/static/image/common/headLogo.png', //logo图
+				mobilePhone: "",
+				isAgreeTreaty: false, //是否同意协议
+				sessionKey: "",
+				wxOpenId: "",
+				returnUrl: '',
+				type: '',
+				unionID:'',
+			};
+		},
+		onShow() {
+			this.windowHeight = uni.getSystemInfoSync().windowHeight - 80
+		},
+		onLoad(option) {
+			console.log(uni.getSystemInfoSync().windowHeight)
+			console.log(uni.getSystemInfoSync())
+			console.log(option.returnUrl)
+			this.returnUrl = unescape(option.returnUrl);
+			console.log(this.returnUrl)
+			this.type = option.type
+			// #ifdef MP-WEIXIN
+			var self = this;
+			wx.login({
+				success(res) {
+					if (res.code) {
+						var data = {};
+						data.code = res.code;
+						common.call("GetWxaSession", data, function(result) {
+							self.wxOpenId = result.data.openID;
+							self.sessionKey = result.data.sessionKey;
+						})
+					} else {
+						console.log('登录失败！' + res.errMsg)
+					}
+				}
+			})
+			// #endif
+		},
+		methods: {
+			clickToExplain(type) {
+				console.log(type)
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'explain?type=' + type
+					});
+				}, 200);
+			},
+			wxLogin: function() {
+				var self = this;
+				if (this.wxOpenId == "") {
+					uni.showToast({
+						title: "请先授权获取微信用户信息",
+						icon: "none"
+					});
+					return;
+				}
+				
+				// if (self.type == "user") {
+				// 	uni.switchTab({
+				// 		url: "/pages/user/index"
+				// 	})
+				// } else if (self.type == "books") {
+				// 	uni.switchTab({
+				// 		url: "/pages/books/index"
+				// 	})
+				// } else {
+				// 	console.log(self.returnUrl)
+
+				// }
+				console.log(this.mobilePhone)
+				var data = new Object();
+				data.wxaOpenId = this.wxOpenId;
+				data.mobilePhone = this.mobilePhone;
+				data.companyId = uni.getStorageSync("companyId");
+				data.unionId = this.unionID;
+				common.call("MemberWXLogin", data, function(result) {
+					console.log("数据：", result);
+					var memberInfo = result.data;
+					uni.setStorageSync("memberId", memberInfo.id);
+					uni.setStorageSync("companyId", memberInfo.companyId);
+					uni.setStorageSync("wxOpenId", memberInfo.wxaOpenId);
+					uni.setStorageSync("mobilePhone", data.mobilePhone);
+					if (self.returnUrl && self.returnUrl != "undefined") {
+						uni.switchTab({
+							url: self.returnUrl
+						})
+					} else {
+						uni.navigateBack();
+					}
+				});
+			},
+			phoneNumberChanged(e) {
+				if (!this.checkInput()) {
+					return false;
+				}
+				uni.showLoading({
+					mask: true
+				});
+				var self = this;
+				wx.login({
+					success: function(res) {
+						console.log(res);
+						var data = {};
+						data.code = res.code;
+						data.WXAppID = config.appId;
+						common.call("GetWxaSession", data, function(result) {
+							console.log(result)
+							var sessionKey = result.data.sessionKey;
+							var cryptor = new WXBizDataCrypt(config.appId, sessionKey);
+							if(e.detail.encryptedData == undefined || e.detail.encryptedData =="undefined"){
+								uni.showToast({
+									title: "授权失败",
+									icon: "none"
+								});
+								uni.hideLoading();
+								return;
+							}
+							var decryptedData = cryptor.decryptData(e.detail.encryptedData, e.detail.iv)
+								
+							self.mobilePhone = decryptedData.phoneNumber;
+							self.unionID = result.data.unionID
+							console.log(self.mobilePhone)
+							console.log(decryptedData)
+							self.$forceUpdate();
+
+							uni.showLoading({
+								mask: true
+							});
+							self.wxLogin();
+						})
+					}
+				})
+				console.log(e);
+			},
+			back() {
+				uni.navigateBack();
+			},
+			agreeTreaty(e) {
+				var value = e.detail.value;
+				if (value.length > 0) {
+					this.isAgreeTreaty = true;
+				} else {
+					this.isAgreeTreaty = false;
+				}
+			},
+			checkInput() {
+				console.log(this.isAgreeTreaty)
+				if (!this.isAgreeTreaty) {
+					uni.showToast({
+						title: "请先阅读并同意《用户服务协议》和《隐私政策协议》",
+						icon: "none"
+					})
+					return false;
+				}
+				return true;
+			},
+		},
+
+	};
+</script>
+<style>
+	@import url("/css/common.css");
+	@import url("/css/base.css");
+
+	page {
+		background-color: #5EAC59;
+	}
+
+	.logo-box {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		margin-top: 100rpx;
+		margin-bottom: 50rpx;
+	}
+
+	.logo-img {
+		width: 350rpx;
+		height: 220rpx;
+		/* border-radius: 50%; */
+		/* padding: 10rpx; */
+		/* border: 1rpx solid #e1e1e1; */
+		margin-bottom: 10rpx;
+	}
+
+	.button_blue {
+		border-radius: 40rpx;
+		/* background: linear-gradient(93deg, #FACC3F 0%, #FACC3F 100%); */
+		background: rgb(243,152,56);
+		font-size: 28rpx;
+	}
+
+	.back-btn {
+		width: 80%;
+		background-color: #ebebeb;
+		color: #000000;
+		border-radius: 40rpx;
+		height: 80rpx;
+		line-height: 80rpx;
+		font-size: 28rpx;
+		margin-top: 20rpx;
+	}
+
+	.treaty-box {
+		display: flex;
+		align-items: center;
+		/* width: 700rpx; */
+		justify-content: center;
+		margin: 30rpx auto;
+
+	}
+
+	.label-box {
+		display: flex;
+		align-items: center;
+	}
+
+	.treaty-box-bottom {
+		display: flex;
+		align-items: center;
+	}
+
+	text {
+		font-size: 28rpx;
+	}
+
+	.blue {
+		color: #198cff;
+	}
+</style>

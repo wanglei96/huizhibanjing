@@ -1,0 +1,84 @@
+.divDataBaseName div{
+	float: right;
+}
+.buttonSearch{
+	margin-right: 20px;
+}
+.divModule{
+	width: 150px;
+	height:600px;
+	border-right: 1px solid #ccc;
+	float:left; 
+}
+.divModule_title,.divModule_add,.module_item{
+	height:30px;
+	line-height:30px;
+	border-bottom:1px solid #ccc; 
+}
+.module_item,.divModule_add{
+	cursor:pointer;
+}
+.divModule_title,.divModule_add{
+	text-align: center;	
+}
+.checked_module_item{
+	background-color: #eee;
+}
+.table_div{
+	float: left;
+	width:450px;
+	overflow:hidden;
+	height:600px;
+	border-right:1px solid #ccc;  
+}
+.table_div_title{
+	text-align: center;
+	height:30px;
+	line-height:30px;
+	border-bottom:1px solid #ccc;
+}
+.table_item{
+	height:20px;
+	line-height:20px;
+	border-bottom:1px solid #ccc;
+}
+.table_choose,.open_table_detail,.table_delete{
+	float:right;
+	width:40px;
+	line-height:20px;
+	text-align:center;
+	border-left:1px solid #ccc;
+	background-color: #eee;
+	
+}
+.table_div .datagrid-btable{
+	max-height:522px;
+    overflow-y: auto;
+    display:inline-block;
+}
+.output_directory{
+	width:300px;
+}
+.add_table_button{
+	float: right;
+	margin-right: 5px;
+}
+.saveFeild{
+	margin-left: 5px;
+}
+.button_create_code{
+	float: right;
+}
+.div_code_generate_select{
+	width: 100px;	
+}
+.div_code_generate{
+	float:right;
+}
+.img_module_button{
+	margin-top:5px;
+	margin-right:3px;
+	float:right;
+	height:20px;
+	cursor:pointer;
+}

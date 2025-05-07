@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>参数管理</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css"></link>
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css"></link>
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/management.js?v=7"></script>
+
+<link rel="stylesheet" href="../../css/common.css" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script>
+	managementContext.dataName = "SysSetting";
+	managementContext.tableName = "sys_setting";
+	managementContext.primaryKeyName = "code";
+	managementContext.customTableColumns = [ {
+		field : 'code',
+		title : '编码',
+		fixed : true,
+		width : 150,
+		align : 'left'
+	}, {
+		field : 'name',
+		title : '名称',
+		fixed : true,
+		width : 150,
+		align : 'left'
+	}, {
+		field : 'sys_setting_category_name',
+		title : '所属分类',
+		fixed : true,
+		width : 80,
+		align : 'center'
+	}, {
+		field : 'required_name',
+		title : '是否必填',
+		fixed : true,
+		width : 80,
+		align : 'center'
+	}, {
+		field : 'sys_data_type_name',
+		title : '数据类型',
+		fixed : true,
+		width : 80,
+		align : 'center'
+	}, {
+		field : 'sys_ui_control_name',
+		title : '控件类型',
+		fixed : true,
+		width : 80,
+		align : 'center'
+	}, {
+		field : 'description',
+		title : '描述',
+		width : 100,
+		align : 'left'
+	} ];
+	function bindControls() {
+		//绑定参数分类
+		bindCodeNameTree("ulSysSettingCategory", "sys_setting_category",
+				"参数分类", false, function(node) {
+					bindData();
+				});
+		//绑定参数分类
+		bindCodeNameComboTree("ctSysSettingCategoryCode",
+				"sys_setting_category");
+		//绑定控件类型
+		bindCodeNameComboTree("ctSysUIControlCode", "sys_ui_control");
+		//绑定数据类型
+		bindCodeNameComboTree("ctSysDataTypeCode", "sys_data_type");
+	}
+	/*
+	  取得请求参数
+	 */
+	function getParameters() {
+		var parameters = getParametersBase();
+		parameters.sysSettingCategoryCode = getSysSettingCategoryCode();
+		return parameters;
+	}
+	/*
+		取得参数分类节点Code
+	 */
+	function getSysSettingCategoryCode() {
+		var node = $("#ulSysSettingCategory").tree("getSelected");
+		//alert(JSON.stringify(node));
+		if (node == null) {
+			var parentCode = "";
+			return parentCode;
+		}
+		return node.id;
+	}
+
+	/*
+	 * 设置修改模式
+	 */
+	function setEditMode() {
+		setEditModeBase();
+		$("#txtCode").textbox("readonly", true);
+	}
+</script>
+</head>
+<body>
+	<div class="easyui-layout" style="width:100%;" fit="true">
+		<div region="west" split="true" title="" style="width:150px;"
+			id="divNbqaBusinessTypePanel">
+			<p style="padding:5px;margin:0;"></p>
+			<ul id="ulSysSettingCategory" class="easyui-tree">
+			</ul>
+		</div>
+		<div id="content" region="center" style="padding:1px;">
+			<div class="toolbar_panel" id="divToolbar">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add"
+					plain="true" onclick="openAddDialog()" id="btnAdd">新增</a> <a href="#"
+					class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+					onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a id="lnkRefreshPage" href="#"
+					class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+					onclick="refreshPage()">刷新</a>
+			</div>
+			<div id="divSearchPanel" class="search_panel easyui-panel">
+				<div class="search_item">
+					<span class="search_item_caption">编码:</span> <input
+						id="txtSearchCode" class="search_item_textbox easyui-textbox">
+				</div>
+				<div class="search_item">
+					<span class="search_item_caption">名称:</span> <input
+						id="txtSearchName" class="search_item_textbox easyui-textbox">
+				</div>
+				<div class="search_item_command">
+					<a href="#" class="easyui-linkbutton" plain="true"
+						iconCls="icon-search" onclick="query()">查询</a>
+				</div>
+			</div>
+			<table id="tableGrid">
+			</table>
+			<!-- 基本信息 -->
+			<div id="divDetailDialog" class="easyui-dialog" style="width:450px"
+				closed="true" buttons="#dlg-buttons">
+				<form id="formDetail" method="post" novalidate
+					style="margin:0;padding:20px 20px">
+					<div title="基本信息" data-options="closable:false"
+						style="padding:10px">
+						<div style="margin-bottom:10px">
+							<input id="txtCode" name="txtAppNumber" class="easyui-textbox"
+								label="编码:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="txtName" name="txtServiceName" class="easyui-textbox"
+								label="名称:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="txtValue" name="txtValue" class="easyui-textbox"
+								label="初始值:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="ctSysSettingCategoryCode"
+								name="ctSysSettingCategoryCode" class="easyui-combotree"
+								label="所属分类:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="ctSysUIControlCode" name="ctSysUIControlCode"
+								class="easyui-combotree" label="控件类型:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="ctSysDataTypeCode" name="ctSysDataTypeCode"
+								class="easyui-combotree" label="数据类型:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<label style="width: 100px; height:24px;">是否必填:</label> <input
+								type="checkbox" style="margin-left: 25px;" id="chkRequired"
+								name="chkRequired" />
+						</div>
+						<div style="margin-bottom:10px">
+							<label style="width: 100px; height:24px;">是否只读:</label> <input
+								type="checkbox" style="margin-left: 25px;" id="chkReadonly"
+								name="chkReadonly" />
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="txtDescription" name="txtDescription"
+								class="easyui-textbox" label="描述:" multiline="true"
+								labelPosition="left" style="width:100%;height:120px;">
+						</div>
+					</div>
+				</form>
+			</div>
+			<div id="dlg-buttons">
+				<a href="javascript:void(0)" class="easyui-linkbutton"
+					iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton"
+					id="btnCancel" iconCls="icon-cancel"
+					onclick="javascript:closeDetailDialog();" style="width:90px">取消</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

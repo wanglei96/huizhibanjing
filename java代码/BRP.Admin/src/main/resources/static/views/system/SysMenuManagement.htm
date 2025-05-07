@@ -1,0 +1,755 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>菜单管理</title>
+	<link rel="stylesheet" type="text/css"
+		  href="../../themes/custom/easyui.css" />
+	<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+	<script type="text/javascript" src="../../js/jquery.js"></script>
+	<script type="text/javascript" src="../../js/util.js"></script>
+	<script type="text/javascript" src="../../js/common.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script type="text/javascript" src="../../js/json2.js"></script>
+	<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../../js/util.js?v=1"></script>
+	<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+	<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../js/jquery.query.js"></script>
+	<script type="text/javascript" src="../../js/jquery.uploader.js"></script>
+	<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+	<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+	<script type="text/javascript" src="../../js/management.js"></script>
+	<style>
+		.addFunction {
+			margin-right: 31px;
+			margin-left: 31px;
+			margin-bottom: 10px;
+		}
+
+		.inline_block_div {
+			width: 180px;
+			display: inline-block;
+		}
+
+		.input-file {
+			width: 68px;
+		}
+
+		.filePath {
+			width: 350px;
+		}
+
+		.divPreview {
+			display: none;
+			width: 300px;
+			height: 300px;
+			position: absolute;
+			z-index: 10000;
+			top: 100px;
+			left: 700px;
+		}
+
+		#picPreview {
+			width: 250px;
+			height: auto;
+		}
+
+		.preview {
+			width: 250px;
+			height: auto;
+		}
+
+		.imgThumb {
+			max-height: 80px;
+			max-width: 200px;
+		}
+
+		.photo {
+			max-width: 50px;
+			max-height: 50px;
+			border: 1px;
+			position: relative;
+			top: 8px;
+			cursor: pointer;
+		}
+
+		.inputFilePath {
+			width: 330px;
+			position: relative;
+			left: -49px;
+			top: 10px;
+			font-size: 12px;
+			position: relative;
+			border: 1px solid #ddd;
+			background-color: #fff;
+			vertical-align: middle;
+			display: inline-block;
+			overflow: hidden;
+			-moz-border-radius: 4px 4px 4px 4px;
+			-webkit-border-radius: 4px 4px 4px 4px;
+			border-radius: 4px 4px 4px 4px;
+			height: 22px;
+			line-height: 22px;
+		}
+	</style>
+	<script>
+		managementContext.dataName = "SysMenu";
+		managementContext.tableName = "sys_menu";
+		managementContext.title = "菜单";
+		managementContext.gridType = "Tree";
+		var functionContext = new Object();
+		functionContext.dialogMode = "view";
+		functionContext.pageIndex = 0;
+		functionContext.pageSize = config.defaultPageSize;
+		functionContext.allowPaging = true;
+		/*
+        取得树的列
+         */
+		function getTreeColumns(lstData) {
+			var treeColumns = [ [ {
+				title : '操作',
+				field : 'operation',
+				width : 240,
+				fixed : true,
+				align : 'center'
+			}, {
+				title : '名称',
+				field : 'name',
+				fixed : true,
+				width : 180
+			}, {
+				field : 'sys_menu_type_name',
+				title : '菜单类型',
+				fixed : true,
+				width : 80,
+				align : 'center'
+			}, {
+				field : 'value',
+				title : '菜单值',
+				fixed : true,
+				width : 150,
+				align : 'left'
+			}, {
+				field : 'display_order',
+				title : '显示顺序',
+				fixed : true,
+				width : 80,
+				align : 'right'
+			}, {
+				field : 'url',
+				title : '地址',
+				width : 80
+			} ] ];
+			return treeColumns;
+		}
+		/*
+        绑定控件
+         */
+		function bindControls() {
+			//菜单类型
+			bindCodeNameComboBox("cmbSearchSysMenuTypeCode", "sys_menu_type");
+			//菜单类型
+			bindCodeNameComboBox("cmbSysMenuTypeCode", "sys_menu_type");
+			//上级菜单
+			bindIdNameComboTree("ctParentId", "sys_menu");
+		}
+		/*
+        刷新控件
+         */
+		function refreshControls() {
+			//上级菜单
+			bindIdNameComboTree("ctParentId", "sys_menu");
+		}
+
+		/*
+         * 取得树节点
+         */
+		function getTreeNode(dataItem) {
+			var treeNode = dataItem;
+			var lnkViewHtml = getGridViewButtonHtml(dataItem);
+			var lnkEditHtml = getGridEditButtonHtml(dataItem);
+			var lnkDeleteHtml = getGridDeleteButtonHtml(dataItem);
+			var lnkMoveUpHtml = getGridMoveUpButtonHtml(dataItem);
+			var lnkMoveDownHtml = getGridMoveDownButtonHtml(dataItem);
+			var lnkCopyHtml = getGridCopyButtonHtml(dataItem);
+			var operation = "<div class='grid_commands'>" + lnkViewHtml
+					+ lnkEditHtml + lnkDeleteHtml + lnkMoveUpHtml + lnkMoveDownHtml
+					+ lnkCopyHtml + "</div>";
+			treeNode.operation = operation;
+			return treeNode;
+		}
+		/*
+         * 取得实体
+         */
+		function getEntity() {
+			var newEntity = getEntityBase();
+			if (newEntity.parentId == "") {
+				newEntity.parentId = 0;
+			}
+			return newEntity;
+		}
+		/*
+        重置超级管理员权限
+         */
+		function resetAdminPermissions() {
+			call("ResetAdminPermissions", null, function(result) {
+				showMessage("重置超级管理员权限成功。");
+			});
+		}
+		/*
+        取得树的列
+         */
+		function getFunctionTreeColumns(lstData) {
+			var tableColumns = [ [ {
+				title : '操作',
+				field : 'operation',
+				width : 150,
+				fixed : true,
+				align : 'center'
+			}, {
+				field : 'code',
+				title : '编号',
+				fixed : true,
+				width : 250,
+				align : 'center'
+			}, {
+				field : 'name',
+				title : '名称',
+				fixed : true,
+				width : 150,
+				align : 'center'
+			}, {
+				field : 'description',
+				title : '描述',
+				fixed : true,
+				width : 80,
+				align : 'center'
+			}, {
+				field : 'display_order',
+				title : '显示顺序',
+				fixed : true,
+				width : 80,
+				align : 'center'
+			} ] ];
+			return tableColumns;
+		}
+		/*
+         * 绑定数据实体
+         */
+		function bindEntity(primaryKey) {
+			sysMenuId = primaryKey;
+			bindEntityBase(primaryKey);
+			bindFunction(primaryKey);
+			$(".addFunction").show();
+			if (isViewMode()) {
+				$(".addFunction").hide();
+			}
+		}
+		/*
+         * 输出实体信息
+         */
+		function outputEntity(dataItem) {
+			outputEntityBase(dataItem);
+			getFilePathByFileId(dataItem.pictureId, "picture");
+			getFilePathByFileId(dataItem.activationPictureId, "activationPicture");
+			$("#hfSysMenuId").val(dataItem.id);
+			$("#hfSysMenuValue").val(dataItem.value);
+		}
+		/*
+         * 获取function列表
+         */
+		function bindFunction(sysMenuId) {
+			var data = new Object();
+			data.condition = "resource = (SELECT value FROM sys_menu WHERE id = "
+					+ sysMenuId + ")";
+			data.tableName = "sys_function";
+			data.pageIndex = functionContext.pageIndex;
+			data.pageSize = functionContext.pageSize;
+			data.orderBy = "display_order";
+			call("GetList", data, function(result) {
+				var primaryKeyName = managementContext.primaryKeyName;
+				managementContext.primaryKeyName = "code";
+				outputFunctionListGrid(result.data.dataList, "functionTableGrid");
+				managementContext.primaryKeyName = primaryKeyName;
+				setFunctionPager(result.data);
+			});
+
+		}
+
+		/*
+         * 设置分页
+         */
+		function setFunctionPager(data) {
+			//alert(JSON.stringify(data));
+			// 分页
+			var pager = $('#functionTableGrid').datagrid('getPager');
+			pager.pagination('refresh', {
+				total : data.recordCount,
+				pageSize : data.pageSize,
+				pageNumber : functionContext.pageIndex + 1,
+				onSelectPage : function(pageNumber, pageSize) {
+					functionContext.pageIndex = pageNumber - 1;
+					functionContext.pageSize = pageSize;
+					$(this).pagination('loading');
+					bindFunction($("#hfSysMenuId").val());
+					$(this).pagination('loaded');
+				}
+			});
+		}
+		/*
+         * 输出列表
+         */
+		function outputFunctionListGrid(dataList, gridControlId,
+										getGridRowCallback, getTableColumnsCallback) {
+			// 设置列
+			try {
+				var tableColumns = getFunctionTreeColumns();
+				// alert(JSON.stringify(tableColumns));
+				$('#' + gridControlId).datagrid({
+					columns : tableColumns,
+					pagination : true,
+					fitColumns : true
+				})
+			} catch (e) {
+				console.log(e);
+			}
+			// 清空datagrid数据
+			$('#' + gridControlId).datagrid('loadData', {
+				total : 0,
+				rows : []
+			});
+			for (var i = 0; i < dataList.length; i++) {
+				var dataItem = dataList[i];
+				outputListItem(dataItem, gridControlId, getGridRowCallback);
+			}
+		}
+		/*
+         * 取得查看按钮Html
+         */
+		function getGridViewButtonHtml(dataItem) {
+			var functionName = "openViewDialog"
+			if (typeof (dataItem.id) == "undefined") {
+				functionName = "openFunctionViewDialog";
+				return getGridButtonHtml(dataItem, functionName, "查看");
+			}
+			return getGridButtonHtml(dataItem, functionName, "查看", "View");
+		}
+		/*
+         * 取得修改按钮Html
+         */
+		function getGridEditButtonHtml(dataItem) {
+			var functionName = "openEditDialog";
+			var title = "修改";
+			if (typeof (dataItem.id) == "undefined") {
+				functionName = "openFunctionEditDialog";
+				if (isViewMode()) {
+					return "";
+				}
+				return getGridButtonHtml(dataItem, functionName, "修改");
+			}
+			return getGridButtonHtml(dataItem, functionName, "修改", "Update");
+		}
+
+		/*
+         * 取得删除按钮Html
+         */
+		function getGridDeleteButtonHtml(dataItem) {
+			var functionName = "deleteDataItem";
+			if (typeof (dataItem.id) == "undefined") {
+				functionName = "deleteFunctionItem";
+				if (isViewMode()) {
+					return "";
+					functionName = "";
+				}
+				return getGridButtonHtml(dataItem, functionName, "删除");
+			}
+			return getGridButtonHtml(dataItem, functionName, "删除", "Delete");
+		}
+		function openAddFunctionDialog() {
+			$("#functionFormDetail").form('clear');
+			// 设置新增模式
+			functionContext.dialogMode = "add";
+			removeFunctionFormDetailReadonly();
+			var resource = $("#hfSysMenuValue").val();
+			$("#txtFunctionCode").textbox("setValue", resource);
+			$("#hidFunctionResource").val(resource);
+			openDialog("divFunctionDialog", '新增操作');
+		}
+		function openFunctionViewDialog(primaryKey) {
+			// 设置查看模式
+			setFunctionFormDetailReadonly();
+			functionContext.dialogMode = "view";
+			// 绑定数据实体
+			bindFunctionEntity(primaryKey);
+			// 显示
+			openDialog("divFunctionDialog", '查看操作');
+			event.stopPropagation();
+		}
+		function openFunctionEditDialog(primaryKey) {
+			// 设置修改模式
+			functionContext.dialogMode = "update";
+			removeFunctionFormDetailReadonly();
+			// 绑定实体
+			bindFunctionEntity(primaryKey);
+			// 打开对话框
+			openDialog("divFunctionDialog", '修改操作');
+			event.stopPropagation();
+
+		}
+		function deleteFunctionItem(primaryKey) {
+			if (!confirm("确定要删除吗?")) {
+				return;
+			}
+			var data = new Object();
+			data.code = primaryKey;
+			data.tableName = "sys_function";
+			call("DeleteSysFunction", data, function(result) {
+				bindFunction($("#hfSysMenuId").val());
+			})
+		}
+		function bindFunctionEntity(primaryKey) {
+			var data = new Object();
+			data.code = primaryKey;
+			data.tableName = "sys_function";
+			call("GetSysFunction", data, function(result) {
+				outputFunctionEntity(result.data)
+			})
+		}
+		function outputFunctionEntity(dataItem) {
+			$("#hidFunctionResource").val($("#hfSysMenuValue").val());
+			$("#txtFunctionCode").textbox("setValue", dataItem.code);
+			$("#txtFunctionName").textbox("setValue", dataItem.name);
+			$("#txtFunctionDisplayOrder")
+					.textbox("setValue", dataItem.displayOrder);
+			$("#txtFunctionDescription").textbox("setValue", dataItem.description);
+		}
+
+		function saveFunction() {
+			var data = getFunctionEntity();
+			if (functionContext.dialogMode == "update") {
+				call("UpdateSysFunction", data, function(result) {
+					closeFuctionDialog();
+					bindFunction($("#hfSysMenuId").val());
+				});
+			} else if (functionContext.dialogMode == "add") {
+				call("AddSysFunction", data, function(result) {
+					closeFuctionDialog();
+					bindFunction($("#hfSysMenuId").val());
+				});
+			}
+		}
+
+		function getFunctionEntity() {
+			var data = new Object();
+			data.code = $("#txtFunctionCode").val();
+			data.name = $("#txtFunctionName").val();
+			data.resource = $("#hidFunctionResource").val();
+			data.displayOrder = $("#txtFunctionDisplayOrder").val();
+			data.description = $("txtFunctionDescription").val();
+			return data;
+		}
+
+		function setFunctionFormDetailReadonly() {
+			$("#btnFunctionSave").hide();
+			$("#txtFunctionCode").textbox("readonly", true);
+			$("#txtFunctionName").textbox("readonly", true);
+			$("#txtFunctionDisplayOrder").textbox("readonly", true);
+			$("#txtFunctionDescription").textbox("readonly", true);
+		}
+
+		function removeFunctionFormDetailReadonly() {
+			$("#btnFunctionSave").show();
+			$("#txtFunctionCode").textbox("readonly", false);
+			if (functionContext.dialogMode == "update") {
+				$("#txtFunctionCode").textbox("readonly", true);
+			}
+			$("#txtFunctionName").textbox("readonly", false);
+			$("#txtFunctionDisplayOrder").textbox("readonly", false);
+			$("#txtFunctionDescription").textbox("readonly", false);
+		}
+
+		function closeFuctionDialog() {
+			$('#divFunctionDialog').dialog('close');
+		}
+
+		function openAddBasicFunctionDialog() {
+			var data = new Object();
+			data.functionList = [];
+			var functionView = getFastAddFunctionEntity("View", "查看");
+			data.functionList.push(functionView);
+			var functionAdd = getFastAddFunctionEntity("Add", "新增");
+			data.functionList.push(functionAdd);
+			var functionDelete = getFastAddFunctionEntity("Delete", "删除");
+			data.functionList.push(functionDelete);
+			var sysMenuTypeCode = $("#cmbSysMenuTypeCode").combobox("getValue");
+			if (sysMenuTypeCode == "" || sysMenuTypeCode == "Admin") {
+				var functionUpdate = getFastAddFunctionEntity("Update", "修改");
+				data.functionList.push(functionUpdate);
+			} else {
+				var functionUpdate = getFastAddFunctionEntity("Edit", "修改");
+				data.functionList.push(functionUpdate);
+			}
+			var functionBatchUpdate = getFastAddFunctionEntity("BatchDelete", "批量删除");
+			data.functionList.push(functionBatchUpdate);
+			call("AddSysFunctionList", data, function(result) {
+				closeFuctionDialog();
+				bindFunction($("#hfSysMenuId").val());
+			});
+		}
+
+		function getFastAddFunctionEntity(code, name) {
+			var data = new Object();
+			var resource = $("#hfSysMenuValue").val();
+			data.code = resource + code;
+			data.name = name;
+			data.resource = resource;
+			return data;
+		}
+		/*
+         * 获取图片、视频、附件地址
+         */
+		function getFilePathByFileId(fileId, pathInputId) {
+			$("#" + pathInputId + "Path").val("");
+			//$("#"+pathInputId+"AutoUpload").attr("src","../../img/blank.jpg");
+			if (typeof (fileId) == "undefined" || fileId == null) {
+				fileId = "";
+			}
+			if (fileId != "") {
+				var data = new Object();
+				data.tableName = "sys_upload_file";
+				data.condition = "id =" + fileId;
+				data.condition += ""
+				call("GetTable", data, function(result) {
+					$.each(result.data, function(index, value) {
+						$("#" + pathInputId + "Path").val(value.path);
+						$("#" + pathInputId + "AutoUpload").attr("src", config.adminRootUrl + value.path);
+					});
+					if (isViewMode()) {
+						$("#" + pathInputId + "Path").attr("disabled", "disabled");
+						//$(".inputFilePath").css("margin-top","16px");
+						//$(".photo").hide();
+					}
+				});
+			}
+		}
+		var sysMenuId = null;
+		function onAdded(result) {
+			sysMenuId = result.data;
+		}
+		function onUpdated(result) {
+		}
+		/**
+		 输出数据后处理
+		 */
+		function postOutputData() {
+			if (sysMenuId != null) {
+				$('#tableGrid').treegrid("expandTo", sysMenuId);
+			}
+		}
+	</script>
+</head>
+
+<body>
+<div class="page">
+	<div class="toolbar_panel" id="divToolbar">
+		<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+		   onclick="openAddDialog()" id="btnAdd">新增</a> <a href="#"
+														   class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+														   onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a
+			id="btnResetAdminPermissions" href="#" class="easyui-linkbutton"
+			iconCls="icon-lock" plain="true" onclick="resetAdminPermissions()">重置权限</a><a
+			id="lnkRefreshPage" href="#" class="easyui-linkbutton"
+			iconCls="icon-reload" plain="true" onclick="refreshPage()">刷新</a>
+	</div>
+	<div id="divSearchPanel" class="search_panel easyui-panel">
+		<div class="search_item">
+			<span class="search_item_caption">名称:</span> <input
+				id="txtSearchName" class="search_item_textbox easyui-textbox" />
+		</div>
+		<div class="search_item">
+			<span class="search_item_caption">描述:</span> <input
+				id="txtSearchDescription"
+				class="search_item_textbox easyui-textbox" />
+		</div>
+		<div class="search_item">
+			<span class="search_item_caption">菜单类型:</span> <input
+				id="cmbSearchSysMenuTypeCode"
+				class="search_item_textbox easyui-combobox" />
+		</div>
+		<div class="search_item_command">
+			<a href="#" class="easyui-linkbutton" plain="true"
+			   iconCls="icon-search" onclick="query()">查询</a>
+		</div>
+	</div>
+	<div class="data_panel">
+		<table id="tableGrid" class="easyui-treegrid" style="height:auto;">
+		</table>
+	</div>
+	<div id="divDetailDialog" class="easyui-dialog"
+		 style="width:800px;" closed="true"
+		 buttons="#divDetailCommandBar">
+		<div id="divMenuTabs" class="easyui-tabs"
+			 style="width:100%;" closed="true">
+			<div title="基本信息" style="padding:20px;display:none;">
+				<form id="formDetail" method="post" novalidate class="detail_form">
+					<div class="form_item">
+						<input id="txtName" class="easyui-textbox" label="名称:"
+							   labelPosition="left" style="width:100%;" />
+					</div>
+					<div class="form_item">
+						<input id="txtValue" class="easyui-textbox" label="菜单值:"
+							   labelPosition="left" style="width:100%;" />
+					</div>
+					<div class="form_item">
+						<input id="cmbSysMenuTypeCode" class="easyui-combobox"
+							   label="菜单类型:" labelPosition="left" style="width:100%;" />
+					</div>
+					<div class="form_item">
+						<input id="ctParentId" class="easyui-combotree" label="上级菜单:"
+							   labelPosition="left" style="width:100%;" />
+					</div>
+					<div class="form_item_full">
+						<input id="txtUrl" class="easyui-textbox" label="地址:"
+							   labelPosition="left" style="width:100%;" />
+					</div>
+					<div class="form_item_full">
+						<input id="txtPath" class="easyui-textbox" label="路径:"
+							   labelPosition="left" style="width:100%;" />
+					</div>
+					<div class="form_item_full" style="height:50px;">
+						<span style="float:left;width:148px;line-height:50px;">图片:</span>
+						<input type="hidden" class="easyui-textbox" id="hfPictureId" />
+						<input class="inputFilePath" id="picturePath" /> <input
+							type="file" id="pictureAutoUploadFileUpload"
+							style="display: none" /> <img src="../../img/uploadPic.png"
+														  class="photo" id="pictureAutoUpload" />
+					</div>
+					<div class="form_item_full" style="height:50px;">
+						<span style="float:left;width:148px;line-height:50px;">被选中图片:</span>
+						<input type="hidden" class="easyui-textbox"
+							   id="hfActivationPictureId" /> <input class="inputFilePath"
+																	id="activationPicturePath" /> <input type="file"
+																										 id="activationPictureAutoUploadFileUpload" style="display: none" />
+						<img src="../../img/uploadPic.png" class="photo"
+							 id="activationPictureAutoUpload" />
+					</div>
+					<div class="form_item">
+						<input id="txtDisplayOrder" class="easyui-textbox" label="显示顺序:"
+							   labelPosition="left" style="width:100%;" />
+					</div>
+					<div class="form_item_full">
+						<input id="txtDescription" class="easyui-textbox" label="描述:"
+							   multiline="true" labelPosition="left"
+							   style="width:100%;height:120px;" />
+					</div>
+				</form>
+			</div>
+			<div title="功能" style="overflow:auto;padding:20px;display:none;">
+				<input type="hidden" id="hfSysMenuValue" value="" /> <input
+					type="hidden" id="hfSysMenuId" value="" /> <a
+					id="addCustomFunctionButton" href="#"
+					class="easyui-linkbutton addFunction" plain="true"
+					onclick="openAddFunctionDialog()">添加功能</a> <a
+					id="addBasicFunctionButton" href="#"
+					class="easyui-linkbutton addFunction" plain="true"
+					onclick="openAddBasicFunctionDialog()">添加基本功能</a> <a
+					id="addAuditFunctionButton" href="#"
+					class="easyui-linkbutton addFunction" plain="true"
+					onclick="openAddFunctionDialog()">添加审核功能</a> <a
+					id="addImportFunctionButton" href="#"
+					class="easyui-linkbutton addFunction" plain="true"
+					onclick="openAddFunctionDialog()">添加导入功能</a> <a
+					id="addExportFunctionButton" href="#"
+					class="easyui-linkbutton addFunction" plain="true"
+					onclick="openAddFunctionDialog()">添加导出功能</a>
+				<table id="functionTableGrid">
+				</table>
+			</div>
+		</div>
+	</div>
+	<div id="divDetailCommandBar" class="detail_commandbar">
+		<a href="javascript:void(0)" class="easyui-linkbutton"
+		   iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+		<a href="javascript:void(0)" class="easyui-linkbutton"
+		   iconCls="icon-cancel"
+		   onclick="javascript:$('#divDetailDialog').dialog('close')"
+		   style="width:90px">取消</a>
+	</div>
+	<div id="divFunctionDialog" class="easyui-dialog" style="width:400px"
+		 closed="true" buttons="#dlg-function-buttons">
+		<input type="hidden" id="hidFunctionResource" value="" />
+		<form id="functionFormDetail" method="post" novalidate
+			  style="margin:0;padding:20px 50px">
+			<div style="margin-bottom:10px">
+				<input id="txtFunctionCode" name="txtFunctionCode"
+					   class="easyui-textbox" label="操作编号:" style="width:100%" />
+			</div>
+			<div style="margin-bottom:10px">
+				<input id="txtFunctionName" name="txtFunctionName"
+					   class="easyui-textbox" label="操作名称:" style="width:100%" />
+			</div>
+			<div style="margin-bottom:10px">
+				<input id="txtFunctionDisplayOrder" name="txtFunctionDisplayOrder"
+					   class="easyui-textbox" label="显示顺序:" style="width:100%" />
+			</div>
+			<div style="margin-bottom:10px">
+				<input id="txtFunctionDescription" name="txtFunctionDescription"
+					   class="easyui-textbox" label="描述:" multiline="true"
+					   labelPosition="left" style="width:100%;height:120px;" />
+			</div>
+		</form>
+		<div id="dlg-function-buttons">
+			<a href="javascript:void(0)" class="easyui-linkbutton c6"
+			   iconCls="icon-ok" onclick="saveFunction()" style="width:90px"
+			   id="btnFunctionSave">保存</a> <a href="javascript:void(0)"
+											  class="easyui-linkbutton" iconCls="icon-cancel"
+											  onclick="javascript:closeFuctionDialog();" style="width:90px">取消</a>
+		</div>
+	</div>
+</div>
+<!-- 上传图片 -->
+<script>
+	$(function() {
+		$("#pictureAutoUpload").uploadify({
+			isImage : true,
+			fileUploadID : "imgAutoUploadFileUpload",
+			uploading : function() {
+				showProgressBar();
+			},
+			success : function(result) {
+				hideProgressBar();
+				$("#hfPictureId").val(result.data.id);
+				$("#picturePath").val(result.data.path);
+				$("#pictureAutoUpload").attr("src", config.adminRootUrl + result.data.path);
+			},
+			fail : function(result) {
+				hideProgressBar();
+			}
+		});
+		$("#activationPictureAutoUpload").uploadify({
+			isImage : true,
+			fileUploadID : "imgAutoUploadFileUpload",
+			uploading : function() {
+				showProgressBar();
+			},
+			success : function(result) {
+				hideProgressBar();
+				$("#hfActivationPictureId").val(result.data.id);
+				$("#activationPicturePath").val(result.data.path);
+				$("#activationPictureAutoUpload").attr("src", config.adminRootUrl + result.data.path);
+			},
+			fail : function(result) {
+				hideProgressBar();
+			}
+		});
+	});
+	function showProgressBar() {
+		$("#divProgressBar").show();
+	}
+	function hideProgressBar() {
+		$("#divProgressBar").hide();
+	}
+</script>
+</body>
+</html>

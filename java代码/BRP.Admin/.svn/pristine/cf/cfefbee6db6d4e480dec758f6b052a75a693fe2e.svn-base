@@ -1,0 +1,41 @@
+package BRP.service;
+
+import BRP.data.Member;
+import BRP.model.MemberManager;
+import net.sf.json.JSONObject;
+import org.springframework.util.CollectionUtils;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
+public class EditMemberTransferServiceHandler extends ServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        Integer oldDeliverPlaceId = JsonHelper.getInt(jData, "oldDeliverPlaceId");
+        Integer delivererId = JsonHelper.getInt(jData, "delivererId");
+        Integer newDeliverPlaceId = JsonHelper.getInt(jData, "newDeliverPlaceId");
+
+        // 获取当前配送点下面的会员
+        List<Member> memberList= MemberManager.getInstance().getList("deliver_place_id = " + oldDeliverPlaceId);
+
+        if(CollectionUtils.isEmpty(memberList)){
+            this.writeErrorResponse(response,"当前配送点下没有会员");
+            return;
+        }
+        // 批量修改会员配送点
+        memberList.stream().forEach(member -> {
+            try {
+                member.setDelivererId(delivererId);
+                member.setDeliverPlaceId(newDeliverPlaceId);
+                MemberManager.getInstance().update(member);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        this.writeSuccessResponse(response, "转移成功");
+    }
+}

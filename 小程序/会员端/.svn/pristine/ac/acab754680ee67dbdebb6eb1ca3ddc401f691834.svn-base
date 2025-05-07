@@ -1,0 +1,326 @@
+{
+	"pages": [
+		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/home/index",
+			"style": {
+				// "navigationBarTitleText": "首页",
+				"transparentTitle": "auto",
+				"navigationStyle": "custom",
+				// "navigationBarBackgroundColor": "#5EAC59",
+				// "navigationBarTextStyle": "white",
+				"app-plus": {
+					"titleNView": {
+						"autoBackButton":false
+						// "buttons": [
+						// {
+						//     "color": "#333",
+						//     "colorPressed": "#eee",
+						//     "float": "left",
+						//     "fontSize": "22px",
+						//     "fontSrc": "http://admin.8630.net/wyb/static/image/common/service.png" // 字体文件
+						//     // "text": "\ue600" // 字体图标\u 开头，加上字体图标unicode后面四位
+						// }]
+					}
+				}
+			}
+		}, 
+		{
+			"path": "pages/home/slideDetail",
+			"style": {
+				"navigationBarTitleText": "慧至半径童书馆",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/common/login",
+			"style": {
+				"navigationBarTitleText": "慧至半径童书馆",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/common/explain",
+			"style": {
+				"navigationBarTitleText": "慧至半径童书馆",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/home/search",
+			"style": {
+				"navigationBarTitleText": "慧至半径童书馆",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/home/serviceQRCodeCall",
+			"style": {
+				"navigationBarTitleText": "联系客服",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/home/libraryIntroduction",
+			"style": {
+				"navigationBarTitleText": "书馆介绍",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/home/borrowGuide",
+			"style": {
+				"navigationBarTitleText": "借阅指南",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/home/newBooks",
+			"style": {
+				"navigationBarTitleText": "新书上架",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/home/homeGoodNightStory",
+			"style": {
+				"navigationBarTitleText": "慧至半径童书馆",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/home/booksDetail",
+			"style": {
+				"navigationBarTitleText": "慧至半径童书馆",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/home/requiredBook",
+			"style": {
+				"navigationBarTitleText": "必读书单",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/home/requiredBookDetail",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/category/index",
+			// "style": {
+			// 	"navigationBarTitleText": "分类",
+			// 	"transparentTitle": "auto",
+			// 	"navigationStyle": "custom"
+			// },
+			"style": {
+				"navigationBarTitleText": "分类",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/books/index",
+			"style": {
+				"navigationBarTitleText": "书箱",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/index",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/joinMember", 
+			"style": {
+				"navigationBarTitleText": "预登记信息",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/serviceQRCode", 
+			"style": {
+				"navigationBarTitleText": "联系客服",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/memberCardRecord",
+			"style": {
+				"navigationBarTitleText": "会员卡变更记录",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/suspendCard",
+			"style": {
+				"navigationBarTitleText": "办理停卡",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/loanRecord",
+			"style": {
+				"navigationBarTitleText": "借阅记录",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/scoreRecord",
+			"style": {
+				"navigationBarTitleText": "积分记录",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/loanableNotice",
+			"style": {
+				"navigationBarTitleText": "可借通知",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/bookMark",
+			"style": {
+				"navigationBarTitleText": "收藏",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/home/homeActivity",
+			"style": {
+				"navigationBarTitleText": "俱乐部活动",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/activity",
+			"style": {
+				"navigationBarTitleText": "参与的活动",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/activityDetail",
+			"style": {
+				"navigationBarTitleText": "俱乐部活动",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/goodNightStory",
+			"style": {
+				"navigationBarTitleText": "晚安故事",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/goodNightStoryDetail",
+			"style": {
+				"navigationBarTitleText": "慧至半径童书馆",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/goodNightStoryDetailRecord",
+			"style": {
+				"navigationBarTitleText": "慧至半径童书馆",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/user/retailOrder",
+			"style": {
+				"navigationBarTitleText": "我的订单",
+				"navigationBarBackgroundColor": "#5EAC59",
+				"navigationBarTextStyle": "white"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "慧至半径童书馆",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+		// "navigationStyle": "custom",
+		// "app-plus": {
+		//   "background": "#efeff4"
+		// }
+	},
+	"tabBar": {
+		"borderStyle": "black",
+		"backgroundColor": "#fff", 
+		"color": "#999999",
+		"selectedColor": "#FACC3F",
+		"list": [
+			{
+				"pagePath": "pages/home/index",
+				"iconPath": "static/image/tabbar/home.png",
+				"selectedIconPath": "static/image/tabbar/home_active.png",
+				"text": "首页" 
+			}, 
+			{
+				"pagePath": "pages/category/index",
+				"iconPath": "static/image/tabbar/category.png",
+				"selectedIconPath": "static/image/tabbar/category_active.png",
+				"text": "分类"
+			},
+			{
+				"pagePath": "pages/books/index", 
+				"iconPath": "static/image/tabbar/books.png",
+				"selectedIconPath": "static/image/tabbar/books_active.png",
+				"text": "书箱"
+			},
+			{ 
+				"pagePath": "pages/user/index", 
+				"iconPath": "static/image/tabbar/user.png",
+				"selectedIconPath": "static/image/tabbar/user_active.png",
+				"text": "我的"
+			}
+		]
+	},
+	"condition": { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [{
+			"name": "", //模式名称
+			"path": "", //启动页面，必选
+			"query": "" //启动参数，在页面的onLoad函数里面得到
+		}]
+	}
+}

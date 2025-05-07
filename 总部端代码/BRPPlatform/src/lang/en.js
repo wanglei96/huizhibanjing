@@ -1,0 +1,96 @@
+const messages = {
+  首页: 'home',
+  // 工作台
+  Dashboard: 'Dashboard',
+  工作台: 'Workplace',
+  分析页: 'Analysis',
+  监控页: 'Monitor',
+  // 系统管理
+  系统管理: 'System',
+  用户管理: 'User',
+  用户详情: 'User Detail',
+  角色管理: 'Role',
+  菜单管理: 'Menu',
+  部门管理: 'Organization',
+  字典管理: 'Dictionary',
+  系统日志: 'OperationRecord',
+  // 表单页面
+  表单页面: 'Form',
+  基础表单: 'Basic Form',
+  复杂表单: 'Advanced Form',
+  分步表单: 'Step Form',
+  // 列表页面
+  列表页面: 'List Page',
+  基础列表: 'Basic List',
+  复杂列表: 'Advanced List',
+  卡片列表: 'Card List',
+  项目列表: 'Project List',
+  应用列表: 'Application List',
+  文章列表: 'Article List',
+  // 结果页面
+  结果页面: 'Result Page',
+  成功页面: 'Success Page',
+  失败页面: 'Fail Page',
+  // 异常页面
+  异常页面: 'Exception',
+  'HTTP 403': 'HTTP 403',
+  'HTTP 404': 'HTTP 404',
+  'HTTP 500': 'HTTP 500',
+  // 个人中心
+  个人中心: 'User',
+  个人资料: 'Profile',
+  站内消息: 'Message',
+  系统消息: 'System Notice',
+  个人私信: 'Personal Message',
+  待办事项: 'To-do list',
+  // 获取授权
+  获取授权: 'Authorization',
+  // 右侧栏
+  整体风格设置: 'Theme Setting',
+  侧边栏风格: 'Navigation Mode',
+  顶栏风格: 'TopBar Mode',
+  切换动画: 'Switch Animation',
+  页面切换动画: 'Transition',
+  滑动消退: 'Slide Right',
+  底部消退: 'Slide Bottom',
+  放大渐变: 'Zoom In',
+  缩小渐变: 'Zoom Out',
+  淡入淡出: 'Fade',
+  恢复默认: 'Reset',
+  // 顶栏菜单
+  修改密码: 'Password',
+  退出系统: 'SignOut',
+  // 登录界面
+  用户登录: 'User Login',
+  记住密码: 'Remember password',
+  登录系统: 'Login system',
+  忘记密码: 'Forgot password',
+  密码登录: 'Password',
+  短信登录: 'SMS',
+  扫码登录: 'Scan Code',
+  // tabs 标签菜单
+  刷新当前: 'Refresh',
+  关闭当前: 'Close Current',
+  关闭左侧: 'Close Left',
+  关闭右侧: 'Close Right',
+  关闭其它: 'Close other',
+  关闭全部: 'Close All',
+  // 扩展组件
+  扩展组件: 'Extention',
+  视频播放: 'Player',
+  在线直播: 'Live',
+  富文本编辑器: 'Editor',
+  二维码: 'qrcode',
+  水印组件: 'Water Mark',
+  滚动数字: 'Roll Number',
+  城市选择: 'Select City',
+  引导组件: 'Guide',
+  状态文本: 'StatusText',
+  动态标签: 'Tag',
+  文本修饰: 'Text',
+  图片轮播: 'Carousel',
+  图片上传: 'ImageUpload',
+  订单详情: 'Order'
+}
+
+export default messages

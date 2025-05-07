@@ -1,0 +1,1 @@
+<view><view class="h40"></view><view class="funView"><block wx:for="{{list}}" wx:for-item="item" wx:for-index="index" wx:key="index"><view data-event-opts="{{[['tap',[['clickToDeliverPlace',['$0'],[[['list','',index]]]]]]]}}" bindtap="__e">{{''+item.name+''}}</view></block></view></view>

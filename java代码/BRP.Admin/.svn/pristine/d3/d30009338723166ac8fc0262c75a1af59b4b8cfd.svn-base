@@ -1,0 +1,25 @@
+package BRP.service;
+
+import BRP.data.BookSku;
+import BRP.model.BookSkuManager;
+import net.sf.json.JSONObject;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class BookSkuSynchronousNameServiceHandler extends ServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        Integer id =JsonHelper.getInt(jData, "id");
+        BookSku theBookSku  = BookSkuManager.getInstance().getEntity(id);
+        theBookSku.setBindingTypeCode(null);
+        BookSkuManager.getInstance().update(theBookSku);
+        this.writeSuccessResponse(response);
+    }
+}

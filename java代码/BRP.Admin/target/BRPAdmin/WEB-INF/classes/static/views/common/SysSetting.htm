@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>短信参数设置</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<link rel="stylesheet" href="../../css/common.css" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript"
+	src="../../js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+	//查询
+	$(document).ready(function() {
+		//绑定数据
+		bindData();
+	});
+
+	function bindData() {
+		//清除table里的元素
+		$("#tableList").empty();
+		var data = new Object();
+		data.pageSize = 10000;
+		data.sysSettingCategoryCode = $.query.get("SysSettingCategoryCode");
+		call("GetSysSettingList", data, function(result) {
+			//alert(JSON.stringify(result.data.dataList));
+			outputList(result.data.dataList);
+		});
+	}
+	function outputList(dataList) {
+		$("#tableList tr:gt(0)").remove();
+		for ( var i = 0; i < dataList.length; i++) {
+			var dataItem = dataList[i];
+			outputListItem(dataItem);
+		}
+	}
+	function outputListItem(dataItem) {
+		//alert(JSON.stringify(dataItem));
+
+		var htmlTr = "<tr>";
+		htmlTr += "<td class=\"tdLeftClass\">" + dataItem.name + ":" + "</td>";
+		if (dataItem.sysUIControlCode == "TextBox") {
+			//判断是否只读 1 表示只读
+			if (dataItem.readonly != 1) {
+				htmlTr += "<td>"
+						+ "<input type=\"text\" value="+dataItem.value+" code=" + dataItem.code + " class=\"tdRightClass easyui-textbox\" id=\"txtTextBox\" />"
+						+ "</td>";
+			} else {
+				htmlTr += "<td>" + +dataItem.value + "</td>";
+			}
+		} else if (dataItem.sysUIControlCode == "DateTimeBox") {
+			//判断是否只读 1 表示只读
+			if (dataItem.readonly != 1) {
+				htmlTr += "<td>"
+						+ "<input type=\"text\" value="+dataItem.value+" code=" + dataItem.code + " class=\"tdRightClass NumberBoxClass easyui-textbox\"/>"
+						+ "</td>";
+			} else {
+				htmlTr += "<td>" + +dataItem.value + "</td>";
+			}
+		} else if (dataItem.sysUIControlCode == "CheckBox") {
+			//判断value的值是否为true 如果是true选中复选框
+			if (dataItem.value != "true" && dataItem.value != "True") {
+				htmlTr += "<td>"
+						+ "<input type=\"checkBox\" code=" + dataItem.code + "  id=\"ckCheckBox\">"
+						+ "</td>";
+			} else {
+				htmlTr += "<td>"
+						+ "<input type=\"checkBox\" checked='checked' code=" + dataItem.code + "  id=\"ckCheckBox\"/>"
+						+ "</td>";
+			}
+		} else if (dataItem.sysUIControlCode == "TextArea") {
+			//判断是否只读 1 表示只读
+			if (dataItem.readonly != 1) {
+				htmlTr += "<td>"
+				htmlTr += "<textarea  class=\"textareaClass\" id=\"taTextArea\" code=" + dataItem.code + ">"
+						+ dataItem.value + "</textarea>";
+				htmlTr += "</td>";
+			} else {
+				htmlTr += "<td>" + +dataItem.value + "</td>";
+			}
+		} else if (dataItem.sysUIControlCode == "NumericBox") {
+			//判断是否只读 1 表示只读
+			if (dataItem.readonly != 1) {
+				htmlTr += "<td>"
+						+ "<input type=\"text\" value="+dataItem.value+" code=" + dataItem.code + " class=\"tdRightClass NumberBoxClass easyui-textbox\"id=\"txtNumericBox\"/>"
+						+ "</td>";
+			} else {
+				htmlTr += "<td>" + +dataItem.value + "</td>";
+			}
+		} else if (dataItem.sysUIControlCode == "PasswordBox") {
+			//判断是否只读 1 表示只读
+			if (dataItem.readonly != 1) {
+				htmlTr += "<td>"
+						+ "<input type=\"text\" value="+dataItem.value+" code=" + dataItem.code + " class=\"tdRightClass NumberBoxClass easyui-textbox\"id=\"txtPasswordBox\"/>"
+						+ "</td>";
+			} else {
+				htmlTr += "<td>" + +dataItem.value + "</td>";
+			}
+		} else if (dataItem.sysUIControlCode == "DateBox") {
+			//判断是否只读 1 表示只读
+			if (dataItem.readonly != 1) {
+				htmlTr += "<td>"
+						+ "<input type=\"text\" onClick=\"WdatePicker()\" value="
+						+ dataItem.value + " code=" + dataItem.code
+						+ " class=\"tdRightClass\"id=\"txtPasswordBox\"/>"
+						+ "</td>";
+			} else {
+				htmlTr += "<td>" + +dataItem.value + "</td>";
+			}
+		} else {
+			//判断是否只读 1 表示只读
+			if (dataItem.readonly != 1) {
+				htmlTr += "<td>"
+						+ "<input type=\"text\" value="+dataItem.value+" code=" + dataItem.code + " class=\"tdRightClass easyui-textbox\" id=\"txtTextBox\" />"
+						+ "</td>";
+			} else {
+				htmlTr += "<td>" + +dataItem.value + "</td>";
+			}
+
+		}
+		htmlTr += "</tr>";
+		$("#tableList").append(htmlTr);
+		$.parser.parse($('#tableList'));
+	}
+	/*
+		保存
+	 */
+	function save() {
+		var data = getSysSettingEntity();
+		call("SaveSysSettings", data, function(result) {
+			alert("保存成功！");
+		});
+	}
+	/*
+		取得页面数据
+	 */
+	function getSysSettingEntity() {
+		var arrSysSetting = new Array();
+		$("#tableList textarea").each(function() {
+			var sysSetting = new Object();
+			sysSetting.code = $(this).attr("code");
+			if (sysSetting.code == "" || sysSetting.code == null) {
+				return;
+			}
+			sysSetting.value = $(this).val();
+			arrSysSetting.push(sysSetting);
+		});
+		$("#tableList input[type=text]").each(function() {
+			var sysSetting = new Object();
+			sysSetting.code = $(this).attr("code");
+			if (sysSetting.code == "" || sysSetting.code == null) {
+				return;
+			}
+			sysSetting.value = $(this).val();
+			arrSysSetting.push(sysSetting);
+		});
+		$("#tableList input[type=checkBox]").each(function() {
+			var sysSetting = new Object();
+			sysSetting.code = $(this).attr("code");
+			if (sysSetting.code == "" || sysSetting.code == null) {
+				return;
+			}
+			if ($(this).is(':checked')) {
+				sysSetting.value = "true";
+			} else {
+				sysSetting.value = "false";
+			}
+			arrSysSetting.push(sysSetting);
+		});
+		return arrSysSetting;
+	}
+</script>
+<style type="text/css">
+.contentClass {
+	margin-left: 20px;
+	margin-top: 20px;
+	width: 500px;
+}
+
+.tdLeftClass {
+	text-align: right;
+	font-size: 12px;
+}
+
+.tdRightClass {
+	width: 200px;
+	height: 22px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	display: inline-block;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	position: relative;
+	vertical-align: middle;
+	white-space: nowrap;
+	padding-left: 3px;
+	font-size: 12px;
+}
+
+.NumberBoxClass {
+	text-align: right;
+}
+
+td {
+	height: 20px;
+}
+
+.contentBtnDivClass {
+	margin-top: 10px;
+	margin-left: 85px;
+}
+
+.textareaClass {
+	height: 50px;
+	width: 200px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	display: inline-block;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	position: relative;
+	vertical-align: middle;
+	white-space: nowrap;
+	font-size: 13px;
+	padding-left: 3px;
+}
+
+.btnTdClass {
+	text-align: center;
+}
+
+.btnInput {
+	width: 65px;
+	height: 25px;
+}
+</style>
+</head>
+
+<body>
+	<div class="contentClass">
+		<table id="tableList">
+		</table>
+		<div class="contentBtnDivClass">
+			<input type="button" value="保存" onclick="save()"
+				class="easyui-linkbutton btnInput" />
+		</div>
+	</div>
+</body>
+</html>

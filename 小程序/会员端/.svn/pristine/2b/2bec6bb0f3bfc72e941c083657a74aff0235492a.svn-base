@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "俱乐部活动",
+  "navigationBarBackgroundColor": "#5EAC59",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "mp-html": "/components/mp-html/mp-html"
+  }
+}

@@ -1,0 +1,122 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.data.BookOrderItem;
+import BRP.model.*;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.data.DataEntity;
+import strosoft.app.service.ServiceContext;
+import strosoft.app.service.UpdateServiceHandler;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+
+public class UpdateBookOrderInfoServiceHandler extends UpdateServiceHandler {
+    private HttpServletRequest request;
+    private JSONObject jData;
+    private SqlSession sqlSession;
+    private Integer borrowCount;
+    private Integer returnCount;
+
+    @Override
+    protected DataEntity processDataEntity(ServiceContext updateServiceContext, DataEntity newDataEntity)
+            throws Exception {
+        request = updateServiceContext.getRequest();
+        jData = getRequestData(request);
+        sqlSession = updateServiceContext.getSession();
+        borrowCount = JsonHelper.getInt(jData, "borrowCount");
+        returnCount = JsonHelper.getInt(jData, "returnCount");
+        Integer newBorrowCount = JsonHelper.getInt(jData, "newBorrowCount");
+        Integer newReturnCount = JsonHelper.getInt(jData, "newReturnCount");
+        BookOrder newBookOrder = (BookOrder) newDataEntity;
+
+        /*//获取会员卡
+        theMemberCard = MemberCardManager.getInstance().getEntityByMemberId(sqlSession, newBookOrder.getMemberId());
+        Integer canBorrowCount = theMemberCard.getBorrowableQuantity() + newReturnCount;
+        if(canBorrowCount < newBorrowCount){
+            throw new Exception("当前会员可借数量不足！");
+        }*/
+
+
+        //获取会员卡
+        ViewMemberCard theViewMemberCard = ViewMemberCardManager.getInstance().getEntityByMemberId(sqlSession, newBookOrder.getMemberId());
+        //获取会员卡已借阅数量
+        Integer borrowedQuantity = ViewBookOrderItemManager.getInstance().getBorrowedQuantity(sqlSession, newBookOrder.getMemberId());
+        //获取会员卡总借阅数量
+        Integer allQuantity = theViewMemberCard.getMaxBorrowableQuantity().intValue() + theViewMemberCard.getExtendQuantity().intValue();
+
+        if (borrowedQuantity + newBorrowCount - newReturnCount > allQuantity) {
+            throw new Exception("当前会员可借数量不足！");
+        }
+
+
+        //获取会员卡借阅数量
+        if (borrowCount > 0) {
+            newBookOrder.setBookOrderBorrowStatusCode(BookOrderBorrowStatusCodes.StockOuting);
+        } else if (returnCount > 0) {
+            newBookOrder.setBookOrderBorrowStatusCode(BookOrderBorrowStatusCodes.Delivering);
+        }
+        if (returnCount > 0) {
+            newBookOrder.setBookOrderReturnStatusCode(BookOrderReturnStatusCodes.Retrieving);
+        }
+        return newBookOrder;
+    }
+
+    @Override
+    protected void postProcess(ServiceContext updateServiceContext) throws Exception {
+
+        List<BookOrderItem> bookOrderItemList = JsonHelper.getJavaList(BookOrderItem.class, jData, "bookOrderItemList");
+        BookOrder theBookOrder = (BookOrder) updateServiceContext.getDataEntity();
+        //判断是否开启只还未借是否配送
+        List<BookOutOrder> lstBookOutOrder = new ArrayList<BookOutOrder>();
+        for (BookOrderItem bookOrderItem : bookOrderItemList) {
+            Book theBook = BookManager.getInstance().getEntity(sqlSession, bookOrderItem.getBookId());
+            if (bookOrderItem.getBookOrderTypeCode().equals(BookOrderTypeCodes.Borrow)) {
+                BookOutOrder newBookOutOrder = new BookOutOrder();
+                if (bookOrderItem.getId() != null) {
+                    bookOrderItem.setDeliverStatusCode(DeliverStatusCodes.Outing);
+                    BookOrderItemManager.getInstance().update(sqlSession, bookOrderItem);
+                    //删除找书出库单
+                    BookOutOrderManager.getInstance().deleteByBookOrderItemId(sqlSession, bookOrderItem.getId());
+                    newBookOutOrder.setBookOrderItemId(bookOrderItem.getId());
+                } else {
+                    //修改图书状态
+                    theBook.setBorrowStatusCode(BorrowStatusCodes.OutCloud);
+                    theBook.setIsAvailable(false);
+                    BookManager.getInstance().update(sqlSession, theBook);
+                    bookOrderItem.setBookOrderId(theBookOrder.getId());
+                    bookOrderItem.setDeliverStatusCode(DeliverStatusCodes.Outing);
+                    Integer newBookOrderItemId = BookOrderItemManager.getInstance().add(sqlSession, bookOrderItem);
+                    newBookOutOrder.setBookOrderItemId(newBookOrderItemId);
+                    //修改会员卡可借数量
+                    /*theMemberCard.setBorrowableQuantity(theMemberCard.getBorrowableQuantity() - 1);
+                    MemberCardManager.getInstance().update(sqlSession, theMemberCard);*/
+                }
+                newBookOutOrder.setBookOutOrderStatusCode(BookOutOrderStatusCodes.NotFound);
+                lstBookOutOrder.add(newBookOutOrder);
+            } else if (bookOrderItem.getBookOrderTypeCode().equals(BookOrderTypeCodes.Return)) {
+                if (bookOrderItem.getId() != null) {
+                    bookOrderItem.setDeliverStatusCode(DeliverStatusCodes.Delivering);
+                    BookOrderItemManager.getInstance().update(sqlSession, bookOrderItem);
+                } else {
+                    bookOrderItem.setDeliverStatusCode(DeliverStatusCodes.Delivering);
+                    bookOrderItem.setBookOrderId(theBookOrder.getId());
+                    BookOrderItemManager.getInstance().add(sqlSession, bookOrderItem);
+                    //修改图书状态
+                    theBook.setBorrowStatusCode(BorrowStatusCodes.WaitingDelivery);
+                    BookManager.getInstance().update(sqlSession, theBook);
+                    //修改会员卡可借数量
+                    /*theMemberCard.setBorrowableQuantity(theMemberCard.getBorrowableQuantity() + 1);
+                    MemberCardManager.getInstance().update(sqlSession, theMemberCard);*/
+                }
+            }
+        }
+        //添加找书出库单
+        BookOutOrderManager.getInstance().addList(sqlSession, lstBookOutOrder);
+    }
+}

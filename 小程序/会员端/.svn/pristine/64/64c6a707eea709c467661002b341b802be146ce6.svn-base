@@ -1,0 +1,73 @@
+<template>
+	<view class="content">
+		<view class="contentPanel">
+			<view class="pd_10">
+				<rich-text :nodes="content"></rich-text>
+			</view>
+		</view>
+		<view class="f14"></view>
+		<view class="indent f14"></view>
+		<view style="font-size: 30rpx; font-weight: bold;"></view>
+	</view>
+</template>
+<script>
+	import config from "@/js/config.js";
+	import common from "@/js/common.js";
+	let that = null;
+	export default {
+		data() {			return {				serviceImageRootUrl: config.serviceImageRootUrl,
+				type: 1,
+				content: "",
+			};
+		},
+		onLoad(data) {
+			that = this;
+			if (data.type == 1) {
+				that.type = 1;
+				uni.setNavigationBarTitle({
+					title: '隐私政策'
+				});
+				this.getViewChannel("PrivacyPolicy");
+			} else if (data.type == 2) {
+				that.type = 2;
+				uni.setNavigationBarTitle({
+					title: '用户协议'
+				});
+				this.getViewChannel("UserAgreement");
+			}
+		},
+		methods: {
+			getViewChannel(code) {
+				var self = this;
+				var data = {};
+				data.code = code;
+				common.call('GetViewCmsChannelByCode', data, function(res) {
+					that.content = res.data.text
+				});
+			},
+		}
+	};
+</script>
+
+<style lang="scss">
+	@import url("/css/common.css");
+	page {
+		background-color: #5EAC59;
+	}
+
+	.indent {
+		text-indent: 2rem;
+	}
+
+	.pd_10 {
+		padding: 10px;
+	}
+
+	.f14 {
+		font-size: 28rpx;
+	}
+
+	.bold {
+		font-weight: bold;
+	}
+</style>

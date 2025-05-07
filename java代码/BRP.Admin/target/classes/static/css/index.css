@@ -1,0 +1,45 @@
+.main_button_exit {
+	float: right;
+	font-size: 14px;
+	line-height: 40px;
+	height: 40px;
+	margin-right: 40px;
+}
+
+.header_site {
+	float: left;
+	width: 300px;
+}
+
+.header_site a {
+	line-height: 40px;
+	height: 40px;
+	color: #333;
+	font-size: 14px;
+	padding: 0 5px 0 5px;
+	text-decoration: none;
+}
+
+.system_name {
+	float: left;
+	width: 200px;
+	text-align: center;
+	line-height: 40px;
+	height: 40px;
+	color: #333;
+	font-size: 16px;
+	font-weight: bold;
+	text-shadow: 3px 3px 3px #888888;
+}
+.divCmsLanguage{
+	float: right;
+    font-size: 14px;
+    line-height: 40px;
+    height: 40px;
+    margin-right: 40px
+}
+.divCmsLanguage select{
+	width: 100px;
+	line-height: 20px;
+	height: 20px;
+}

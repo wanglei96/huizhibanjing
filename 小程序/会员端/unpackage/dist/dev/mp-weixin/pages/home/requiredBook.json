@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "必读书单",
+  "navigationBarBackgroundColor": "#5EAC59",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "searchbar": "/components/uni-search-bar/uni-search-bar",
+    "datetimepicker": "/components/uni-datetime-picker/uni-datetime-picker"
+  }
+}

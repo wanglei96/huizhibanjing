@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.uploader.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/management.js"></script>
+<script type="text/javascript" src="../../js/cms/cms.promission.js"></script>
+<script>
+	managementContext.dataName = "CmsChannel";
+	managementContext.tableName = "cms_channel";
+	managementContext.title = "栏目管理";
+	managementContext.gridType = "Tree";
+	managementContext.isCms = true;
+	managementContext.detailPageMode = "Page";
+	/*
+	取得树的列
+	 */
+	function getTreeColumns(lstData) {
+		var treeColumns = [ [ {
+			title : '操作',
+			field : 'operation',
+			width : 200,
+			fixed : true,
+			align : 'left'
+		}, {
+			title : '名称',
+			field : 'name',
+			align : 'left',
+			fixed : true,
+			width : 320
+		},  {
+			field : 'code',
+			title : '栏目编码',
+			fixed : true,
+			width : 180,
+			align : 'left'
+		},  {
+			title : '页面Title',
+			field : 'title',
+			align : 'left',
+			fixed : true,
+			width : 180
+		},{
+			field : 'keyword',
+			title : '关键字',
+			fixed : true,
+			width : 180,
+			align : 'left'
+		}, {
+			field : 'description',
+			title : '描述',
+			width : 200,
+			align : 'left'
+		}, {
+			field : 'createTime',
+			title : '创建时间',
+			fixed : true,
+			width : 180,
+			align : 'left',
+			formatter:function(value, row, index){
+				return (new Date(value.time)).Format("yyyy-MM-dd hh:mm:ss");
+			}
+		}] ];
+		return treeColumns;
+	}
+	
+	/*
+	取得请求参数
+	 */
+	function getParameters() {
+		var parameters = getParametersBase();
+		//var cmsChannelId = getSelectedcmsChannelId();
+		var cmsSiteId = $.cookie("cmsSiteId");
+		parameters.operatorId = $.cookie("sysUserId");
+		parameters.cmsLanguageCode = currentCmsLanguageCode;
+		parameters.condition = "cms_site_id='" + cmsSiteId+"'";
+		return parameters;
+	}
+	/*
+	 * 取得树数据
+	 */
+	function getGridTreeDataBase(lstData) {
+		// alert(JSON.stringify(lstData));
+		if (managementContext.primaryKeyName == "id") {
+			var treeData = getGridTreeData(lstData, 0, "id", "parentId");
+			// alert(JSON.stringify(treeData));
+			return treeData;
+		} else if (managementContext.primaryKeyName == "code") {
+			var treeData = getGridTreeData(lstData, "", "code", "parent_code");
+			// alert(JSON.stringify(treeData));
+			return treeData;
+		}
+	}
+	/*
+	 * 取得树节点
+	 */
+	function getTreeNode(dataItem) {
+		var treeNode = dataItem;
+		var lnkViewHtml = getGridViewButtonHtml(dataItem);
+		var lnkEditHtml = getGridEditButtonHtml(dataItem);
+		var lnkDeleteHtml = getGridDeleteButtonHtml(dataItem);
+		var lnkMoveUpHtml = getGridMoveUpButtonHtml(dataItem);
+		var lnkMoveDownHtml = getGridMoveDownButtonHtml(dataItem);
+		var operation;
+		if(isPermitted(dataItem.id) && isPermitted(dataItem.parentId)){
+			operation = "<div class='grid_commands'>" + lnkViewHtml + lnkEditHtml
+				+ lnkDeleteHtml + lnkMoveUpHtml + lnkMoveDownHtml + "</div>";
+		} else if(isPermitted(dataItem.id) && !isPermitted(dataItem.parentId)){
+			operation = "<div class='grid_commands'>" + lnkViewHtml + lnkEditHtml+"</div>";
+		} else{
+			operation = "<div class='grid_commands'>" + lnkViewHtml + "</div>";
+		}
+		treeNode.operation = operation;
+		return treeNode;
+	}
+	/*
+	 * 取得数据项父节点值
+	 */
+	function getParentValue(dataItem) {
+		var parentValue = "";
+		if (managementContext.primaryKeyName == "id") {
+			parentValue = dataItem.parentId;
+		} else {
+			parentValue = dataItem.parent_code;
+		}
+		return parentValue;
+	}
+	
+	/*
+	 * 输出树型列表
+	 */
+	function outputTreeGrid(dataList) {
+		var treeData = getGridTreeDataBase(dataList);
+		var treeColumns = getTreeColumns(dataList);
+		$('#tableGrid').treegrid({
+			idField : managementContext.primaryKeyName,
+			treeField : 'name',
+			checkbox : true,
+			fitColumns : true,
+			showFooter : true,
+			pagination : false,
+			cascadeCheck : false,
+			columns : treeColumns
+		});
+		$('#tableGrid').treegrid("loadData", treeData);
+		//加载数据后展开树形列表
+		if($("#txtSearchName").val()!=""){
+			$(".tree-hit").trigger("click");
+		}else{
+			$(".tree-hit").eq(0).trigger("click");
+		}
+		
+	}
+	/*
+	 * 移动数据
+	 */
+	function move(moveDirection, primaryKey, parentValue) {
+		var data = new Object();
+		data.moveDirection = moveDirection;
+		data.tableName = "cms_channel";
+		data.id = primaryKey;
+		data.condition = " parent_id="+ parentValue;
+		call("MoveCms", data, function(result) {
+			refreshControls();
+			bindData();
+		});
+		event.stopPropagation();
+	}
+	/*
+	 * 批量删除
+	 */
+	function deleteDataItems() {
+		var selectedRows = [];
+		if (managementContext.gridType == "List") {
+			selectedRows = $('#tableGrid').datagrid('getSelections');
+	
+		} else if (managementContext.gridType == "Tree") {
+			selectedRows = $('#tableGrid').treegrid('getCheckedNodes');
+		} else {
+			return;
+		}
+		if (selectedRows.length == 0) {
+			alert("请至少选择一行数据!");
+			return false;
+		}
+		var primaryKeys = [];
+		for ( var i = 0; i < selectedRows.length; i++) {
+			primaryKeys.push(selectedRows[i].id);
+		}
+		if(!isPermittedDelete(selectedRows)){
+			alert("包含无删除权限栏目");
+		}else{
+			 var data = new Object();
+			data.tableName = managementContext.tableName;
+			data.primaryKeys = primaryKeys;
+			if (confirm("确定要删除吗?")) {
+		
+				call(managementContext.batchDeleteServiceName, data, function(result) {
+					refreshControls();
+					bindData();
+				});
+			}
+		} 
+	}
+	function isPermittedDelete(selectedRows){
+		for ( var i = 0; i < selectedRows.length; i++) {
+			if(!isPermitted(selectedRows[i].parentId)){
+				return false;
+			}
+		}
+		return true;
+	}
+</script>
+</head>
+
+<body>
+	<div class="page">
+		<div class="toolbar_panel" id="divToolbar">
+			<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+				onclick="openAddDialog()" id="btnAdd">新增</a> <a href="#"
+				class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+				onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a id="lnkRefreshPage" href="#"
+				class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+				onclick="refreshPage()">刷新</a>
+		</div>
+		<div>
+			<div>
+				<div id="divSearchPanel" class="search_panel easyui-panel">
+					<div class="search_item">
+						<span class="search_item_caption">名称:</span> <input
+							id="txtSearchName" class="search_item_textbox easyui-textbox">
+					</div>
+					<div class="search_item_command">
+						<a href="#" class="easyui-linkbutton" plain="true"
+							iconCls="icon-search" onclick="query()">查询</a>
+					</div>
+				</div>
+				<div class="data_panel">
+					<table id="tableGrid" class="table table-bordered table-hover"
+						style="height:auto;">
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

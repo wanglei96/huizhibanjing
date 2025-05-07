@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SysRoleList.html</title>
+	
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    
+    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+	<script type="text/javascript" src="../../js/jquery.js"></script>
+	<script type="text/javascript" src="../../js/common.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script type="text/javascript" src="../../js/json2.js"></script>
+	<script>
+		$(document).ready(function(){
+			var data = new Object();
+			data.tableName = "sys_menu_type",
+			call("GetSysMenuTypeList",data, function(result){
+			//alert(JSON.stringify(result.data));
+				outputList(result.data);
+			});
+				
+		});
+		function outputList(dataList) {
+			$("#tableList tr:gt(0)").remove();
+			for ( var i = 0; i < dataList.length; i++) {
+				var dataItem = dataList[i];
+				outputListItem(dataItem);
+			}
+		}
+		function outputListItem(dataItem) {
+
+			var htmlTr = "<tr>";
+			htmlTr += "<td>" + dataItem.code + "</td>";
+			htmlTr += "<td>" + dataItem.sysMenuTypeName + "</td>";
+			htmlTr += "<td>" + dataItem.displayOrder+ "</td>";
+			htmlTr += "<td>"; 
+				htmlTr += "<a href='javascript:void(0)' onclick='selectSysOrganization("+dataItem.code+")'>查看</a>";
+				htmlTr += "<a href='javascript:void(0)' onclick='selectSysOrganization("+dataItem.code+")'>修改</a>";
+			    htmlTr += "<a href='javascript:void(0)' onclick='deleteSysOrganization("+dataItem.code+")'>删除</a>";					
+			htmlTr += "</td>";
+			htmlTr += "</tr>";
+			console.log(htmlTr);
+			$("#tableList").append(htmlTr);
+		}
+		
+		
+		$(function(){
+			//弹出新增页面
+			$("#btnAdd").click(function(){	
+				$("#save").show();
+				$("#btnUpdate").hide();
+			});
+			//新增
+			$("#btnSave").click(function(){
+				var textName = $("#textName").val();
+				var textCode = $("#textCode").val();
+				var textdisplayOrder = $("#textdisplayOrder").val();			
+				var data = new Object();
+				data.tableName = "sys_menu_type";
+				data.textName = textName;
+				data.textCode = textCode;
+				data.textdisplayOrder = textdisplayOrder;
+				call("AddSysMenuType",data,function(result){
+					window.location.href="SysMenuTypeList.html";
+				});		
+			});
+		});
+		/* 
+		//删除
+		function deleteSysOrganization(id){
+			var id = id;
+		//	alert(id);
+			var data = new Object();
+			data.tableName="sys_organization";
+			data.id=id;
+			call("DeleteSysOrganization",data,function(result){
+				window.location.href="SysOrganizationList.html";
+			});	
+		}
+	
+		//查看
+		function selectSysOrganization(id){
+			var id =id;
+			var data = new Object();
+			data.tableName = "sys_organization";
+			data.id = id;
+			call("SelectSysOrganization",data,function(result){
+				$("#save").show();
+				$("#btnSave").hide();
+		
+				$("#textName").val(result.data.organizationName);
+				$("#textID").val(result.data.parentId);
+				$("#textdisplayOrder").val(result.data.displayOrder);
+				$("#hid").val(result.data.id);
+			});	
+		}
+		
+		function update(){
+			var id = $("#hid").val();
+			var textName = $("#textName").val();
+			var textID = $("#textID").val();
+			var textdisplayOrder = $("#textdisplayOrder").val();
+			var data = new Object();
+			data.tableName = "sys_organization";
+			data.id=id;
+			data.textName = textName;
+			data.textID = textID;
+			data.textdisplayOrder = textdisplayOrder;
+			call("UpdateSysOrganization", data, function(result) {
+			//	alert(JSON.stringify(result.data));
+				window.location.href="SysOrganizationList.html";
+			});
+		}   */
+	</script>
+  </head>
+  
+  <body>
+ 	 <div class="title_bar">测试页面</div>
+ 	<div class="command_bar" width="500" >
+		<input id="btnAdd" value="新增" type="button"/>
+		<input type="button" id="" onclick="javascript:history.go(-1);" value="返回"/>
+	</div>
+	<div class="grid_panel">
+			<table id="tableList" width="500">
+				<tr>
+					<td>code</td>
+					<td>sysMenuTypeName</td>
+					<td>displayOrder</td>
+					<td>操作</td>
+				</tr>
+			</table>
+	</div>
+	<div clas s="total_panel" ></div>
+	
+	<!--新增、查看、修改 -->
+	<div align="" id ="save" style="display:none ;"> 
+    	<table  width="500" border="1" cellpadding="0" cellspacing="0">
+        	<tr>
+            	<td colspan="2" align="center">新增</td>
+            </tr>
+            <tr>	
+            	<td align="right">code：</td>
+                <td> <input type="text" name="textCode" id="textCode" value=""/></td>
+            </tr>
+             <tr>	
+            	<td align="right">sysMenuTypeName：</td>
+                <td> <input type="text" name="textName" id="textName" value=""/></td>
+            </tr>
+             <tr>	
+            	<td align="right">displayOrder：</td>
+                <td> <input type="text" name="textdisplayOrder" id="textdisplayOrder" value=""/></td>
+            </tr>
+            <tr>
+            	<td align="center" colspan="2">
+            		<input type="hidden" id="hid" value=""/>
+                	<input type="button" id="btnSave"  value="提交"/>
+                	<input type="button" id="btnUpdate"  onclick="update()" value="修改"/>
+                    <input type="button" id="" onclick="javascript:history.go(0);" value="取消"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+  </body>
+</html>

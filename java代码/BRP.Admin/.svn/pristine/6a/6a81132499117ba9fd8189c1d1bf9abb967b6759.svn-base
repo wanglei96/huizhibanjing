@@ -1,0 +1,90 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.model.*;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+import strosoft.app.util.Tracer;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
+
+public class RelieveStopMemberCardServiceHandler extends ServiceHandler {
+    @Override
+    public void process(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONObject jData = getRequestData(request);
+        Integer memberCardDisableLogId = JsonHelper.getInt(jData, "memberCardDisableLogId");
+        Integer offDays = JsonHelper.getInt(jData, "offDays");
+
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+
+            MemberCardDisableLog theMemberCardDisableLog = MemberCardDisableLogManager.getInstance().getEntity(sqlSession, memberCardDisableLogId);
+            if (offDays == null) {
+                LocalDate nowDate = LocalDate.parse(DateHelper.getDateString());
+                LocalDate stopDate = LocalDate.parse(DateHelper.format(theMemberCardDisableLog.getStopDate(), "yyyy-MM-dd"));
+                offDays = nowDate.until(stopDate).getDays();
+            }
+            theMemberCardDisableLog.setDays(offDays);
+            theMemberCardDisableLog.setStopEndDate(DateHelper.getCurrentTimestamp());
+            theMemberCardDisableLog.setIsRelieve(true);
+            MemberCardDisableLogManager.getInstance().update(sqlSession, theMemberCardDisableLog);
+            // 如果时间为空，当前时间-停卡开始时间
+
+            //修改会员卡到期时间
+            String updateMemberCardSql = String.format(
+                    "UPDATE member_card SET expire_date = DATE_ADD(DATE(expire_date), INTERVAL %d DAY), is_stop_card = 0 WHERE id = %d;",
+                    offDays, theMemberCardDisableLog.getMemberCardId());
+            MyBatisManager.getInstance().executeUpdate(sqlSession, updateMemberCardSql);
+
+            //Member theMember = MemberManager.getInstance().getEntity(sqlSession, theMemberCardDisableLog.getMemberId());
+            MemberCard theMemberCard = MemberCardManager.getInstance().getEntity(sqlSession, theMemberCardDisableLog.getMemberCardId());
+
+            //添加会员时长变更记录
+            MemberCardServiceTimeLog newMemberCardServiceTimeLog = new MemberCardServiceTimeLog();
+            newMemberCardServiceTimeLog.setMemberId(theMemberCardDisableLog.getMemberId());
+            newMemberCardServiceTimeLog.setDays(offDays);
+            newMemberCardServiceTimeLog.setMemberCardServiceTimeTypeCode("StopCard");
+            newMemberCardServiceTimeLog.setAddTime(DateHelper.getCurrentTimestamp());
+            newMemberCardServiceTimeLog.setEffectiveTime(DateHelper.getCurrentTimestamp());
+            newMemberCardServiceTimeLog.setExpiryTime(theMemberCard.getExpireDate());
+            newMemberCardServiceTimeLog.setMemberCardServiceTimeGiftTypeCode("StopCardGift");
+            newMemberCardServiceTimeLog.setGiftDays(offDays);
+            MemberCardServiceTimeLogManager.getInstance().add(sqlSession, newMemberCardServiceTimeLog);
+
+            //添加消息记录
+           /* Message newMessage = new Message();
+            newMessage.setMemberId(theMember.getId());
+            newMessage.setCompanyId(theMember.getCompanyId());
+            newMessage.setMessageTypeCode(MessageTypeCodes.MemberCardSuspensionEnd);
+            newMessage.setPushTime(DateHelper.getCurrentTimestamp());
+            newMessage.setContent("您的会员卡暂停已结束，可以正常使用了！");
+            MessageManager.getInstance().add(sqlSession, newMessage);
+            if (!StringHelper.isNullOrEmpty(theMember.getWxaOpenId())) {
+                // 将发送模板消息的操作放入一个新的线程中执行
+                new Thread(() -> {
+                    try {
+                        MessageManager.getInstance().sendWxaStopCardMessage(theMemberCardDisableLog, theMember, theMemberCard);
+                    } catch (Exception e) {
+                        // 处理发送消息失败的情况
+                        e.printStackTrace();
+                    }
+                }).start();
+            }*/
+
+            this.writeSuccessResponse(response);
+            MyBatisManager.getInstance().commitSession(sqlSession);
+        } catch (Exception e) {
+            MyBatisManager.getInstance().rollbackSession(sqlSession);
+            throw new RuntimeException(e);
+        } finally {
+            MyBatisManager.getInstance().closeSession(sqlSession);
+        }
+    }
+}

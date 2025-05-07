@@ -1,0 +1,579 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import java.lang.Boolean;
+import strosoft.app.util.JsonHelper;
+import java.lang.Double;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+import java.math.BigDecimal;
+public class ViewMember extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer companyId;//门店ID;
+    private  String memberNo;//会员编号;
+    private  String name;//名称;
+    private  String nickname;//昵称;
+    private  String mobilePhone;//联系电话;
+    private  Boolean gender;//性别（1男，0女）;
+    private  Timestamp birthday;//出生日期;
+    private  String school;//学校;
+    private  Integer gradeId;//年级;
+    private  Integer classId;//班级;
+    private  String wxaOpenId;//微信OpenID;
+    private  String wxOpenId;//微信OpenID;
+    private  Integer score;//积分;
+    private  String entranceGuard;//门禁;
+    private  Integer deliverAreaId;//配送大区ID;
+    private  Integer deliverPlaceId;//配送点ID;
+    private  Integer deliverLineId;//配送线路ID;
+    private  Integer delivererId;//配送员ID;
+    private  String distanceCode;//距离远近编码;
+    private  String address;//地址;
+    private  Double longitude;//经度;
+    private  Double latitude;//纬度;
+    private  BigDecimal bookboxAmount;//书箱费;
+    private  Timestamp payTime;//缴费时间;
+    private  String paymentMethodCode;//支付方式编码;
+    private  Timestamp bookboxCancelTime;//注销时间;
+    private  String bookboxRemark;//书箱备注;
+    private  String memberBookboxStatusCode;//会员书箱状态编码;
+    private  String bookboxNo;//书箱号;
+    private  String bookboxPlace;
+    private  Boolean isActivated;//是否激活;
+    private  Boolean enabled;//是否启用;
+    private  Integer maxBorrowQuantity;//最大可借本数;
+    private  Boolean isRemote;//是否远距离配送;
+    private  Integer headImageFileId;//头像ID;
+    private  Timestamp nightStoryExpireDate;//晚安故事到期时间;
+    private  String referrer;//推荐人;
+    private  Integer bookPocketQuantity;//书袋数量;
+    private  Boolean isSign;//是否预登记;
+    private  String unionId;//微信用户unionId;
+    private  Boolean isCancel;//是否注销会员;
+    private  Timestamp cancelTime;//注销会员时间;
+    private  String cancelOperator;//注销操作人;
+    private  String cancelMobilePhone;//注销手机号;
+    private  Timestamp createTime;//创建时间;
+    private  Timestamp updateTime;//更新时间;
+    private  String deliverAreaName;//配送大区;
+    private  String deliverPlaceName;//名称;
+    private  String delivererName;//配送员名称;
+    private  String companyName;//门店名称;
+    private  String paymentMethodName;//支付方式名称;
+    private  String memberBookboxStatusName;//会员书箱状态编码;
+    private  String distanceName;//会员地址远近;
+    private  String memberCardCardNo;//会员卡号;
+    private  Timestamp memberCardEffectiveDate;//生效日期;
+    private  Timestamp memberCardExpireDate;//失效日期;
+    private  Integer stoppableCardQuantity;//可停卡次数;
+    private  Integer memberCardMaxBorrowQuantity;//最大可借图书数量;
+    private  BigDecimal extendQuantity;//;
+    private  String headImageFilePath;//头像路径;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setCompanyId(Integer companyId)    
+    {
+        this.companyId = companyId;
+    }
+    public  Integer getCompanyId()    
+    {
+        return companyId;
+    }
+    public  void setMemberNo(String memberNo)    
+    {
+        this.memberNo = memberNo;
+    }
+    public  String getMemberNo()    
+    {
+        return memberNo;
+    }
+    public  void setName(String name)    
+    {
+        this.name = name;
+    }
+    public  String getName()    
+    {
+        return name;
+    }
+    public  void setNickname(String nickname)    
+    {
+        this.nickname = nickname;
+    }
+    public  String getNickname()    
+    {
+        return nickname;
+    }
+    public  void setMobilePhone(String mobilePhone)    
+    {
+        this.mobilePhone = mobilePhone;
+    }
+    public  String getMobilePhone()    
+    {
+        return mobilePhone;
+    }
+    public  void setGender(Boolean gender)    
+    {
+        this.gender = gender;
+    }
+    public  Boolean getGender()    
+    {
+        return gender;
+    }
+    public  void setBirthday(Timestamp birthday)    
+    {
+        this.birthday = birthday;
+    }
+    public  Timestamp getBirthday()    
+    {
+        return birthday;
+    }
+    public  void setSchool(String school)    
+    {
+        this.school = school;
+    }
+    public  String getSchool()    
+    {
+        return school;
+    }
+    public  void setGradeId(Integer gradeId)    
+    {
+        this.gradeId = gradeId;
+    }
+    public  Integer getGradeId()    
+    {
+        return gradeId;
+    }
+    public  void setClassId(Integer classId)    
+    {
+        this.classId = classId;
+    }
+    public  Integer getClassId()    
+    {
+        return classId;
+    }
+    public  void setWxaOpenId(String wxaOpenId)    
+    {
+        this.wxaOpenId = wxaOpenId;
+    }
+    public  String getWxaOpenId()    
+    {
+        return wxaOpenId;
+    }
+    public  void setWxOpenId(String wxOpenId)    
+    {
+        this.wxOpenId = wxOpenId;
+    }
+    public  String getWxOpenId()    
+    {
+        return wxOpenId;
+    }
+    public  void setScore(Integer score)    
+    {
+        this.score = score;
+    }
+    public  Integer getScore()    
+    {
+        return score;
+    }
+    public  void setEntranceGuard(String entranceGuard)    
+    {
+        this.entranceGuard = entranceGuard;
+    }
+    public  String getEntranceGuard()    
+    {
+        return entranceGuard;
+    }
+    public  void setDeliverAreaId(Integer deliverAreaId)    
+    {
+        this.deliverAreaId = deliverAreaId;
+    }
+    public  Integer getDeliverAreaId()    
+    {
+        return deliverAreaId;
+    }
+    public  void setDeliverPlaceId(Integer deliverPlaceId)    
+    {
+        this.deliverPlaceId = deliverPlaceId;
+    }
+    public  Integer getDeliverPlaceId()    
+    {
+        return deliverPlaceId;
+    }
+    public  void setDeliverLineId(Integer deliverLineId)    
+    {
+        this.deliverLineId = deliverLineId;
+    }
+    public  Integer getDeliverLineId()    
+    {
+        return deliverLineId;
+    }
+    public  void setDelivererId(Integer delivererId)    
+    {
+        this.delivererId = delivererId;
+    }
+    public  Integer getDelivererId()    
+    {
+        return delivererId;
+    }
+    public  void setDistanceCode(String distanceCode)    
+    {
+        this.distanceCode = distanceCode;
+    }
+    public  String getDistanceCode()    
+    {
+        return distanceCode;
+    }
+    public  void setAddress(String address)    
+    {
+        this.address = address;
+    }
+    public  String getAddress()    
+    {
+        return address;
+    }
+    public  void setLongitude(Double longitude)    
+    {
+        this.longitude = longitude;
+    }
+    public  Double getLongitude()    
+    {
+        return longitude;
+    }
+    public  void setLatitude(Double latitude)    
+    {
+        this.latitude = latitude;
+    }
+    public  Double getLatitude()    
+    {
+        return latitude;
+    }
+    public  void setBookboxAmount(BigDecimal bookboxAmount)    
+    {
+        this.bookboxAmount = bookboxAmount;
+    }
+    public  BigDecimal getBookboxAmount()    
+    {
+        return bookboxAmount;
+    }
+    public  void setPayTime(Timestamp payTime)    
+    {
+        this.payTime = payTime;
+    }
+    public  Timestamp getPayTime()    
+    {
+        return payTime;
+    }
+    public  void setPaymentMethodCode(String paymentMethodCode)    
+    {
+        this.paymentMethodCode = paymentMethodCode;
+    }
+    public  String getPaymentMethodCode()    
+    {
+        return paymentMethodCode;
+    }
+    public  void setBookboxCancelTime(Timestamp bookboxCancelTime)    
+    {
+        this.bookboxCancelTime = bookboxCancelTime;
+    }
+    public  Timestamp getBookboxCancelTime()    
+    {
+        return bookboxCancelTime;
+    }
+    public  void setBookboxRemark(String bookboxRemark)    
+    {
+        this.bookboxRemark = bookboxRemark;
+    }
+    public  String getBookboxRemark()    
+    {
+        return bookboxRemark;
+    }
+    public  void setMemberBookboxStatusCode(String memberBookboxStatusCode)    
+    {
+        this.memberBookboxStatusCode = memberBookboxStatusCode;
+    }
+    public  String getMemberBookboxStatusCode()    
+    {
+        return memberBookboxStatusCode;
+    }
+    public  void setBookboxNo(String bookboxNo)    
+    {
+        this.bookboxNo = bookboxNo;
+    }
+    public  String getBookboxNo()    
+    {
+        return bookboxNo;
+    }
+    public  void setBookboxPlace(String bookboxPlace)    
+    {
+        this.bookboxPlace = bookboxPlace;
+    }
+    public  String getBookboxPlace()    
+    {
+        return bookboxPlace;
+    }
+    public  void setIsActivated(Boolean isActivated)    
+    {
+        this.isActivated = isActivated;
+    }
+    public  Boolean getIsActivated()    
+    {
+        return isActivated;
+    }
+    public  void setEnabled(Boolean enabled)    
+    {
+        this.enabled = enabled;
+    }
+    public  Boolean getEnabled()    
+    {
+        return enabled;
+    }
+    public  void setMaxBorrowQuantity(Integer maxBorrowQuantity)    
+    {
+        this.maxBorrowQuantity = maxBorrowQuantity;
+    }
+    public  Integer getMaxBorrowQuantity()    
+    {
+        return maxBorrowQuantity;
+    }
+    public  void setIsRemote(Boolean isRemote)    
+    {
+        this.isRemote = isRemote;
+    }
+    public  Boolean getIsRemote()    
+    {
+        return isRemote;
+    }
+    public  void setHeadImageFileId(Integer headImageFileId)    
+    {
+        this.headImageFileId = headImageFileId;
+    }
+    public  Integer getHeadImageFileId()    
+    {
+        return headImageFileId;
+    }
+    public  void setNightStoryExpireDate(Timestamp nightStoryExpireDate)    
+    {
+        this.nightStoryExpireDate = nightStoryExpireDate;
+    }
+    public  Timestamp getNightStoryExpireDate()    
+    {
+        return nightStoryExpireDate;
+    }
+    public  void setReferrer(String referrer)    
+    {
+        this.referrer = referrer;
+    }
+    public  String getReferrer()    
+    {
+        return referrer;
+    }
+    public  void setBookPocketQuantity(Integer bookPocketQuantity)    
+    {
+        this.bookPocketQuantity = bookPocketQuantity;
+    }
+    public  Integer getBookPocketQuantity()    
+    {
+        return bookPocketQuantity;
+    }
+    public  void setIsSign(Boolean isSign)    
+    {
+        this.isSign = isSign;
+    }
+    public  Boolean getIsSign()    
+    {
+        return isSign;
+    }
+    public  void setUnionId(String unionId)    
+    {
+        this.unionId = unionId;
+    }
+    public  String getUnionId()    
+    {
+        return unionId;
+    }
+    public  void setIsCancel(Boolean isCancel)    
+    {
+        this.isCancel = isCancel;
+    }
+    public  Boolean getIsCancel()    
+    {
+        return isCancel;
+    }
+    public  void setCancelTime(Timestamp cancelTime)    
+    {
+        this.cancelTime = cancelTime;
+    }
+    public  Timestamp getCancelTime()    
+    {
+        return cancelTime;
+    }
+    public  void setCancelOperator(String cancelOperator)    
+    {
+        this.cancelOperator = cancelOperator;
+    }
+    public  String getCancelOperator()    
+    {
+        return cancelOperator;
+    }
+    public  void setCancelMobilePhone(String cancelMobilePhone)    
+    {
+        this.cancelMobilePhone = cancelMobilePhone;
+    }
+    public  String getCancelMobilePhone()    
+    {
+        return cancelMobilePhone;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setUpdateTime(Timestamp updateTime)    
+    {
+        this.updateTime = updateTime;
+    }
+    public  Timestamp getUpdateTime()    
+    {
+        return updateTime;
+    }
+    public  void setDeliverAreaName(String deliverAreaName)    
+    {
+        this.deliverAreaName = deliverAreaName;
+    }
+    public  String getDeliverAreaName()    
+    {
+        return deliverAreaName;
+    }
+    public  void setDeliverPlaceName(String deliverPlaceName)    
+    {
+        this.deliverPlaceName = deliverPlaceName;
+    }
+    public  String getDeliverPlaceName()    
+    {
+        return deliverPlaceName;
+    }
+    public  void setDelivererName(String delivererName)    
+    {
+        this.delivererName = delivererName;
+    }
+    public  String getDelivererName()    
+    {
+        return delivererName;
+    }
+    public  void setCompanyName(String companyName)    
+    {
+        this.companyName = companyName;
+    }
+    public  String getCompanyName()    
+    {
+        return companyName;
+    }
+    public  void setPaymentMethodName(String paymentMethodName)    
+    {
+        this.paymentMethodName = paymentMethodName;
+    }
+    public  String getPaymentMethodName()    
+    {
+        return paymentMethodName;
+    }
+    public  void setMemberBookboxStatusName(String memberBookboxStatusName)    
+    {
+        this.memberBookboxStatusName = memberBookboxStatusName;
+    }
+    public  String getMemberBookboxStatusName()    
+    {
+        return memberBookboxStatusName;
+    }
+    public  void setDistanceName(String distanceName)    
+    {
+        this.distanceName = distanceName;
+    }
+    public  String getDistanceName()    
+    {
+        return distanceName;
+    }
+    public  void setMemberCardCardNo(String memberCardCardNo)    
+    {
+        this.memberCardCardNo = memberCardCardNo;
+    }
+    public  String getMemberCardCardNo()    
+    {
+        return memberCardCardNo;
+    }
+    public  void setMemberCardEffectiveDate(Timestamp memberCardEffectiveDate)    
+    {
+        this.memberCardEffectiveDate = memberCardEffectiveDate;
+    }
+    public  Timestamp getMemberCardEffectiveDate()    
+    {
+        return memberCardEffectiveDate;
+    }
+    public  void setMemberCardExpireDate(Timestamp memberCardExpireDate)    
+    {
+        this.memberCardExpireDate = memberCardExpireDate;
+    }
+    public  Timestamp getMemberCardExpireDate()    
+    {
+        return memberCardExpireDate;
+    }
+    public  void setStoppableCardQuantity(Integer stoppableCardQuantity)    
+    {
+        this.stoppableCardQuantity = stoppableCardQuantity;
+    }
+    public  Integer getStoppableCardQuantity()    
+    {
+        return stoppableCardQuantity;
+    }
+    public  void setMemberCardMaxBorrowQuantity(Integer memberCardMaxBorrowQuantity)    
+    {
+        this.memberCardMaxBorrowQuantity = memberCardMaxBorrowQuantity;
+    }
+    public  Integer getMemberCardMaxBorrowQuantity()    
+    {
+        return memberCardMaxBorrowQuantity;
+    }
+    public  void setExtendQuantity(BigDecimal extendQuantity)    
+    {
+        this.extendQuantity = extendQuantity;
+    }
+    public  BigDecimal getExtendQuantity()    
+    {
+        return extendQuantity;
+    }
+    public  void setHeadImageFilePath(String headImageFilePath)    
+    {
+        this.headImageFilePath = headImageFilePath;
+    }
+    public  String getHeadImageFilePath()    
+    {
+        return headImageFilePath;
+    }
+    public  ViewMember copy()    
+    {
+        ViewMember entity = null;
+        try        
+        {
+            entity = (ViewMember) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

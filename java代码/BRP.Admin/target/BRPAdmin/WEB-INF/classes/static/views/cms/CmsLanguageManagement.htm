@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cms语言管理</title>
+<link rel="stylesheet" type="text/css" href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/cms/cms.build.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/management.js"></script>
+<style>
+	.cms_language_switch_div{
+		height: 24px;
+		width: 220px;
+		float: right;
+		margin-right: 400px;
+	}
+	.cms_language_switch_title{
+		height: 24px;
+		width: 130px;
+		line-height: 24px;
+		float: left;
+	}
+	.cms_language_switch_item{
+		height: 24px;
+		width: 43px;
+		line-height: 24px;
+		text-align: center;
+		float: left;
+		cursor: pointer;
+		border: 1px solid #ccc;
+	}
+	.chosen_switch_item{
+		background-color: #ccc;
+		color: white;
+		cursor: default;
+	}
+	.switch_on,.switch_off{
+		display: none;
+	}
+	.chosen_switch_item .switch_on{
+		display: block;
+	}
+	.cms_language_switch_item .switch_off{
+		display: block;
+	}
+</style>
+<script type="text/javascript">
+	managementContext.dataName="CmsLanguage";
+	managementContext.tableName="cms_language";
+	managementContext.primaryKeyName="code";
+	managementContext.operationColumnWidth = 300;
+	managementContext.customTableColumns = [ {
+		field : 'code',
+		title : '编码',
+		fixed : true,
+		width : 150,
+		align : 'left'
+	},{
+		field : 'name',
+		title : '名称',
+		fixed : true,
+		width : 150,
+		align : 'left'
+	},{
+		field : 'path',
+		title : '生成路径',
+		fixed : true,
+		width : 150,
+		align : 'left'
+	},{
+		field : 'display_order',
+		title : '显示顺序',
+		width : 30,
+		align : 'left'
+	},{
+		field : 'description',
+		title : '描述',
+		width : 100,
+		align : 'left'
+	}];
+	/*
+ * 绑定数据
+ */
+function bindData() {
+	//加载多语言支持系统参数
+	BindCmsLanguage();
+	var requestParameters = getParameters();
+	// alert(JSON.stringify(requestParameters));
+	requestParameters.cmsSiteId =  $.cookie("cmsSiteId");
+	requestParameters.orderBy = "display_order";
+	call(managementContext.getListServiceName, requestParameters, function(
+			result) {
+		outputData(result.data.dataList);
+		//设置功能权限
+		if(!managementContext.isBasicTable){
+			bindTableGridFunctionPermission();
+		}
+		// 设置分页
+		if (managementContext.allowPaging) {
+			setPager(result.data);
+		}
+	});
+}
+	/*
+	取得操作按钮列表
+	 */
+	function getOperationButtonHtmlArray(dataItem) {
+		var arrOpeartionButtonHtml = getOperationButtonHtmlArrayBase(dataItem);
+		var lnkSetCurrentHtml = getGridButtonHtml(dataItem, "setDefault",
+				"设为默认语言");
+		var lnkMoveUpButtonHtml = getGridMoveUpButtonHtml(dataItem);
+		var lnkMoveDownButtonHtml = getGridMoveDownButtonHtml(dataItem);
+			arrOpeartionButtonHtml.push(lnkMoveUpButtonHtml);
+			arrOpeartionButtonHtml.push(lnkMoveDownButtonHtml);
+		if (null == dataItem.is_default || dataItem.is_default == 0) {
+			arrOpeartionButtonHtml.push(lnkSetCurrentHtml);
+		}
+		return arrOpeartionButtonHtml;
+	}
+	
+	//设置默认语言
+	function setDefault(code){
+		var data = new Object();
+		data.code = code;
+		data.cmsSiteId =  $.cookie("cmsSiteId");
+		call("SetDefaultCmsLanguage",data,function(result){
+			bindData();
+		})
+	}
+	/*
+	 * 取得实体
+	 */
+	function getEntity() {
+		var newEntity = getEntityBase();
+		newEntity.cmsSiteId = $.cookie("cmsSiteId");
+		return newEntity;
+	}
+	//多语言开关
+	function switchCmslanguage(value){
+		var text ="";
+		if(value == "true"){
+			text = "开启";
+		}else{
+			text = "关闭";
+		}
+		$.messager.confirm('提示','确定要'+text+'多语言吗,重启CMS系统后才能生效',function(r){
+			if(r){
+				var data = new Object();
+				data.value = value;
+				data.cmsSiteId =  $.cookie("cmsSiteId");
+				call("SwitchIsOnCmsLanguage",data,function(result){
+					BindCmsLanguage();
+				})
+			}
+		})
+	}
+	//加载多语言系统参数
+	function BindCmsLanguage(){
+		var data = new Object();
+		data.tableName = "cms_site";
+		data.condition = " id = "+ $.cookie("cmsSiteId");
+		call("GetList",data,function(result){
+			var value = result.data.dataList[0].is_cms_language;
+			$(".cms_language_switch_item").removeClass("chosen_switch_item");
+			$(".cms_language_switch_item").removeAttr("onclick");
+			if(null != value && value == 1){
+				$("#switch_open").addClass("chosen_switch_item");
+				$("#switch_close").attr("onclick","switchCmslanguage(0)");
+			}else{
+				$("#switch_close").addClass("chosen_switch_item");
+				$("#switch_open").attr("onclick","switchCmslanguage(1)");
+			}
+		})
+	}
+</script>
+
+</head>
+
+<body>
+	<div class="easyui-layout" style="width:100%;" fit="true">
+		<div id="content" region="center" style="padding:1px;">
+			<div class="toolbar_panel" id="divToolbar">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add"
+					plain="true" onclick="openAddDialog()" id="btnAdd">新增</a> <a href="#"
+					class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+					onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a id="lnkRefreshPage" href="#"
+					class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+					onclick="refreshPage()">刷新</a>
+				<div class="cms_language_switch_div">
+					<div class="cms_language_switch_title">是否开启CMS多语言：</div>
+					<div class="cms_language_switch_item chosen_switch_item" id="switch_open">
+						<span class="switch_on">已开启</span><span class="switch_off">开启</span></div>
+					<div class="cms_language_switch_item" id="switch_close">
+						<span class="switch_on">已关闭</span><span class="switch_off">关闭</span></div>
+				</div>
+			</div>
+			<div id="divSearchPanel" class="search_panel easyui-panel">
+				<div class="search_item">
+					<span class="search_item_caption">编号:</span> <input
+						id="txtSearchCode" class="search_item_textbox easyui-textbox">
+				</div>
+				<div class="search_item">
+					<span class="search_item_caption">名称:</span> <input
+						id="txtSearchName" class="search_item_textbox easyui-textbox">
+				</div>
+				<div class="search_item_command">
+					<a href="#" class="easyui-linkbutton" plain="true"
+						iconCls="icon-search" onclick="query()">查询</a>
+				</div>
+			</div>
+			<table id="tableGrid">
+			</table>
+			<!-- 基本信息 -->
+			<div id="divDetailDialog" class="easyui-dialog" style="width:450px"
+				closed="true" buttons="#dlg-buttons">
+				<form id="formDetail" method="post" novalidate
+					style="margin:0;padding:20px 20px">
+					<div title="基本信息" data-options="closable:false"
+						style="padding:10px">
+						<div style="margin-bottom:10px">
+							<input id="txtCode" name="txtCode" class="easyui-textbox"
+								label="编码:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="txtName" name="txtName" class="easyui-textbox"
+								label="名称:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="txtPath" name="txtPath" class="easyui-textbox"
+								label="生成路径:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="txtDescription" name="txtDescription"
+								class="easyui-textbox" label="描述:" multiline="true"
+								labelPosition="left" style="width:100%;height:120px;">
+						</div>
+						<div style="margin-bottom:10px;">
+							<input id="txtDisplayOrder" name="txtDisplayOrder" class="easyui-textbox"
+								label="显示顺序:" style="width:100%">
+						</div>
+					</div>
+				</form>
+				<div id="dlg-buttons">
+					<a href="javascript:void(0)" class="easyui-linkbutton"
+						iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+					<a href="javascript:void(0)" class="easyui-linkbutton"
+						iconCls="icon-cancel" onclick="javascript:closeDetailDialog();"
+						style="width:90px">取消</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

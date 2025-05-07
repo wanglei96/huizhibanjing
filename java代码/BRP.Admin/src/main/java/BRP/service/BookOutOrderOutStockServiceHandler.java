@@ -1,0 +1,26 @@
+package BRP.service;
+
+import BRP.data.BookOrderBorrowStatusCodes;
+import BRP.data.BookOutOrderStatusCodes;
+import BRP.model.BookOutOrderManager;
+import net.sf.json.JSONObject;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
+
+public class BookOutOrderOutStockServiceHandler extends ServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        Integer bookOutOrderId = JsonHelper.getInt(jData, "bookOutOrderId");
+        Integer bookOrderId = JsonHelper.getInt(jData, "bookOrderId");
+        Integer bookId = JsonHelper.getInt(jData, "bookId");
+        Integer bookOrderItemId = JsonHelper.getInt(jData, "bookOrderItemId");
+        BookOutOrderManager.getInstance().bookOutOrderOutStock(bookOutOrderId, bookOrderId, bookId, bookOrderItemId);
+        this.writeSuccessResponse(response);
+    }
+}

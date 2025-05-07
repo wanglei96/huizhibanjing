@@ -1,0 +1,678 @@
+package BRP.data;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import java.util.*;
+import BRP.data.BookTag;
+import BRP.model.AgeGroupBookTagManager;
+import java.io.IOException;
+import BRP.model.BookSkuBookTagManager;
+import strosoft.app.common.IdDataManager;
+import strosoft.app.data.DataEntity;
+import java.math.*;
+public class BookTagMaster extends IdDataManager 
+{
+    public  int add(BookTag entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int result = 0;
+        try        
+        {
+            result = add(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return result;
+    }
+    public  int add(SqlSession sqlSession,BookTag entity)    
+    {
+        int rows = sqlSession.insert("BookTag.insertBookTag",entity);
+        int newId = Integer.valueOf(entity.getId().toString());
+        if (newId > 0)         
+        {
+            return newId;
+        }
+         else         
+        {
+            return rows;
+        }
+    }
+    public  int add(DataEntity dataEntity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer num = null;
+        try        
+        {
+            num  = add(sqlSession,dataEntity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return num;
+    }
+    public  int add(SqlSession sqlSession,DataEntity dataEntity)    
+    {
+        return add(sqlSession,(BookTag)dataEntity);
+    }
+    public  int addList(List<BookTag> list)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = addList(sqlSession,list);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int addList(SqlSession sqlSession,List<BookTag> list)    
+    {
+        if(null == list || list.size() == 0)        
+        {
+            return 0;
+        }
+        int rows = sqlSession.insert("BookTag.insertBookTags",list);
+        return rows;
+    }
+    public  int delete(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = delete(sqlSession,id);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int delete(SqlSession sqlSession,Integer id)    
+    {
+        int rows = delete(sqlSession,getEntity(sqlSession,id));
+        return rows;
+    }
+    public  int delete(DataEntity entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = delete(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int delete(SqlSession sqlSession,DataEntity entity)    
+    {
+        AgeGroupBookTagManager.getInstance().deleteByBookTagId(sqlSession,((BookTag)entity).getId());
+        BookSkuBookTagManager.getInstance().deleteByBookTagId(sqlSession,((BookTag)entity).getId());
+        int rows = sqlSession.delete("BookTag.deleteBookTag",entity);
+        return rows;
+    }
+    public  int batchDelete(List<Integer> list)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            for(int i=0;i<list.size();i++)            
+            {
+                rows += delete(sqlSession,list.get(i));
+            }
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            rows=0;
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int batchDelete(SqlSession sqlSession,List<Integer> list)    
+    {
+        int rows = 0;
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  int batchDeleteByEntity(SqlSession sqlSession,List<? extends DataEntity> list)    
+    {
+        int rows = 0;
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  DataEntity getDataEntity(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        DataEntity newDataEntity = null;
+        try        
+        {
+            newDataEntity = getDataEntity(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return newDataEntity;
+    }
+    public  DataEntity getDataEntity(SqlSession sqlSession,Integer id)    
+    {
+        DataEntity newDataEntity = getEntity(sqlSession,id);
+         return newDataEntity;
+    }
+    public  BookTag getEntity(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        BookTag newEntity = null;
+        try        
+        {
+            newEntity = getEntity(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return newEntity;
+    }
+    public  BookTag getEntity(SqlSession sqlSession,Integer id)    
+    {
+        BookTag entity = createEntity();
+        entity.setId(id);
+        BookTag newEntity = sqlSession.selectOne("BookTag.selectBookTag",entity);
+        return newEntity;
+    }
+    public  List<BookTag> getList()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<BookTag> list = null;
+        try        
+        {
+            list = getList(sqlSession);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<BookTag> getList(SqlSession sqlSession)    
+    {
+        List<BookTag> list = sqlSession.selectList("BookTag.selectBookTags");
+        return list;
+    }
+    public  List<BookTag> getList(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<BookTag> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<BookTag> getList(SqlSession sqlSession,String condition)    
+    {
+        List<BookTag> list = sqlSession.selectList("BookTag.selectBookTagByCondition",condition);
+        return list;
+    }
+    public  List<BookTag> getList(String condition,String orderBy)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<BookTag> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition,orderBy);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<BookTag> getList(SqlSession sqlSession,String condition,String orderBy)    
+    {
+        String conditionAndOrderBy = condition +" order by "+orderBy;
+        List<BookTag> list = sqlSession.selectList("BookTag.selectBookTagByCondition",conditionAndOrderBy);
+        return list;
+    }
+    public  List<BookTag> getList(int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<BookTag> list = null;
+        try        
+        {
+            list = getList(sqlSession,pageIndex,pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+        finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<BookTag> getList(SqlSession sqlSession,int pageIndex,int pageSize)    
+    {
+        String sql = String.format("select * from book_tag limit %s, %s", pageSize * pageIndex, pageSize);
+        List<BookTag> list = sqlSession.selectList("BookTag.selectBookTagBySql", sql);
+        return list;
+    }
+    public  List<BookTag> getListPage(String condition,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<BookTag> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<BookTag> getList(SqlSession sqlSession,String condition,int pageIndex,int pageSize)    
+    {
+        String sql = condition + " limit " + pageSize * pageIndex + "," + pageSize;
+        List<BookTag> list = sqlSession.selectList("BookTag.selectBookTagByCondition",sql);
+        return list;
+    }
+    public  List<BookTag> getList(String condition,String orderBy,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<BookTag> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, orderBy, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<BookTag> getList(SqlSession sqlSession,String condition,String orderBy,int pageIndex,int pageSize)    
+    {
+        String sql = condition +" order by " + orderBy + " limit " + pageSize * pageIndex + " , " + pageSize;
+        List<BookTag> list = sqlSession.selectList("BookTag.selectBookTagByCondition",sql);
+        return list;
+    }
+    public  List<BookTag> getListBySql(String sql)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<BookTag> list = null;
+        try        
+        {
+            list = getListBySql(sqlSession,sql);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<BookTag> getListBySql(SqlSession sqlSession,String sql)    
+    {
+        List<BookTag> list = sqlSession.selectList("BookTag.selectBookTagBySql",sql);
+        return list;
+    }
+    public  Integer getCount(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer count = null;
+        try        
+        {
+            count = getCount(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return count;
+    }
+    public  Integer getCount(SqlSession sqlSession,String condition)    
+    {
+        Integer rows = sqlSession.selectOne("BookTag.selectCountByCondition",condition);
+        return rows;
+    }
+    public  int update(BookTag entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = update(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int update(SqlSession sqlSession,BookTag entity)throws IOException    
+    {
+        int rows = sqlSession.update("BookTag.updateBookTag",entity);
+        return rows;
+    }
+    public  BookTag createEntity()    
+    {
+        return new BookTag();
+    }
+    public  DataEntity createDataEntity()    
+    {
+        return new BookTag();
+    }
+    public  int clear()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = clear(sqlSession);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int clear(SqlSession sqlSession)    
+    {
+        int rows = 0;
+        List<BookTag> list = getList(sqlSession);
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  int deleteByCompanyId(Integer companyId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = deleteByCompanyId(sqlSession,companyId);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int deleteByLanguageCode(String languageCode)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = deleteByLanguageCode(sqlSession,languageCode);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int deleteByCompanyId(SqlSession sqlSession,Integer companyId)    
+    {
+        List<BookTag> list = getListByCompanyId(sqlSession,companyId);
+        int rows = batchDeleteByEntity(sqlSession,list);
+        return rows;
+    }
+    public  int deleteByLanguageCode(SqlSession sqlSession,String languageCode)    
+    {
+        List<BookTag> list = getListByLanguageCode(sqlSession,languageCode);
+        int rows = batchDeleteByEntity(sqlSession,list);
+        return rows;
+    }
+    public  List<BookTag> getListByCompanyId(Integer companyId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<BookTag> entitys = null;
+         try        
+        {
+            entitys = getListByCompanyId(sqlSession,companyId);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entitys;
+    }
+    public  List<BookTag> getListByLanguageCode(String languageCode)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<BookTag> entitys = null;
+         try        
+        {
+            entitys = getListByLanguageCode(sqlSession,languageCode);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entitys;
+    }
+    public  List<BookTag> getListByCompanyId(SqlSession sqlSession,Integer companyId)    
+    {
+        List<BookTag> entitys = sqlSession.selectList("BookTag.selectBookTagByCompanyId",companyId);
+        return entitys;
+    }
+    public  List<BookTag> getListByLanguageCode(SqlSession sqlSession,String languageCode)    
+    {
+        List<BookTag> entitys = sqlSession.selectList("BookTag.selectBookTagByLanguageCode",languageCode);
+        return entitys;
+    }
+    public  BookTag getEntityById(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        BookTag entity = null;
+        try        
+        {
+             entity = getEntityById(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entity;
+    }
+    public  BookTag getEntityById(SqlSession sqlSession,Integer id)    
+    {
+        BookTag entity = sqlSession.selectOne("selectBookTagByCondition","id='"+id+"'");
+        return entity;
+    }
+    public  boolean existsId(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Boolean flag = null;
+        try        
+        {
+            flag = existsId(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return flag;
+    }
+    public  boolean existsId(SqlSession sqlSession,Integer id)    
+    {
+        Integer rows = sqlSession.selectOne("BookTag.selectIntBySql","select count(*) from book_tag where id= '"+id+"'");
+        return rows>0?true:false;
+    }
+}

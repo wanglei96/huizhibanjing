@@ -1,0 +1,674 @@
+package BRP.data;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import java.util.*;
+import java.io.IOException;
+import strosoft.app.common.IdDataManager;
+import strosoft.app.data.DataEntity;
+import BRP.data.CompanySettlementItem;
+import java.math.*;
+public class CompanySettlementItemMaster extends IdDataManager 
+{
+    public  int add(CompanySettlementItem entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int result = 0;
+        try        
+        {
+            result = add(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return result;
+    }
+    public  int add(SqlSession sqlSession,CompanySettlementItem entity)    
+    {
+        int rows = sqlSession.insert("CompanySettlementItem.insertCompanySettlementItem",entity);
+        int newId = Integer.valueOf(entity.getId().toString());
+        if (newId > 0)         
+        {
+            return newId;
+        }
+         else         
+        {
+            return rows;
+        }
+    }
+    public  int add(DataEntity dataEntity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer num = null;
+        try        
+        {
+            num  = add(sqlSession,dataEntity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return num;
+    }
+    public  int add(SqlSession sqlSession,DataEntity dataEntity)    
+    {
+        return add(sqlSession,(CompanySettlementItem)dataEntity);
+    }
+    public  int addList(List<CompanySettlementItem> list)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = addList(sqlSession,list);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int addList(SqlSession sqlSession,List<CompanySettlementItem> list)    
+    {
+        if(null == list || list.size() == 0)        
+        {
+            return 0;
+        }
+        int rows = sqlSession.insert("CompanySettlementItem.insertCompanySettlementItems",list);
+        return rows;
+    }
+    public  int delete(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = delete(sqlSession,id);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int delete(SqlSession sqlSession,Integer id)    
+    {
+        int rows = delete(sqlSession,getEntity(sqlSession,id));
+        return rows;
+    }
+    public  int delete(DataEntity entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = delete(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int delete(SqlSession sqlSession,DataEntity entity)    
+    {
+        int rows = sqlSession.delete("CompanySettlementItem.deleteCompanySettlementItem",entity);
+        return rows;
+    }
+    public  int batchDelete(List<Integer> list)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            for(int i=0;i<list.size();i++)            
+            {
+                rows += delete(sqlSession,list.get(i));
+            }
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            rows=0;
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int batchDelete(SqlSession sqlSession,List<Integer> list)    
+    {
+        int rows = 0;
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  int batchDeleteByEntity(SqlSession sqlSession,List<? extends DataEntity> list)    
+    {
+        int rows = 0;
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  DataEntity getDataEntity(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        DataEntity newDataEntity = null;
+        try        
+        {
+            newDataEntity = getDataEntity(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return newDataEntity;
+    }
+    public  DataEntity getDataEntity(SqlSession sqlSession,Integer id)    
+    {
+        DataEntity newDataEntity = getEntity(sqlSession,id);
+         return newDataEntity;
+    }
+    public  CompanySettlementItem getEntity(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        CompanySettlementItem newEntity = null;
+        try        
+        {
+            newEntity = getEntity(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return newEntity;
+    }
+    public  CompanySettlementItem getEntity(SqlSession sqlSession,Integer id)    
+    {
+        CompanySettlementItem entity = createEntity();
+        entity.setId(id);
+        CompanySettlementItem newEntity = sqlSession.selectOne("CompanySettlementItem.selectCompanySettlementItem",entity);
+        return newEntity;
+    }
+    public  List<CompanySettlementItem> getList()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanySettlementItem> list = null;
+        try        
+        {
+            list = getList(sqlSession);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanySettlementItem> getList(SqlSession sqlSession)    
+    {
+        List<CompanySettlementItem> list = sqlSession.selectList("CompanySettlementItem.selectCompanySettlementItems");
+        return list;
+    }
+    public  List<CompanySettlementItem> getList(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanySettlementItem> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanySettlementItem> getList(SqlSession sqlSession,String condition)    
+    {
+        List<CompanySettlementItem> list = sqlSession.selectList("CompanySettlementItem.selectCompanySettlementItemByCondition",condition);
+        return list;
+    }
+    public  List<CompanySettlementItem> getList(String condition,String orderBy)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanySettlementItem> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition,orderBy);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanySettlementItem> getList(SqlSession sqlSession,String condition,String orderBy)    
+    {
+        String conditionAndOrderBy = condition +" order by "+orderBy;
+        List<CompanySettlementItem> list = sqlSession.selectList("CompanySettlementItem.selectCompanySettlementItemByCondition",conditionAndOrderBy);
+        return list;
+    }
+    public  List<CompanySettlementItem> getList(int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanySettlementItem> list = null;
+        try        
+        {
+            list = getList(sqlSession,pageIndex,pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+        finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanySettlementItem> getList(SqlSession sqlSession,int pageIndex,int pageSize)    
+    {
+        String sql = String.format("select * from company_settlement_item limit %s, %s", pageSize * pageIndex, pageSize);
+        List<CompanySettlementItem> list = sqlSession.selectList("CompanySettlementItem.selectCompanySettlementItemBySql", sql);
+        return list;
+    }
+    public  List<CompanySettlementItem> getListPage(String condition,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanySettlementItem> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanySettlementItem> getList(SqlSession sqlSession,String condition,int pageIndex,int pageSize)    
+    {
+        String sql = condition + " limit " + pageSize * pageIndex + "," + pageSize;
+        List<CompanySettlementItem> list = sqlSession.selectList("CompanySettlementItem.selectCompanySettlementItemByCondition",sql);
+        return list;
+    }
+    public  List<CompanySettlementItem> getList(String condition,String orderBy,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanySettlementItem> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, orderBy, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanySettlementItem> getList(SqlSession sqlSession,String condition,String orderBy,int pageIndex,int pageSize)    
+    {
+        String sql = condition +" order by " + orderBy + " limit " + pageSize * pageIndex + " , " + pageSize;
+        List<CompanySettlementItem> list = sqlSession.selectList("CompanySettlementItem.selectCompanySettlementItemByCondition",sql);
+        return list;
+    }
+    public  List<CompanySettlementItem> getListBySql(String sql)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanySettlementItem> list = null;
+        try        
+        {
+            list = getListBySql(sqlSession,sql);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanySettlementItem> getListBySql(SqlSession sqlSession,String sql)    
+    {
+        List<CompanySettlementItem> list = sqlSession.selectList("CompanySettlementItem.selectCompanySettlementItemBySql",sql);
+        return list;
+    }
+    public  Integer getCount(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer count = null;
+        try        
+        {
+            count = getCount(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return count;
+    }
+    public  Integer getCount(SqlSession sqlSession,String condition)    
+    {
+        Integer rows = sqlSession.selectOne("CompanySettlementItem.selectCountByCondition",condition);
+        return rows;
+    }
+    public  int update(CompanySettlementItem entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = update(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int update(SqlSession sqlSession,CompanySettlementItem entity)throws IOException    
+    {
+        int rows = sqlSession.update("CompanySettlementItem.updateCompanySettlementItem",entity);
+        return rows;
+    }
+    public  CompanySettlementItem createEntity()    
+    {
+        return new CompanySettlementItem();
+    }
+    public  DataEntity createDataEntity()    
+    {
+        return new CompanySettlementItem();
+    }
+    public  int clear()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = clear(sqlSession);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int clear(SqlSession sqlSession)    
+    {
+        int rows = 0;
+        List<CompanySettlementItem> list = getList(sqlSession);
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  int deleteByCompanySettlementId(Integer companySettlementId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = deleteByCompanySettlementId(sqlSession,companySettlementId);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int deleteBySalesOrderId(Integer salesOrderId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = deleteBySalesOrderId(sqlSession,salesOrderId);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int deleteByCompanySettlementId(SqlSession sqlSession,Integer companySettlementId)    
+    {
+        List<CompanySettlementItem> list = getListByCompanySettlementId(sqlSession,companySettlementId);
+        int rows = batchDeleteByEntity(sqlSession,list);
+        return rows;
+    }
+    public  int deleteBySalesOrderId(SqlSession sqlSession,Integer salesOrderId)    
+    {
+        List<CompanySettlementItem> list = getListBySalesOrderId(sqlSession,salesOrderId);
+        int rows = batchDeleteByEntity(sqlSession,list);
+        return rows;
+    }
+    public  List<CompanySettlementItem> getListByCompanySettlementId(Integer companySettlementId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanySettlementItem> entitys = null;
+         try        
+        {
+            entitys = getListByCompanySettlementId(sqlSession,companySettlementId);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entitys;
+    }
+    public  List<CompanySettlementItem> getListBySalesOrderId(Integer salesOrderId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanySettlementItem> entitys = null;
+         try        
+        {
+            entitys = getListBySalesOrderId(sqlSession,salesOrderId);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entitys;
+    }
+    public  List<CompanySettlementItem> getListByCompanySettlementId(SqlSession sqlSession,Integer companySettlementId)    
+    {
+        List<CompanySettlementItem> entitys = sqlSession.selectList("CompanySettlementItem.selectCompanySettlementItemByCompanySettlementId",companySettlementId);
+        return entitys;
+    }
+    public  List<CompanySettlementItem> getListBySalesOrderId(SqlSession sqlSession,Integer salesOrderId)    
+    {
+        List<CompanySettlementItem> entitys = sqlSession.selectList("CompanySettlementItem.selectCompanySettlementItemBySalesOrderId",salesOrderId);
+        return entitys;
+    }
+    public  CompanySettlementItem getEntityById(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        CompanySettlementItem entity = null;
+        try        
+        {
+             entity = getEntityById(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entity;
+    }
+    public  CompanySettlementItem getEntityById(SqlSession sqlSession,Integer id)    
+    {
+        CompanySettlementItem entity = sqlSession.selectOne("selectCompanySettlementItemByCondition","id='"+id+"'");
+        return entity;
+    }
+    public  boolean existsId(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Boolean flag = null;
+        try        
+        {
+            flag = existsId(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return flag;
+    }
+    public  boolean existsId(SqlSession sqlSession,Integer id)    
+    {
+        Integer rows = sqlSession.selectOne("CompanySettlementItem.selectIntBySql","select count(*) from company_settlement_item where id= '"+id+"'");
+        return rows>0?true:false;
+    }
+}

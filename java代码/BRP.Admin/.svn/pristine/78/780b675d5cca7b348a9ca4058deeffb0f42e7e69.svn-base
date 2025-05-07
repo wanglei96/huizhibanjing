@@ -1,0 +1,649 @@
+package BRP.model;
+
+import BRP.data.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.common.MySqlConditionBuilder;
+import strosoft.app.service.ServiceContext;
+import strosoft.app.util.*;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class BookOrderManager extends BookOrderMaster {
+    private static BookOrderManager _instance;
+
+    private BookOrderManager() {
+        this.setTableName("book_order");
+        this.setTypeName("BookOrder");
+    }
+
+    public static BookOrderManager getInstance() {
+        if (_instance == null) {
+            _instance = new BookOrderManager();
+        }
+        return _instance;
+    }
+
+    /**
+     * 线下还书
+     *
+     * @param companyId
+     * @param returnBookSn
+     * @return
+     * @throws Exception
+     */
+    public ReturnBookOrderInfo addReturnBookOrder(Integer companyId, String returnBookSn) throws Exception {
+        SqlSession session = MyBatisManager.getInstance().openSession();
+        try {
+            String timReturnBookSn = returnBookSn.trim();
+            ViewBook theViewBook = ViewBookManager.getInstance().getEntityBySn(timReturnBookSn, companyId);
+            ReturnBookOrderInfo newReturnBookOrderInfo = new ReturnBookOrderInfo();
+            if (theViewBook == null) {
+                throw new Exception("该图书编号未找到相关图书！");
+            }
+            if (theViewBook.getBorrowStatusCode().equals(BorrowStatusCodes.In)) {
+                newReturnBookOrderInfo.setViewBook(theViewBook);
+                return newReturnBookOrderInfo;
+            }
+            if (theViewBook.getMemberId() == null) {
+                throw new Exception("该图书已还请勿重复提交！");
+            }
+            //修改这本书的借书单明细
+            String condition = String.format(
+                    "book_id = %d and member_id = %d and is_returned is not true and book_order_type_code='%s'",
+                    theViewBook.getId(), theViewBook.getMemberId(), BookOrderTypeCodes.Borrow);
+            List<ViewBookOrderItem> borrowBookOrderItemList = ViewBookOrderItemManager.
+                    getInstance().getList(session, condition, "create_time desc");
+            if (borrowBookOrderItemList.size() == 0) {
+                throw new Exception("该图书已还请勿重复提交！");
+            }
+            //获取会员卡
+            //MemberCard theMemberCard = MemberCardManager.getInstance().getEntityByMemberId(session, theViewBook.getMemberId());
+            //判断是否提交了线上还书并且配送员没有点我送达
+            String checkCondition = String.format("book_id=%d and member_id=%d and is_returned is not true and book_order_type_code='%s' and is_offline is not true ",
+                    theViewBook.getId(), theViewBook.getMemberId(), BookOrderTypeCodes.Return);
+            List<ViewBookOrderItem> checkBookOrderItemList = ViewBookOrderItemManager.
+                    getInstance().getList(session, checkCondition, "create_time desc");
+            if (checkBookOrderItemList.size() > 0) {
+                //修改会员卡可借数量
+                //theMemberCard.setBorrowableQuantity(theMemberCard.getBorrowableQuantity() - 1);
+                ViewBookOrderItem theViewBookOrderItem = checkBookOrderItemList.get(0);
+                BookOrderItemManager.getInstance().delete(session, theViewBookOrderItem.getId());
+                //判断订单是否存在
+                String orderCountCondition = String.format("book_order_id=%d", theViewBookOrderItem.getBookOrderId());
+                Integer count = BookOrderItemManager.getInstance().getCount(session, orderCountCondition);
+                if (count == 0) {
+                    BookOrderManager.getInstance().delete(session, theViewBookOrderItem.getBookOrderId());
+                }
+            }
+
+            //添加还书单
+            BookOrder newBookOrder = new BookOrder();
+            //设置订单编号
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            Date now = new Date();
+            String bookOrderNo = sdf.format(now);
+            newBookOrder.setBookOrderNo(bookOrderNo);
+            newBookOrder.setIsOffline(true);
+            newBookOrder.setBookOrderReturnStatusCode(BookOrderReturnStatusCodes.OfflineReturned);
+            newBookOrder.setMemberId(theViewBook.getMemberId());
+            newBookOrder.setBusinessDate(DateHelper.getCurrentTimestamp());
+            newBookOrder.setCompanyId(companyId);
+            Integer newBookOrderId = this.add(session, newBookOrder);
+
+            //添加书籍订单项
+            BookOrderItem newBookOrderItem = new BookOrderItem();
+            newBookOrderItem.setBookOrderId(newBookOrderId);
+            newBookOrderItem.setBookId(theViewBook.getId());
+            newBookOrderItem.setBookOrderTypeCode(BookOrderTypeCodes.Return);
+            newBookOrderItem.setBookReturnTime(DateHelper.getCurrentTimestamp());
+            newBookOrderItem.setDeliverStatusCode(DeliverStatusCodes.Storageing);
+            int newBookOrderItemId = BookOrderItemManager.getInstance().add(session, newBookOrderItem);
+            //修改借书单明细为已还并加上还书时间
+            if (borrowBookOrderItemList.size() > 0) {
+                String strBookReturnTime = DateHelper.getDateTimeString();
+                String sql = String.format("update book_order_item set is_returned = 1,  " +
+                        "book_return_time = '%s' \n" +
+                        "where id = %d", strBookReturnTime, borrowBookOrderItemList.get(0).getId());
+                MyBatisManager.getInstance().executeUpdate(session, sql);
+            }
+
+
+            //修改会员卡可借数量
+            //theMemberCard.setBorrowableQuantity(theMemberCard.getBorrowableQuantity() + 1);
+            //MemberCardManager.getInstance().update(session, theMemberCard);
+            //获取图书并修改图书状态
+            Book theBook = BookManager.getInstance().getEntity(session, theViewBook.getId());
+            theBook.setMemberId(null);
+            theBook.setBorrowStatusCode(BorrowStatusCodes.InCloud);
+            BookManager.getInstance().update(session, theBook);
+            ViewBookOrderItem newViewBookOrderItem = ViewBookOrderItemManager.getInstance().getEntityById(session, newBookOrderItemId);
+
+            //获取会员剩余还书数量
+            int borrowingQuantity = BookManager.getInstance().getCount(session, "member_id=" + theViewBook.getMemberId());
+            ReturnBookOrderItemInfo newReturnBookOrderItemInfo = (ReturnBookOrderItemInfo) ClassHelper.copyObject(ReturnBookOrderItemInfo.class, newViewBookOrderItem);
+            newReturnBookOrderItemInfo.setBorrowingQuantity(borrowingQuantity);
+            //获取损毁提醒
+            String bookDamageCondition = String.format("member_id=%d and book_id = %d and is_remind is true",
+                    theViewBook.getMemberId(), theViewBook.getId());
+            List<BookDamage> lstBookDamage = BookDamageManager.getInstance().getList(session, bookDamageCondition);
+            if (lstBookDamage.size() > 0) {
+                newReturnBookOrderItemInfo.setIsDamage(true);
+            }
+            newReturnBookOrderInfo.setReturnBookOrderItemInfo(newReturnBookOrderItemInfo);
+
+            MyBatisManager.getInstance().commitSession(session);
+            return newReturnBookOrderInfo;
+        } catch (Exception ex) {
+            MyBatisManager.getInstance().rollbackSession(session);
+            throw ex;
+        } finally {
+            MyBatisManager.getInstance().closeSession(session);
+        }
+    }
+
+    /**
+     * 添加线上还书单
+     *
+     * @param companyId
+     * @param memberId
+     * @param bookId
+     * @throws Exception
+     */
+    public void addOnLineReturnBookOrder(Integer companyId, Integer memberId, Integer bookId) throws Exception {
+        SqlSession session = MyBatisManager.getInstance().openSession();
+        try {
+            Member theMember = MemberManager.getInstance().getEntity(session, memberId);
+            if (!theMember.getCompanyId().equals(companyId)) {
+                throw new Exception("不能在其它门店还书！");
+            }
+            //判断会员书箱是否激活
+            if (theMember.getIsActivated() == null || !theMember.getIsActivated()) {
+                throw new Exception("会员书箱未激活！暂时无法还书");
+            }
+            Book theBook = BookManager.getInstance().getEntity(session, bookId);
+            //查询会员今日订单
+            BookOrder theBookOrder = this.getEntityByMemberIdAndDate(session, memberId);
+            Integer bookOrderId = null;
+            if (theBookOrder == null) {
+                //获取会员线路上的拣书员
+                DeliverLine theDeliverLine = DeliverLineManager.getInstance().getEntity(session, theMember.getDeliverLineId());
+                BookOrder newBookOrder = new BookOrder();
+                //设置订单编号
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                Date now = new Date();
+                String bookOrderNo = sdf.format(now);
+                newBookOrder.setBookOrderNo(bookOrderNo);
+                newBookOrder.setCompanyId(companyId);
+                newBookOrder.setDelivererId(theDeliverLine.getDelivererId());
+                newBookOrder.setBusinessDate(DateHelper.getCurrentTimestamp());
+                if (theDeliverLine.getBookpickerId() != null) {
+                    newBookOrder.setBookpickerId(theDeliverLine.getBookpickerId());
+                }
+                newBookOrder.setIsOffline(false);
+                newBookOrder.setMemberId(memberId);
+                newBookOrder.setBookOrderReturnStatusCode(BookOrderReturnStatusCodes.Submitting);
+                bookOrderId = this.add(session, newBookOrder);
+            } else {
+                bookOrderId = theBookOrder.getId();
+                if (StringHelper.isNullOrEmpty(theBookOrder.getBookOrderReturnStatusCode())) {
+                    theBookOrder.setBookOrderReturnStatusCode(BookOrderReturnStatusCodes.Submitting);
+                    this.update(session, theBookOrder);
+                }
+            }
+            BookOrderItem newBookOrderItem = new BookOrderItem();
+            newBookOrderItem.setBookId(bookId);
+            newBookOrderItem.setBookOrderId(bookOrderId);
+            newBookOrderItem.setBookOrderTypeCode(BookOrderTypeCodes.Return);
+            newBookOrderItem.setDeliverStatusCode(DeliverStatusCodes.Delivering);
+            BookOrderItemManager.getInstance().add(session, newBookOrderItem);
+            //修改图书状态
+            theBook.setBorrowStatusCode(BorrowStatusCodes.WaitingDelivery);
+            BookManager.getInstance().update(session, theBook);
+            //获取会员卡
+            //MemberCard theMemberCard = MemberCardManager.getInstance().getEntityByMemberId(session, memberId);
+            //修改会员卡可借数量
+            /*if (theMemberCard.getBorrowableQuantity() == null) {
+                theMemberCard.setBorrowableQuantity(0);
+            }
+            theMemberCard.setBorrowableQuantity(theMemberCard.getBorrowableQuantity() + 1);
+            MemberCardManager.getInstance().update(session, theMemberCard);*/
+
+            MyBatisManager.getInstance().commitSession(session);
+        } catch (Exception ex) {
+            MyBatisManager.getInstance().rollbackSession(session);
+            throw ex;
+        } finally {
+            MyBatisManager.getInstance().closeSession(session);
+        }
+    }
+
+    /**
+     * 添加线上借书单
+     */
+    public String addOnLineBorrowBookOrder(Integer companyId, Integer memberId, Integer bookSkuId) throws Exception {
+        SqlSession session = MyBatisManager.getInstance().openSession();
+        try {
+            Member theMember = MemberManager.getInstance().getEntity(session, memberId);
+            if (!theMember.getCompanyId().equals(companyId)) {
+                throw new Exception("不能借阅其它门店图书！");
+            }
+            String settingCondition = "company_id=" + companyId;
+            List<CompanySetting> companySettingList = CompanySettingManager.getInstance().getList(session, settingCondition);
+            CompanySettingValueInfo companySettingValueInfo = CompanySettingManager.getInstance().
+                    getCompanySettingValueInfo(companySettingList);
+            //判断门店今天是否营业
+            Boolean isRest = CompanySettingManager.getInstance().checkTodayRest(session, companyId, companySettingValueInfo);
+            //查询会员今日订单
+            BookOrder theBookOrder = this.getEntityByMemberIdAndDate(session, memberId);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            if (isRest) {
+                //获取会员卡
+                ViewMemberCard theViewMemberCard = ViewMemberCardManager.getInstance().getEntityByMemberId(session, memberId);
+                if (theViewMemberCard == null) {
+                    throw new Exception("会员卡不存在！请先办理会员卡。");
+                }
+                if (theViewMemberCard.getMemberCardStatusCode() != null && theViewMemberCard.getMemberCardStatusCode().equals("Locked")) {
+                    throw new Exception("您的线上借书功能已被锁定！请把忘记放进书箱的书带到馆里解锁！");
+                }
+                if (theViewMemberCard.getMemberCardStatusCode() != null && theViewMemberCard.getMemberCardStatusCode().equals("Cancelled")) {
+                    throw new Exception("会员卡已注销,暂时无法借书");
+                }
+            /*if (theViewMemberCard.getEnabled() == null || !theViewMemberCard.getEnabled()) {
+                throw new Exception("会员未启用，暂时无法借书");
+            }*/
+                //判断会员卡是否停卡
+                if (theViewMemberCard.getIsStopCard() != null && theViewMemberCard.getIsStopCard()) {
+                    throw new Exception("您的会员卡已办理停卡服务！停卡中无法借书。");
+                }
+
+                if (theViewMemberCard.getExpireDate() != null && theViewMemberCard.getExpireDate().before(DateHelper.getCurrentTimestamp())) {
+                    throw new Exception("会员已到期，请联系管理员续费激活！");
+                }
+                //获取会员卡已借阅数量
+                Integer borrowedQuantity = ViewBookOrderItemManager.getInstance().getBorrowedQuantity(session, memberId);
+                //获取会员卡总借阅数量
+                Integer allQuantity = theViewMemberCard.getMaxBorrowableQuantity().intValue() + theViewMemberCard.getExtendQuantity().intValue();
+
+                if (borrowedQuantity >= allQuantity) {
+                    throw new Exception("您的书箱已满！最多可以同时借阅" + allQuantity + "本哦~");
+                }
+            /*if (theViewMemberCard.getBorrowableQuantity() == null || theViewMemberCard.getBorrowableQuantity() <= 0) {
+                throw new Exception("会员暂无借阅数量！");
+            }*/
+                if (theViewMemberCard.getIsOnlineReading() == null || !theViewMemberCard.getIsOnlineReading()) {
+                    throw new Exception("书箱未开通！如果已装好，请联系管理开通书箱！");
+                }
+                if (theViewMemberCard.getIsUnlimited() == null || !theViewMemberCard.getIsUnlimited()) {
+                    //获取会员卡已经借阅次数
+                    String condition = String.format("book_order_type_code='%s' and member_id=%d",
+                            BookOrderTypeCodes.Borrow, memberId);
+                    Integer count = ViewBookOrderItemManager.getInstance().getCount(session, condition);
+                    if (theViewMemberCard.getMaxBorrowQuantity() == null || count >= theViewMemberCard.getMaxBorrowQuantity()) {
+                        throw new Exception("会员暂无借阅次数！");
+                    }
+                }
+
+
+                //判断会员书箱是否激活
+                if (theMember.getIsActivated() == null || !theMember.getIsActivated()) {
+                    throw new Exception("书箱未开通！如果已装好，请联系管理开通书箱！\n");
+                }
+                List<Book> lstBook = BookManager.getInstance().getListByCompanyIdAndBookSkuId(session, companyId, bookSkuId);
+                if (lstBook.size() == 1) {
+                    //添加库存不足记录
+                    BookStocksLog bookStocksLog = new BookStocksLog();
+                    bookStocksLog.setBookSkuId(bookSkuId);
+                    BookStocksLogManager.getInstance().add(session, bookStocksLog);
+                }
+                if (lstBook.size() == 0) {
+                    throw new Exception("图书库存不足！");
+                }
+                Book theBook = lstBook.get(0);
+
+                Integer bookOrderId = null;
+                if (theBookOrder == null) {
+                    //获取配送时间
+                    String strDeliveryTime = this.setDeliveryTime(session, theMember.getDistanceCode(), companySettingValueInfo);
+                    Date parsedDate = dateFormat.parse(strDeliveryTime);
+                    Timestamp deliveryTime = new Timestamp(parsedDate.getTime());
+                    //获取会员线路上的拣书员
+                    DeliverLine theDeliverLine = DeliverLineManager.getInstance().getEntity(session, theMember.getDeliverLineId());
+                    theBookOrder = new BookOrder();
+                    //设置订单编号
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                    Date now = new Date();
+                    String bookOrderNo = sdf.format(now);
+                    theBookOrder.setBookOrderNo(bookOrderNo);
+                    theBookOrder.setCompanyId(companyId);
+                    theBookOrder.setDeliverTime(deliveryTime);
+                    theBookOrder.setDelivererId(theDeliverLine.getDelivererId());
+                    if (theDeliverLine.getBookpickerId() != null) {
+                        theBookOrder.setBookpickerId(theDeliverLine.getBookpickerId());
+                    }
+                    theBookOrder.setBusinessDate(DateHelper.getCurrentTimestamp());
+                    theBookOrder.setIsOffline(false);
+                    theBookOrder.setMemberId(memberId);
+                    theBookOrder.setBookOrderBorrowStatusCode(BookOrderBorrowStatusCodes.Submitting);
+
+                    //获取大区排序
+                    ViewBookOrder theAreaViewBookOrder = this.getViewBookOrderByArea(session, companyId, theMember.getDeliverAreaId(), strDeliveryTime);
+                    if (theAreaViewBookOrder == null) {
+                        theBookOrder.setDeliverAreaNumber(1);
+                    } else {
+                        theBookOrder.setDeliverAreaNumber(theAreaViewBookOrder.getDeliverAreaNumber() + 1);
+                    }
+                    bookOrderId = this.add(session, theBookOrder);
+                } else {
+                    bookOrderId = theBookOrder.getId();
+                    if (theBookOrder.getBookOrderBorrowStatusCode() == null || theBookOrder.getDeliverTime() == null) {
+                        //获取配送时间
+                        String strDeliveryTime = this.setDeliveryTime(session, theMember.getDistanceCode(), companySettingValueInfo);
+                        theBookOrder.setBookOrderBorrowStatusCode(BookOrderBorrowStatusCodes.Submitting);
+                        Date parsedDate = dateFormat.parse(strDeliveryTime);
+                        Timestamp deliveryTime = new Timestamp(parsedDate.getTime());
+                        theBookOrder.setDeliverTime(deliveryTime);
+                        //获取大区排序
+                        ViewBookOrder theAreaViewBookOrder = this.getViewBookOrderByArea(session, companyId, theMember.getDeliverAreaId(), strDeliveryTime);
+                        if (theAreaViewBookOrder == null) {
+                            theBookOrder.setDeliverAreaNumber(1);
+                        } else {
+                            theBookOrder.setDeliverAreaNumber(theAreaViewBookOrder.getDeliverAreaNumber() + 1);
+                        }
+                        this.update(session, theBookOrder);
+                    }
+                }
+                //添加借阅明细
+                BookOrderItem newBookOrderItem = new BookOrderItem();
+                newBookOrderItem.setBookId(theBook.getId());
+                newBookOrderItem.setBookOrderId(bookOrderId);
+                newBookOrderItem.setDeliverStatusCode(DeliverStatusCodes.Outing);
+                newBookOrderItem.setBookOrderTypeCode(BookOrderTypeCodes.Borrow);
+                Integer newBookOrderItemId = BookOrderItemManager.getInstance().add(session, newBookOrderItem);
+                //添加找书出库单
+                BookOutOrder newBookOutOrder = new BookOutOrder();
+                newBookOutOrder.setBookOutOrderStatusCode(BookOutOrderStatusCodes.NotFound);
+                newBookOutOrder.setBookOrderItemId(newBookOrderItemId);
+                BookOutOrderManager.getInstance().add(session, newBookOutOrder);
+                //修改图书
+                theBook.setIsAvailable(false);
+                theBook.setBorrowStatusCode(BorrowStatusCodes.OutCloud);
+                BookManager.getInstance().update(session, theBook);
+            }
+            String deliverTime = DateHelper.timestampToString(theBookOrder.getDeliverTime(), "yyyy-MM-dd");
+            Date parsedDate = dateFormat.parse(deliverTime);
+            SimpleDateFormat newDateFormat = new SimpleDateFormat("MM月dd日（E）", Locale.CHINA);
+            String formattedDate = newDateFormat.format(parsedDate);
+            MyBatisManager.getInstance().commitSession(session);
+            return formattedDate;
+        } catch (Exception ex) {
+            MyBatisManager.getInstance().rollbackSession(session);
+            throw ex;
+        } finally {
+            MyBatisManager.getInstance().closeSession(session);
+        }
+    }
+
+    /**
+     * 获取大区今日订单
+     *
+     * @param session
+     * @param companyId
+     * @return
+     */
+    public ViewBookOrder getViewBookOrderByArea(SqlSession session, Integer companyId, Integer deliverAreaId, String strDeliveryTime) {
+        String condition = String.format("company_id=%d and is_offline is not true and deliver_area_id=%d and DATE(deliver_time) = '%s'",
+                companyId, deliverAreaId, strDeliveryTime);
+        List<ViewBookOrder> lstViewBookOrder = ViewBookOrderManager.getInstance().getList(session, condition, "deliver_area_number desc");
+        if (lstViewBookOrder != null && lstViewBookOrder.size() > 0) {
+            return lstViewBookOrder.get(0);
+        }
+        return null;
+    }
+
+
+    /**
+     * @param session
+     * @param companyId
+     * @return
+     */
+    public BookOrder getEntityByCompanyIdAndDate(SqlSession session, Integer companyId, String strDeliveryTime) {
+        String condition = String.format("company_id=%d and is_offline is not true  and DATE(deliver_time) = '%s'", companyId, strDeliveryTime);
+        List<BookOrder> lstBookOrder = this.getList(session, condition, "display_order desc");
+        if (lstBookOrder != null && lstBookOrder.size() > 0) {
+            return lstBookOrder.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * 获取会员今日订单
+     *
+     * @param session
+     * @param memberId
+     * @return
+     */
+    public BookOrder getEntityByMemberIdAndDate(SqlSession session, Integer memberId) {
+        String condition = String.format("member_id = %d AND is_offline is not true \n" +
+                "AND (DATE(deliver_time) > CURDATE() OR deliver_time is null) \n" +
+                "AND book_order_borrow_status_code != 'Received'", memberId);
+        List<BookOrder> lstBookOrder = this.getList(session, condition, "create_time desc");
+        if (lstBookOrder != null && lstBookOrder.size() > 0) {
+            return lstBookOrder.get(0);
+        }
+        return null;
+    }
+
+
+    /**
+     * 设置配送时间
+     *
+     * @param distanceCode
+     * @param companySettingValueInfo
+     */
+    private String setDeliveryTime(SqlSession session, String distanceCode, CompanySettingValueInfo companySettingValueInfo) throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        TimeZone chinaTimeZone = TimeZone.getTimeZone("Asia/Shanghai"); // 代表中国/上海时区
+        calendar.setTimeZone(chinaTimeZone);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setTimeZone(chinaTimeZone);
+        String strDeliveryTime = dateFormat.format(calendar.getTime());
+        //如果远距离配送
+        if (!StringHelper.isNullOrEmpty(distanceCode) && distanceCode.equals("yuan")) {
+            strDeliveryTime = this.setWeeklyYuanBookOrderDeliveryTime(companySettingValueInfo, calendar, dateFormat);
+        }
+        //获取暂停模式
+        String pauseMode = companySettingValueInfo.getPauseMode();
+        if (StringHelper.isNullOrEmpty(pauseMode)) {
+            return strDeliveryTime;
+        }
+        if (pauseMode.contains("Holiday")) {
+            strDeliveryTime = this.setHolidayBookOrderDeliveryTime(session, strDeliveryTime);
+        }
+        if (pauseMode.contains("Temp")) {
+            strDeliveryTime = this.setTempBookOrderDeliveryTime(companySettingValueInfo, calendar, dateFormat, strDeliveryTime);
+        }
+        if (pauseMode.contains("Weekly")) {
+            strDeliveryTime = this.setWeeklyJinBookOrderDeliveryTime(companySettingValueInfo, calendar, dateFormat, strDeliveryTime);
+        }
+        return strDeliveryTime;
+    }
+
+    /**
+     * 暂停模式为节假日，设置配送时间
+     *
+     * @return
+     */
+    private String setHolidayBookOrderDeliveryTime(SqlSession session, String strCurrentTime) throws Exception {
+
+        //获取法定节假日列表
+        List<Holiday> lstHoliday = HolidayManager.getInstance().getList(session);
+
+        // 创建一个存放所有 vacation 的列表
+        ArrayList<String> vacationList = new ArrayList<>();
+
+        // 遍历节假日列表，获取每个节假日的 vacation 并添加到列表中
+        for (Holiday holiday : lstHoliday) {
+            String vacation = holiday.getVacation();
+            String[] vacations = vacation.split("\\|");
+            Collections.addAll(vacationList, vacations);
+        }
+        // 判断当前日期是否为节假日
+        String deliveryTime = "";
+        if (!vacationList.contains(strCurrentTime)) {
+            // 如果当前日期不是节假日，直接返回当前日期
+            deliveryTime = strCurrentTime;
+        } else {
+            // 找到节假日后的第一个工作日
+            deliveryTime = findNextWorkDay(strCurrentTime, vacationList);
+        }
+        return deliveryTime;
+    }
+
+    /**
+     * 寻找节假日后的第一个工作日的方法
+     */
+    private static String findNextWorkDay(String strCurrentTime, ArrayList<String> vacationList) {
+        LocalDate nextDay = LocalDate.parse(strCurrentTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        while (vacationList.contains(nextDay.toString())) {
+            // 如果是节假日，继续往后找
+            nextDay = nextDay.plusDays(1);
+        }
+        return nextDay.toString();
+    }
+
+    /**
+     * 暂定模式为临时，设置配送时间
+     *
+     * @param companySettingValueInfo
+     * @param calendar
+     * @param dateFormat
+     * @throws ParseException
+     */
+    private String setTempBookOrderDeliveryTime(
+            CompanySettingValueInfo companySettingValueInfo, Calendar calendar, SimpleDateFormat dateFormat, String strCurrentTime) throws ParseException {
+        String pauseDateRangeArr = companySettingValueInfo.getPauseDateRangeArr();
+        if (!StringHelper.isNullOrEmpty(pauseDateRangeArr)) {
+            String[] pauseDateRange = pauseDateRangeArr.split("[,，]");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date currentDate = sdf.parse(strCurrentTime);
+            // 判断当前日期是否在休息日期范围内
+            Date startDate = sdf.parse(pauseDateRange[0]);
+            Date endDate = sdf.parse(pauseDateRange[1]);
+            boolean isRestDay = currentDate.compareTo(startDate) >= 0 && currentDate.compareTo(endDate) <= 0;
+
+            // 根据判断结果决定配送时间
+            if (isRestDay) {
+                // 如果当前日期在休息日期范围内，找到最近的下一个工作日作为配送时间
+                calendar.setTime(endDate);
+                calendar.add(Calendar.DAY_OF_MONTH, 1); // 将结束日期的下一天作为配送时间
+                String strDeliveryTime = dateFormat.format(calendar.getTime());
+                //Tracer.writeLine("模式（时间段）配送时间为最近的下一个工作日：" + strDeliveryTime);
+                return strDeliveryTime;
+            } else {
+                // 如果当前日期不在休息日期范围内，配送时间为当前日期
+                return strCurrentTime;
+            }
+        } else {
+            return strCurrentTime;
+        }
+    }
+
+    /**
+     * 暂定模式为星期，近距离订单设置配送时间
+     *
+     * @param companySettingValueInfo
+     * @param calendar
+     * @param dateFormat
+     */
+    private String setWeeklyJinBookOrderDeliveryTime(
+            CompanySettingValueInfo companySettingValueInfo, Calendar calendar, SimpleDateFormat dateFormat, String strCurrentTime) {
+        String pauseDayArr = companySettingValueInfo.getPauseDayArr();
+        if (!StringHelper.isNullOrEmpty(pauseDayArr)) {
+            String[] pauseDayArrs = pauseDayArr.split("[,，]");
+            // 获取当前日期的星期几
+            //int currentWeekday = calendar.get(Calendar.DAY_OF_WEEK);
+            LocalDate currentDate = LocalDate.parse(strCurrentTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+            int currentWeekday = (dayOfWeek.getValue() % 7) + 1;
+            // 判断当前星期是否在数组里
+            boolean isRestDay = false;
+            for (String day : pauseDayArrs) {
+                if (Integer.parseInt(day) == currentWeekday) {
+                    isRestDay = true;
+                    break;
+                }
+            }
+
+            // 根据判断结果决定配送时间
+            if (isRestDay) {
+                // 如果当前星期在数组里，找到最近下一个工作日的日期为配送时间
+                int daysToAdd = 1;
+                while (true) {
+                    currentWeekday = (currentWeekday % 7) + 1; // 将星期几循环在1到7之间
+                    boolean found = false;
+                    for (String day : pauseDayArrs) {
+                        if (Integer.parseInt(day) == currentWeekday) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        break;
+                    }
+                    daysToAdd++;
+                }
+                calendar.add(Calendar.DAY_OF_MONTH, daysToAdd);
+                String strDeliveryTime = dateFormat.format(calendar.getTime());
+                return strDeliveryTime;
+
+            } else {
+                // 如果当前星期不在数组里，配送时间为当前日期
+                return strCurrentTime;
+            }
+        } else {
+            return strCurrentTime;
+        }
+    }
+
+    /**
+     * 暂定模式为星期，远距离订单设置配送时间
+     *
+     * @param companySettingValueInfo
+     * @param calendar
+     * @param dateFormat
+     * @return
+     */
+    private String setWeeklyYuanBookOrderDeliveryTime(
+            CompanySettingValueInfo companySettingValueInfo, Calendar calendar, SimpleDateFormat dateFormat) {
+        //获取远距离配送时间
+        String longDistanceRrderDeliveryTime = companySettingValueInfo.getLongDistanceRrderDeliveryTime();
+        if (!StringHelper.isNullOrEmpty(longDistanceRrderDeliveryTime)) {
+            //获取远距离配送星期
+            int intLongDistanceRrderDeliveryTime = Integer.parseInt(longDistanceRrderDeliveryTime) + 1;
+
+            // 根据给定的星期几，计算距离该日期最近的日期
+            int currentWeekday = calendar.get(Calendar.DAY_OF_WEEK);
+            int intervalDays = intLongDistanceRrderDeliveryTime - currentWeekday;
+            if (intervalDays < 0) {
+                intervalDays += 7;
+            }
+            calendar.add(Calendar.DAY_OF_MONTH, intervalDays);
+            String strDeliveryTime = dateFormat.format(calendar.getTime());
+            return strDeliveryTime;
+        }
+        return dateFormat.format(calendar.getTime());
+    }
+
+}

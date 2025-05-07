@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>批量转移</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<link rel="stylesheet" type="text/css" href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/management.js"></script>
+<script type="text/javascript" src="../../js/cms/cms.promission.js"></script>
+
+<script type="text/javascript">
+	managementContext.dataName="CmsContent";
+	managementContext.tableName="cms_content";
+	managementContext.gridType == "List";
+	managementContext.primaryKeyName="id";
+	managementContext.customTableColumns = [ {
+			field : 'title',
+			title : '内容标题',
+			fixed : true,
+			width : 350,
+			align : 'left'
+		}, {
+			field : 'sub_title',
+			title : '副标题',
+			fixed : true,
+			width : 350,
+			align : 'left'
+		}, {
+			field : 'url',
+			title : '外部链接',
+			fixed : true,
+			width : 280,
+			align : 'center'
+		}, {
+			field : 'cms_content_status_name',
+			title : '状态',
+			fixed : true,
+			width : 100,
+			align : 'center'
+		}];
+
+	/*
+	 * 绑定数据
+	 */
+	function bindData() {
+		var requestParameters = getParameters();
+		// alert(JSON.stringify(requestParameters));
+		var primaryKeys = $.query.get("primaryKeys");
+		requestParameters.condition = "id in (" + primaryKeys + ")";
+		requestParameters.cmsLanguageCode = currentCmsLanguageCode;
+		requestParameters.cmsSiteId =  $.cookie("cmsSiteId");
+		call("GetCmsContentListWidthPermission", requestParameters, function(
+				result) {
+			outputData(result.data.dataList);
+			// 设置分页
+			if (managementContext.allowPaging) {
+				setPager(result.data);
+			}
+		});
+	}
+	
+	$(function(){
+		//站点、栏目联动
+		$("#cmbCmsSiteId").combobox({
+			onChange: function (n,o) {
+				var cmsSiteId = $(this).val();
+				if(cmsSiteId != ""){
+  					bindComboTreeBySite(cmsSiteId);
+				}
+			}
+
+		});
+		//默认选中转移后不删除
+		$("#divIsDelete input[value=0]").trigger("click");
+		
+	});
+	function bindControls(){
+		//绑定站点列表
+		bindIdNameComboBoxWithValue("cmbCmsSiteId","cms_site","",getCookie("cmsSiteId"));
+		//绑定转移类型
+		bindCodeNameComboBoxWithValue("cmbCmsContentTransferCode","cms_content_transfer_type","","All");	
+	}
+	/*
+	 * 绑定联动查询树型表
+	 */
+	function bindComboTreeBySite(cmsSiteId) {
+		bindCmsComboTreeWidthPermission("cmbCmsChannelId", "GetCmsChannelList", 0, "id", "name", "parentId",null,"cms_site_id="+$.cookie("cmsSiteId"));
+	}
+	function transfer() {
+		var data = getEntity();
+			data.dataName=managementContext.dataName;
+			if(!isPermitted(data.cmsChannelId)){
+				alert("目标栏目没有权限");
+			}else{
+				//alert(JSON.stringify(data));
+				if (confirm("确定要转移吗?")) {
+				call("TransferCmsContent", data, function(result) {
+	 		
+				});
+			}
+		}
+ 			
+
+	}
+	/*
+	 * 取得实体
+	 */
+	function getEntity() {
+		var newEntity = getEntityBase();
+		var deleteFlag =$("#divIsDelete :checked").val();
+		var primaryKeys = getDataItems();
+		newEntity.primaryKeys = primaryKeys;
+		newEntity.deleteFlag = deleteFlag;
+		return newEntity;
+	}
+	function closeDetailDialog() {
+	goback();
+	}
+	/*
+	 * 取得数据表列
+	 */
+	function getTableColumnsBase() {
+		var tableColumns = [ [ {
+		field : 'ck',
+		checkbox : true,
+		title : 'Code',
+		width : 30
+	}] ];
+	if (managementContext.customTableColumns != null) {
+		addTableColumns(tableColumns, managementContext.customTableColumns)
+	}
+	return tableColumns;
+	}
+	/*
+	 * 输出列表
+	 */
+	function outputListGrid(dataList, gridControlId, getGridRowCallback,
+			getTableColumnsCallback) {
+		if (gridControlId == null) {
+			gridControlId = "tableGrid";
+		}
+		// 设置列
+		try {
+			var tableColumns = getTableColumns();
+			if (getTableColumnsCallback != null) {
+				tableColumns = getTableColumnsCallback();
+			}
+			// alert(JSON.stringify(tableColumns));
+			$('#' + gridControlId).datagrid({
+				columns : tableColumns,
+				pagination : true,
+				fitColumns : true
+			})
+		} catch (e) {
+			console.log(e);
+		}
+		// 清空datagrid数据
+		$('#' + gridControlId).datagrid('loadData', {
+			total : 0,
+			rows : []
+		});
+		for ( var i = 0; i < dataList.length; i++) {
+			var dataItem = dataList[i];
+			outputListItem(dataItem, gridControlId, getGridRowCallback);
+		}
+		//默认选中全部内容
+		$(".datagrid-header-check :checkbox").trigger("click");
+	}
+	/*
+	 * 批量删除
+	 */
+	function getDataItems() {
+		var selectedRows = [];
+			selectedRows = $('#tableGrid').datagrid('getSelections');
+		if (selectedRows.length == 0) {
+			alert("请至少选择一行数据!");
+			return false;
+		}
+		var primaryKeys = [];
+		for ( var i = 0; i < selectedRows.length; i++) {
+				primaryKeys.push(selectedRows[i].id);
+		}
+		return primaryKeys;
+		
+	}
+	/*
+	 * 绑定树型表
+	 */
+	function bindComboTree(controlId, tableName, parentValue, valueFieldName,
+			textFieldName, parentFieldName, multiple, condition) {
+		var data = new Object();
+		data.tableName = tableName;
+		data.orderBy = "display_order";
+		data.condition = condition;
+		call("GetTable", data, function(result) {
+			// alert(JSON.stringify(result));
+			// console.log(result);
+			var comboTreeData = getComboTreeData(result.data, parentValue,
+					valueFieldName, textFieldName, parentFieldName);
+	
+			$("#" + controlId).combotree({
+				multiple : multiple,
+				data : comboTreeData
+			});
+			// 选中默认值
+			for ( var i = 0; i < result.data.length; i++) {
+				var dataItem = result.data[i];
+				if (dataItem.is_default) {
+					$("#" + controlId).combotree("setValue",
+							dataItem[valueFieldName]);
+				}
+			}
+		});
+	}
+	/*
+	 * 绑定组合框
+	 */
+	function bindComboBoxWithValue(controlId, tableName, valueFieldName,
+			textFieldName, orderBy, emptyText, condition, value) {
+		$("#" + controlId).combobox("clear");
+		var data = new Object();
+		data.tableName = tableName;
+		data.orderBy = orderBy;
+		data.condition = condition;
+		call("GetTable", data, function(result) {
+			// console.log(result.data);
+			var comboboxData = result.data;
+			$("#" + controlId).combobox({
+				valueField : valueFieldName,
+				textField : textFieldName,
+				data : comboboxData
+			});
+			$("#" + controlId).combobox("setValue", value);
+		});
+	}
+</script>
+	<div id="divDetailDialog" class="easyui-layout" style="width:100%;overflow:auto;"
+	 closed="false" fit="true">
+			<div buttons="#dlg-buttons">
+				<form id="formDetail" method="post" novalidate
+					style="margin:0;padding:20px 50px">
+					<span>将内容:</span>
+					<div style="height:550px;width:100%">
+						<table id="tableGrid">
+						</table>
+					</div>
+					<div style="margin-bottom:10px">
+						<span style="display: block;margin-bottom: 10px;">转移到:</span>
+						<input id="cmbCmsSiteId" name="cmbCmsSiteId"
+							class="easyui-combobox" label="站点:"
+							labelPosition="left" style="width:30%">
+						<input id="cmbCmsChannelId" name="cmbCmsChannelId"
+							class="easyui-combotree" label="目标栏目"
+							labelPosition="left" style="width:30%"/>
+					</div>
+					<div style="margin-bottom:10px" id="divIsDelete">
+						<span style="display: block;margin-bottom: 10px;">转移后是否删除:</span>
+					
+						<input id="isDelete" class="isDelete" name="tj" value="1" type="radio">是
+						<input id="isDelete" class="isDelete" name="tj" value="0" type="radio">否
+						
+					</div>
+				</form>
+			</div>
+			<div id="dlg-buttons" style="text-align:center;" id="DivOperation">
+				<a href="javascript:void(0)" class="easyui-linkbutton c6"
+					iconCls="icon-ok" onclick="transfer()" style="width:90px" id="btnTransfer">转移</a>
+					<a href="javascript:void(0)" class="easyui-linkbutton"
+				iconCls="icon-cancel" onclick="javascript:closeDetailDialog();"
+				style="width:90px">返回</a>
+			</div>
+			
+		</div>
+
+</body>
+</html>

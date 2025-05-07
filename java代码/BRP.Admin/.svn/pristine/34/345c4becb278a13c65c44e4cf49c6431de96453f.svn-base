@@ -1,0 +1,125 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.model.*;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.util.StringUtils;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.sql.Timestamp;
+
+/*
+ * 修改会员信息
+ */
+public class EditMemberInfoServiceHandler extends ServiceHandler {
+
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+
+        SqlSession sqlSession = null;
+        try {
+            sqlSession = MyBatisManager.getInstance().openSession();
+            JSONObject jData = this.getRequestData(request);
+            // 会员信息
+            Integer id = JsonHelper.getInt(jData, "id"); // 会员卡id
+            Integer memberId = JsonHelper.getInt(jData, "memberId"); // 会员id
+            String memberName = JsonHelper.getString(jData, "memberName"); // 会员姓名
+            String birthday = JsonHelper.getString(jData, "birthdayText"); // 出生日期
+            String mobilePhone = JsonHelper.getString(jData, "mobilePhone"); // 联系方式
+            Boolean gender = JsonHelper.getBoolean(jData, "gender"); // 性别
+            String school = JsonHelper.getString(jData, "school"); // 学校
+            Integer gradeId = JsonHelper.getInt(jData, "gradeId"); // 年级
+            Integer classId = JsonHelper.getInt(jData, "classId"); // 班级
+            // 会员卡信息
+            Integer referrerId = JsonHelper.getInt(jData, "referrerId"); // 推荐人ID
+            String referrerRemark = JsonHelper.getString(jData, "referrerRemark"); // 推荐人备注
+            Integer memberCardTypeId = JsonHelper.getInt(jData, "memberCardTypeId"); // 会员卡类型
+            String effectiveDateText = JsonHelper.getString(jData, "effectiveDateText"); // 开卡时间
+            String expireDateText = JsonHelper.getString(jData, "expireDateText"); // 失效时间
+            String remark = JsonHelper.getString(jData, "remark"); // 备注
+
+
+            // 构建会员卡对象
+            MemberCard memberCard = MemberCardManager.getInstance().getEntity(sqlSession, id);
+            if (!StringUtils.isEmpty(memberId)) {
+                memberCard.setMemberId(memberId);
+            }
+            if (!StringUtils.isEmpty(referrerId)) {
+                memberCard.setReferrerId(referrerId);
+            }
+            if (!StringUtils.isEmpty(referrerRemark) && !referrerRemark.equals("null")) {
+                memberCard.setReferrerRemark(referrerRemark);
+            } else {
+                memberCard.setReferrerRemark(null);
+            }
+            if (!StringUtils.isEmpty(memberCardTypeId)) {
+                memberCard.setMemberCardTypeId(memberCardTypeId);
+            }
+
+            if (!StringUtils.isEmpty(effectiveDateText) && !StringUtils.isEmpty(expireDateText)) {
+                // 如果修改了开卡时间生成一条记录
+                if(memberCard.getEffectiveDate() == null || !memberCard.getEffectiveDate().equals(DateHelper.toTimestamp(effectiveDateText))){
+                    // 会员卡变更记录
+                    MemberCardServiceTimeLog memberCardServiceTimeLog = new MemberCardServiceTimeLog();
+                    memberCardServiceTimeLog.setMemberId(memberId);
+                    memberCardServiceTimeLog.setEffectiveTime(memberCard.getEffectiveDate());
+                    memberCardServiceTimeLog.setExpiryTime(memberCard.getExpireDate());
+                    memberCardServiceTimeLog.setMemberCardServiceTimeTypeCode("Change");
+                    memberCardServiceTimeLog.setDays(0);
+                    memberCardServiceTimeLog.setAddTime(DateHelper.getCurrentTimestamp());
+                    MemberCardServiceTimeLogManager.getInstance().add(sqlSession,memberCardServiceTimeLog);
+                }
+                memberCard.setEffectiveDate(DateHelper.toTimestamp(effectiveDateText));
+                memberCard.setExpireDate(DateHelper.toTimestamp(expireDateText));
+            }
+
+            if (!StringUtils.isEmpty(remark) && !remark.equals("null")) {
+                memberCard.setRemark(remark);
+            } else {
+                memberCard.setRemark(null);
+            }
+
+            Member member = MemberManager.getInstance().getEntity(sqlSession, memberId);
+            if (!StringUtils.isEmpty(memberName)) {
+                member.setName(memberName);
+            }
+            if (!StringUtils.isEmpty(birthday)) {
+                member.setBirthday(DateHelper.toTimestamp(birthday));
+            }
+            if (!StringUtils.isEmpty(mobilePhone)) {
+                member.setMobilePhone(mobilePhone);
+            }
+            if (!StringUtils.isEmpty(gender)) {
+                member.setGender(gender);
+            }
+            if (!StringUtils.isEmpty(school)) {
+                member.setSchool(school);
+            }
+            if (!StringUtils.isEmpty(gradeId)) {
+                member.setGradeId(gradeId);
+            }
+            if (!StringUtils.isEmpty(classId)) {
+                member.setClassId(classId);
+            }
+            // 修改会员卡信息
+            MemberCardManager.getInstance().update(sqlSession, memberCard);
+            // 修改会员信息
+            member.setUpdateTime(new Timestamp(System.currentTimeMillis())); // 修改时间
+            MemberManager.getInstance().update(sqlSession, member);
+
+            sqlSession.commit();
+            this.writeSuccessResponse(response);
+        } catch (Exception e) {
+            sqlSession.rollback();
+            e.printStackTrace();
+        } finally {
+            sqlSession.close();
+        }
+    }
+}

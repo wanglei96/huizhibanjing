@@ -1,0 +1,611 @@
+<template>
+	<view>
+		<view class="container">
+			<!-- <scroll-view class="contact-scroll" scroll-y > -->
+			<view class="contentPanel">
+				<view class="line80 f32" style=" font-weight: bold;">配送说明</view>
+				<view v-if="explain !='' && explain !=null">
+					<mp-html :content="explain" />
+				</view>
+				<view v-else>
+					<view class="" style="line-height: 60rpx;">1、20分钟以内的借还书订单，可自行取消。</view>
+					<view style="line-height: 60rpx;">2、还的书须在配送当天早上8:00前放入书箱(如果送书时未取回您还的书，您的借书功能会被锁定，需要您将书带到馆里还书后方可解锁)。
+					</view>
+					<view style="line-height: 60rpx;">3、只点还书，没有借书时不会单独去取书。</view>
+				</view>
+			</view>
+			<view v-if="isLogin">
+				<view class="h30"></view>
+				<view class="line90 highlight70Panel" style="z-index: 9;">
+					<view class="line80 center highlight70">
+						<text class="spanContent">已借阅</text> 
+						<text class="spanValue">{{borrowedQuantity}}</text>
+						<text class="spanContent">本</text>&nbsp;
+						<text class="spanContent" style="margin-left: 10rpx;">还可以借阅</text>
+						<text class="spanValue">{{borrowableQuantity}}</text>
+						<text class="spanContent">本</text>
+					</view>
+				</view>
+				<view class="contentPanel" style="margin-top: -50rpx;">
+					<view class="h20"></view>
+					<view>
+						<view v-if="isMember == false" class="line70 center f28">
+							{{content}}
+						</view>
+						<!-- 到手借阅 -->
+						<view class="booksOneList">
+							<view class="books-info " v-for="(item,borrowBookIndex) in borrowBookList" :key="borrowBookIndex" :class="{booksChild:isBorrowBookListLastchild()}">
+								<!-- <view class="img">
+										<image :src= "adminRootUrl + item.imageFilePath"  mode="aspectFit"></image>
+									</view> -->
+								<view class="img">
+									<view style="cursor: pointer;">
+										<image :src="item | toBookImageFilePath" mode="aspectFit"
+											style=" height: 210rpx;display: block;width: 95% ;  border:  2rpx solid rgb(211 211 211); border-radius: 10rpx;">
+										</image>
+									</view>
+								</view>
+								<view class="info">
+									<view class="line10"></view>
+									<view class="name">{{item.bookName}}</view>
+									<view class="series " style="display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden;">
+										<text class="series1">系列：</text> <text class="series2 f24">{{item.bookSeriesName | toNull}}</text>
+									</view>
+									<view class="borrowTime line50 28">
+										<text class="borrowTime1">借阅时间：</text>
+										<text class="borrowTime2 f26">{{item.borrowTimeText | toTime}}</text>
+									</view>
+								</view>
+								<view>
+									<view class="returnbook" @click="clickAddOnLineReturnBookOrder(item,borrowBookIndex)" >
+										还书
+									</view>
+								</view>
+							</view>
+						</view>
+						<!-- 临时借阅单据 -->
+						<view class="booksOneList">
+							<view class="books-info booksChild" v-for="(item,index) in memberBookOrderItemInfoList" :key="index" v-if="item.bookOrderTypeCode == 'Borrow'" :class="{memberBookOrderItemInfoList:isBorrowBookListLastchild()}">
+								<!-- <view class="img">
+										<image :src= "adminRootUrl + item.imageFilePath"  mode="aspectFit"></image>
+									</view> -->
+								<view class="img">
+									<view style="cursor: pointer;">
+										<image :src="item | toBookImageFilePath" mode="aspectFit"
+											style=" height: 210rpx;display: block;width: 95% ;  border:  2rpx solid rgb(211 211 211); border-radius: 10rpx;">
+										</image>
+									</view>
+								</view>
+								<view class="info">
+									<view class="line10"></view>
+									<view class="name">{{item.bookName}}</view>
+									<view class="series" style="display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden;">
+										<text class="series1">系列：</text><text class="series2 f24">{{item.bookSeriesName | toNull}}</text>
+									</view>
+									<view class="borrowTime line50 28">
+										<text class="borrowTime1">借阅时间：</text><text
+											class="borrowTime2 f26"><!-- 2023年12月23日 -->{{item.createTimeText | toTime}}</text>
+									</view>
+								</view>
+								<view>
+									<view v-if="item.remainSeconds > 0">
+										<view class="f26 line50 countDownPanel">
+											<view class="countDownimg">
+												<image :src="imageRootUrl + 'image/countdown.png'"></image>
+											</view>
+											<view class="f26 countDownTime">{{item.remainTime}}</view>
+										</view>
+										<view class="cancelbooks clear" @click="clickCancelBooks(item)">
+											取消借书
+										</view>
+									</view>
+									<view class="returnbook" v-else>
+										{{item.deliverStatusName}}
+									</view>
+								</view>
+							</view>
+						</view>
+					</view>
+				</view>
+				<view class="h30"></view>
+				<view class="line90 highlight90Panel" style="z-index: 9;">
+					<view class="line80 center highlight90">
+						<text class="spanContent">请将以下</text>
+						<text class="spanValue">{{returnedQuantity}}</text>
+						<text class="spanContent">本书放进书箱或带到馆内还书</text>
+					</view>
+				</view>
+				<view class="contentPanel" style="margin-top: -50rpx;">
+					<view class="h20"></view>
+					<view>
+						<view v-if="isMember == false" class="line70 center f28">
+							{{content}}
+						</view>
+						<view class="booksOneList">
+							<view class="books-info booksChild" v-for="(item,index) in memberBookOrderItemInfoList" :key="index" v-if="item.bookOrderTypeCode == 'Return'">
+								<!-- <view class="img">
+										<image :src= "adminRootUrl + item.imageFilePath"  mode="aspectFit"></image>
+									</view> -->
+								<view class="img">
+									<view style="cursor: pointer;">
+										<image :src="item | toBookImageFilePath" mode="aspectFit"
+											style=" height: 210rpx;display: block;width: 95% ;  border:  2rpx solid rgb(211 211 211); border-radius: 10rpx;">
+										</image>
+									</view>
+								</view>
+								<view class="info">
+									<view class="line10"></view>
+									<view class="name">{{item.bookName}}</view>
+									<view class="series" style="display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden;">
+										<text class="series1">系列：</text><text
+											class="series2 f24">{{item.bookSeriesName | toNull}}</text>
+									</view>
+									<view class="borrowTime line50 28">
+										<text class="borrowTime1">借阅时间：</text><text
+											class="borrowTime2 f26"><!-- 2023年12月23日 -->{{item.createTimeText | toTime}}</text>
+									</view>
+								</view>
+								<view>
+									<view v-if="item.remainSeconds > 0">
+										<view class="f26 line50 countDownPanel">
+											<view class="countDownimg">
+												<image :src="imageRootUrl + 'image/countdown.png'"></image>
+											</view>
+											<view class="f26 countDownTime">{{item.remainTime}}</view>
+										</view>
+										<view class="cancelbooks clear"
+											@click="clickCancelledOnlineReturnBookOrder(item,index)">
+											取消还书
+										</view>
+									</view>
+									<view class="returnbook" v-else>
+										等待还书
+									</view>
+								</view>
+							</view>
+						</view>
+					</view>
+				</view>
+				<view class="h150"></view>
+			</view>
+			<view v-else>
+				<view class="line120"></view>
+				<view class="contentPanel center" @click="authorizedLogin()">
+					暂未登录，请先授权登录
+				</view>
+			</view>
+			<!-- </scroll-view> -->
+		</view>
+	</view>
+</template>
+
+<script>
+	import common from "@/js/common.js";
+	import config from "@/js/config.js";
+	import util from "@/js/util.js";
+	let statusBarHeight = uni.getSystemInfoSync().statusBarHeight; // 状态栏 高度
+	import mpHtml from '@/components/mp-html/mp-html'
+	let that = null;
+	export default {
+		data() {
+			return {
+				url: "http://admin.8630.net/WYB/UploadFile/headerTopbg.png",
+				imageRootUrl: config.imageRootUrl, //图片地址
+				adminRootUrl: config.adminRootUrl + "/", //后端图片地址
+				statusBarHeight, // 状态栏 高度
+				head_is_fixed: 0,
+				borrowedQuantity: 0, //已借阅
+				borrowableQuantity: 0, //还可以借阅
+				returnedQuantity: '', //还书多少本
+				memberBookOrderItemInfoList: [], //临时借阅单据 列表
+				borrowBookList: [], //到手书的列表
+				isLogin: false,
+				isMember:true,//是否是会员
+				content:'',//内容
+				explain:'',//说明
+				isAntiShake:false,//防抖
+			};
+		},
+		components: {
+			mpHtml
+		},
+		onReady() {},
+		onShow() {
+			if (common.isLogin() == false) {
+				this.isLogin = false;
+			} else {
+				this.isLogin = true;
+				that.memberCard();
+			}
+			that.biondDeliverExplain();
+		},
+		onPageScroll(e) {
+			that.head_is_fixed = e.scrollTop > 0 ? 1 : 0
+		},
+		onLoad() {
+			that = this;
+			
+		},
+		methods: {
+			biondDeliverExplain(){
+				var data = {};
+				if(common.getCommunityId() == "" || common.getCommunityId() == null ){
+					 data.condition = 'company_id=(SELECT id FROM company where is_default is true)'
+				}else{
+					data.companyId = common.getCommunityId()
+				}
+				data.sysSettingCode = "DeliverExplain"
+				common.call("GetCompanySettingList", data, function(result) {
+					console.log(result.data.dataList.length)
+					if(result.data.dataList.length > 0){
+						that.explain = result.data.dataList[0].value
+					}
+				});
+			},
+			memberCard() { //是否绑定会员卡
+				var data = {};
+				data.tableName = "member_card";
+				data.condition = "member_id = " + common.getMemberId() + " and disabled is not true"
+				data.fields = "count(*) as number"
+				common.call("GetTable", data, function(result) {
+					
+					if (result.data[0].number > 0) {
+						that.bindGetMemberBorrowBookList(); //绑定借书还书单
+						that.isMember=true
+					}else{
+						that.isMember=false
+						that.content = "请先开通会员！"
+					}
+				});
+			},
+			bindGetMemberBorrowBookList() { //绑定借书还书单
+				var self = this;
+				var data = {};
+				data.memberId = common.getMemberId()
+				data.companyId = common.getCommunityId()
+				common.call("GetMemberBorrowBookList", data, function(result) {
+					that.isAntiShake = false
+					if (result.data.borrowedQuantity == null) {
+						that.borrowedQuantity = 0
+					} else {
+						that.borrowedQuantity = result.data.borrowedQuantity
+					}
+					if (result.data.borrowableQuantity == null) {
+						that.borrowableQuantity = 0
+					} else {
+						that.borrowableQuantity = result.data.borrowableQuantity
+					}
+					if (result.data.returnedQuantity == null) {
+						that.returnedQuantity = 0
+					} else {
+						that.returnedQuantity = result.data.returnedQuantity
+					}
+					that.memberBookOrderItemInfoList = result.data.bookOrderItemInfoList //借阅数据临时表
+					that.borrowBookList = result.data.bookList; //到手书的列表
+					for (var i = 0; i < that.memberBookOrderItemInfoList.length; i++) {
+						var curmemberBorrowBookItem = that.memberBookOrderItemInfoList[i];
+						curmemberBorrowBookItem.remainSeconds = curmemberBorrowBookItem.minutes * 60 + curmemberBorrowBookItem.seconds;
+					}
+					
+					var needCountDown = that.computeRemainSeconds();
+					if (needCountDown) {
+						that.countDown();
+					}
+
+					let bookListDeleteIndex = []
+
+					for (let j = 0; j < that.memberBookOrderItemInfoList.length; j++) {
+						if (that.memberBookOrderItemInfoList[j].bookOrderTypeCode != 'Return') {
+							continue
+						}
+						for (let i = that.borrowBookList.length - 1; i >= 0; i--) {
+							if (that.borrowBookList[i].id == that.memberBookOrderItemInfoList[j].bookId) {
+								that.borrowBookList.splice(i, 1);
+							}
+						}
+					}
+
+				});
+			},
+			computeRemainSeconds() {
+				var needCountDown = false;
+				for (var i = 0; i < that.memberBookOrderItemInfoList.length; i++) {
+					var curMemberBorrowBookItem = that.memberBookOrderItemInfoList[i];
+					var remainSeconds = that.getRemainSeconds(curMemberBorrowBookItem);
+					//console.log("remain seconds:" + remainSeconds);
+					var remainMinutes = parseInt(remainSeconds / 60);
+					var seconds = parseInt(remainSeconds % 60);
+					if (remainSeconds - 1 > 0) {
+						curMemberBorrowBookItem.remainTime = (remainMinutes < 10 ? "0" : "") + (remainMinutes > 0 ? remainMinutes + ":" : "0:") + (seconds < 10 ? "0" : "") + seconds;
+						curMemberBorrowBookItem.remainSeconds = remainSeconds - 1;
+					} else {
+						curMemberBorrowBookItem.remainSeconds = 0;
+					}
+					//console.log("remain seconds:" + curMemberBorrowBookItem.remainSeconds);
+					//console.log("remain time:" + curMemberBorrowBookItem.remainTime);
+					if (remainSeconds > 0) {
+						needCountDown = true;
+					}
+				}
+				that.$forceUpdate();
+				return needCountDown;
+			},
+			countDown() {
+				//console.log("count down...");
+				var timer = setTimeout(function() {
+					var needCountDown = that.computeRemainSeconds();
+					if (needCountDown) {
+						that.countDown();
+					}
+				}, 1000)
+			},
+			getRemainSeconds(item) {
+				let currentTime = new Date(); //当前时间   56
+				let createTime = util.strToDate(item.addCreateTimeText) //借阅时间  50 
+				//console.log("create time:" + createTime + " ms:" + createTime.getTime())
+				//console.log("currentTime:" + currentTime + " ms:" + currentTime.getTime())
+				var remainSeconds = (createTime.getTime() - currentTime.getTime()) / 1000;
+				//console.log("remainSeconds:" + remainSeconds)
+				if (remainSeconds > 0) {
+					remainSeconds = remainSeconds;
+				} else {
+					remainSeconds = 0;
+				}
+				return remainSeconds;
+			},
+			clickCancelBooks(item) { //取消借书
+				var data = {};
+				data.bookOrderItemId = item.id
+				common.call("CancelledOnlineBorrowBookOrder", data, function(result) {
+					console.log(result.data)
+					uni.showModal({
+						title: '提示',
+						content: '取消借书成功！',
+						showCancel: false, //没有取消按钮的弹框
+						success: function(res) {
+							if (res.confirm) {
+								that.bindGetMemberBorrowBookList(); //绑定借书还书单
+							}
+						}
+					});
+				});
+			},
+			clickAddOnLineReturnBookOrder(item, index) { //还书
+				if(that.isAntiShake == true){
+					return
+				}
+				that.isAntiShake = true
+				// uni.showLoading();
+				var data = {};
+				data.bookId = item.id
+				data.memberId = common.getMemberId()
+				data.companyId = common.getCommunityId()
+				common.call("AddOnLineReturnBookOrder", data, function(result) {
+					console.log(result.data)
+					uni.showModal({
+						title: '提示',
+						content: '还书成功！',
+						showCancel: false, //没有取消按钮的弹框
+						success: function(res) {
+							if (res.confirm) {
+								that.bindGetMemberBorrowBookList(); //绑定借书还书单
+							}
+						}
+					});
+				}, function(e) {
+					console.log(e)
+					that.isAntiShake = false
+					// uni.hideLoading();
+					if (e.success == false) {
+						uni.showModal({
+							title: "提示",
+							content: e.errorMessage,
+							showCancel: false,
+							confirmText: "确定",
+						});
+					}
+				});
+			},
+			clickCancelledOnlineReturnBookOrder(item, index) { //取消还书
+				var data = {};
+				data.bookOrderItemId = item.id
+				common.call("CancelledOnlineReturnBookOrder", data, function(result) {
+					console.log(result.data)
+					uni.showModal({
+						title: '提示',
+						content: '取消成功！',
+						showCancel: false, //没有取消按钮的弹框
+						success: function(res) {
+							if (res.confirm) {
+								that.bindGetMemberBorrowBookList(); //绑定借书还书单
+							}
+						}
+					});
+				});
+			},
+			authorizedLogin() { //授权登录
+				var pages = getCurrentPages() // 获取栈实例
+				let currentRoute = pages[pages.length - 1].route; // 获取当前页面路由
+				// console.log("路由当前页面路径"+currentRoute)
+				let currentPage = pages[pages.length - 1]['$page']['fullPath'] //当前页面路径(带参数)
+				// console.log("当前页面路径(带参数)"+currentPage)
+				console.log("meiyou dneglu " + currentPage)
+				uni.navigateTo({
+					url: '/pages/common/login'
+				})
+			},
+			isBorrowBookListLastchild(){
+				//true 不显示最后一个横线
+				//false 显示最后一个横线
+				for (let i = 0; i < that.memberBookOrderItemInfoList.length; i++) {
+					let item = that.memberBookOrderItemInfoList[i]
+					if(item.bookOrderTypeCode == "Borrow"){
+						return false //如果有临时借阅单据  就显示最后一条横线
+					}
+				}
+				return true
+			},
+		},
+		filters: {
+			toTime: function(value) {
+				if (value == null) {
+					return ""
+				}
+				var date = new Date(value);
+				var year = date.getFullYear()
+				var month = date.getMonth() + 1
+				var day = date.getDate();
+				return year + "年" + month + "月" + day + "日"
+			},
+			toNull: function(value) {
+				if (value == null || value == "" || value == undefined || value == "undefined") {
+					return ""
+				} else {
+					return value
+				}
+			},
+			toBookImageFilePath(item){
+				if(item.imageFilePath !="" && item.imageFilePath !=null){
+					return that.adminRootUrl + "/" + item.imageFilePath
+				}else{
+					return "../../static/image/common/default.jpg"
+				}
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	@import url("/css/common.css");
+
+	page {
+		background: #5EAC59;
+	}
+
+	.booksOneList {
+		width: 100%;
+		display: block;
+		position: relative;
+		// top: -40px;
+
+		.books-info {
+			display: flex;
+			width: calc(100%);
+			padding: 20rpx 10rpx 10rpx 10rpx;
+			flex-wrap: nowrap;
+			border-bottom: 1px solid #dedede;
+
+			// &:last-child {
+			// 	border-bottom: none;
+			// }
+
+			.img {
+				width: calc(30vw - 70rpx);
+				height: calc(27vw);
+				border-radius: 20rpx;
+				// overflow: hidden;
+				flex-shrink: 0;
+				margin-right: 20upx;
+
+				image {
+					width: calc(30vw - 70rpx);
+					height: calc(27vw);
+				}
+			}
+
+			.info {
+				width: 100%;
+				height: calc(30vw);
+				overflow: hidden;
+				flex-wrap: wrap;
+				align-content: space-between;
+				position: relative;
+
+				.name {
+					width: 100%;
+					font-size: 30rpx;
+					display: -webkit-box;
+					-webkit-box-orient: vertical;
+					-webkit-line-clamp: 2;
+					overflow: hidden;
+					font-weight: bold;
+					line-height: 40rpx;
+					height: 80rpx;
+				}
+
+				.series {
+					.series1 {
+						color: rgb(153, 153, 153);
+						font-weight: 500;
+						font-size: 25rpx;
+					}
+				}
+
+				.borrowTime {
+					.borrowTime1 {
+						color: rgb(153, 153, 153);
+						font-weight: 500;
+						font-size: 25rpx;
+					}
+				}
+			}
+
+			.countDownPanel {
+				width: 130rpx;
+				margin-top: 80rpx;
+
+				.countDownimg {
+					float: left;
+
+					image {
+						width: 40rpx;
+						height: 40rpx;
+						margin-top: 5rpx;
+					}
+				}
+
+				.countDownTime {
+					float: left;
+					color: rgb(153, 153, 153);
+				}
+			}
+
+			.cancelbooks {
+				width: 130rpx;
+				background-color: #FACC3F;
+				height: 50rpx;
+				line-height: 50rpx;
+				font-size: 26rpx;
+				text-align: center;
+				color: white;
+				border-radius: 10rpx;
+			}
+
+			.returnbook {
+				width: 130rpx;
+				background-color: #53D776;
+				height: 50rpx;
+				line-height: 50rpx;
+				font-size: 26rpx;
+				text-align: center;
+				color: white;
+				border-radius: 10rpx;
+				margin-top: 100rpx;
+			}
+
+			.cancelReturnBook {
+				width: 130rpx;
+				background-color: #FE613D;
+				height: 50rpx;
+				line-height: 50rpx;
+				font-size: 26rpx;
+				text-align: center;
+				color: white;
+				border-radius: 10rpx;
+			}
+		}
+		.booksChild:last-child {
+			border-bottom: none;
+		}
+	}
+</style>

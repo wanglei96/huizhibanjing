@@ -1,0 +1,89 @@
+package BRP.model;
+
+import BRP.data.*;
+import org.apache.ibatis.session.SqlSession;
+import org.slf4j.LoggerFactory;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.common.ScheduledTask;
+import strosoft.app.util.DateHelper;
+import strosoft.main.boot.JAppApplication;
+import strosoft.sys.model.SysSettingManager;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class MemberCardDisableScheduledTask extends ScheduledTask {
+    public static final org.slf4j.Logger logger = LoggerFactory.getLogger(JAppApplication.class);
+
+    /**
+     * 处理定时任务
+     */
+    @Override
+    protected void process() {
+        try {
+            //修改会员卡停卡服务
+            this.updateMemberCardDisable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateMemberCardDisable() throws Exception {
+        SqlSession session = MyBatisManager.getInstance().openSession();
+        try {
+            String condition = "DATE(DATE_ADD(stop_end_date,INTERVAL 1 DAY)) <= CURDATE() and is_relieve is not true;";
+            List<MemberCardDisableLog> lstLog = MemberCardDisableLogManager.getInstance().getList(session, condition);
+            if (lstLog.size() > 0) {
+                List<Message> newMessageList = new ArrayList<>();
+                List<MemberCardServiceTimeLog> lstMemberCardServiceTimeLog = new ArrayList<>();
+                for (MemberCardDisableLog log : lstLog) {
+                    //修改会员卡
+                    String updateMemberCardSql = String.format(
+                            "UPDATE member_card SET is_stop_card=0, expire_date = DATE_ADD(expire_date, INTERVAL %s DAY) WHERE id = %d;",
+                            log.getDays(), log.getMemberCardId());
+                    MyBatisManager.getInstance().executeUpdate(session, updateMemberCardSql);
+                    String updateMemberCardDisableSql = String.format(
+                            "UPDATE member_card_disable_log SET is_relieve = 1  WHERE id = %d;", log.getId());
+                    MyBatisManager.getInstance().executeUpdate(session, updateMemberCardDisableSql);
+                    MemberCard theMemberCard = MemberCardManager.getInstance().getEntity(session, log.getMemberCardId());
+                    Member theMember = MemberManager.getInstance().getEntity(session, log.getMemberId());
+                    //添加会员时长变更记录
+                    MemberCardServiceTimeLog newMemberCardServiceTimeLog = new MemberCardServiceTimeLog();
+                    newMemberCardServiceTimeLog.setMemberId(theMember.getId());
+                    newMemberCardServiceTimeLog.setDays(log.getDays());
+                    newMemberCardServiceTimeLog.setMemberCardServiceTimeTypeCode("StopCard");
+                    newMemberCardServiceTimeLog.setAddTime(DateHelper.getCurrentTimestamp());
+                    newMemberCardServiceTimeLog.setEffectiveTime(DateHelper.getCurrentTimestamp());
+                    newMemberCardServiceTimeLog.setExpiryTime(theMemberCard.getExpireDate());
+                    newMemberCardServiceTimeLog.setMemberCardServiceTimeGiftTypeCode("StopCardGift");
+                    lstMemberCardServiceTimeLog.add(newMemberCardServiceTimeLog);
+
+                    //添加停卡消息
+                    Message theMessage = new Message();
+                    theMessage.setMemberId(theMember.getId());
+                    theMessage.setCompanyId(theMember.getCompanyId());
+                    theMessage.setPushTime(DateHelper.getCurrentTimestamp());
+                    theMessage.setMessageTypeCode(MessageTypeCodes.MemberCardSuspensionEnd);
+                    theMessage.setContent("您的会员卡暂停已结束，可以正常使用了！");
+                    newMessageList.add(theMessage);
+                    MessageManager.getInstance().sendWxaStopCardMessage(log, theMember, theMemberCard);
+
+                }
+                if (newMessageList.size() > 0) {
+                    MessageManager.getInstance().addList(session, newMessageList);
+                }
+                if (lstMemberCardServiceTimeLog.size() > 0) {
+                    MemberCardServiceTimeLogManager.getInstance().addList(session, lstMemberCardServiceTimeLog);
+                }
+            }
+            MyBatisManager.getInstance().commitSession(session);
+        } catch (Exception ex) {
+            MyBatisManager.getInstance().rollbackSession(session);
+            throw ex;
+        } finally {
+            MyBatisManager.getInstance().closeSession(session);
+        }
+    }
+}

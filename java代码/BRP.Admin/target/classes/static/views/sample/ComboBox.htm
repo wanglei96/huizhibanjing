@@ -1,0 +1,97 @@
+<html>
+<head>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js">
+	
+</script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<link rel="stylesheet" href="../../themes/custom/easyui.css"
+	type="text/css"></link>
+<script>
+	var context = new Object();
+	context.isDataBinding = false;
+	$(function() {
+		$("#cmbProvince").combobox({
+			onChange : function(newValue, oldValue) {
+				bindCity();
+			}
+		});
+		$("#cmbCity").combobox({
+			onChange : function(newValue, oldValue) {
+				bindCounty();
+			}
+		});
+		//执行命令
+		$("#btnExecuteCommand").click(function() {
+			var data = new Object();
+			data.provinceId = "130000";
+			data.cityId = "130100";
+			data.countyId = "130103";
+			context.isDataBinding = true;
+			bindProvince(data);
+		});
+
+	});
+	function bindProvince(data) {
+		bindIdNameComboBoxWithValue("cmbProvince", "province", "",
+				data.provinceId, function(provinceId) {
+					bindCity(data);
+				});
+	}
+	/*
+	绑定城市
+	 */
+	function bindCity(data) {
+		var provinceId = $("#cmbProvince").combobox("getValue");
+		var condition = "";
+		if (provinceId != "" && provinceId != null) {
+			condition = "parent_id='" + provinceId + "'";
+		}
+		if (data != null && data.cityId != null) {
+			bindIdNameComboBoxWithValue("cmbCity", "city", condition,
+					data.cityId, function(cityId) {
+						bindCounty(data);
+					});
+		} else {
+			if (!context.isDataBinding) {
+				bindIdNameComboBox("cmbCity", "city", condition);
+			}
+		}
+	}
+	/*
+	绑定区县
+	 */
+	function bindCounty(data) {
+		var cityId = $("#cmbCity").combobox("getValue");
+		var condition = "";
+		if (cityId != "" && cityId != null) {
+			condition = "parent_id='" + cityId + "'";
+		}
+		if (data != null && data.countyId != null) {
+			bindIdNameComboBoxWithValue("cmbCounty", "county", condition,
+					data.countyId, function(countyId) {
+						context.isDataBinding = false;
+					});
+		} else {
+			if (!context.isDataBinding) {
+				bindIdNameComboBox("cmbCounty", "county", condition);
+			}
+		}
+	}
+</script>
+</head>
+<body>
+
+	<input id="cmbProvince" name="cmbProvince" class="easyui-combobox"
+		label="省:" style="width:100%" />
+	<input id="cmbCity" name="cmbCity" class="easyui-combobox" label="市:"
+		style="width:100%" />
+	<input id="cmbCounty" name="cmbCounty" class="easyui-combobox"
+		label="区县:" style="width:100%" />
+	<input id="btnExecuteCommand" value="绑定数据" type="button" />
+</body>
+</html>

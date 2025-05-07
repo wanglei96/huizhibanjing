@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SysRoleList.html</title>
+	
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    
+    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+	<script type="text/javascript" src="../../js/jquery.js"></script>
+	<script type="text/javascript" src="../../js/common.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script type="text/javascript" src="../../js/json2.js"></script>
+	<script>
+		$(document).ready(function(){
+			var data = new Object();
+			data.tableName = "sys_role",
+			call("GetSysRoleList",data, function(result){
+			//alert(JSON.stringify(result.data));
+				outputList(result.data);
+			});
+				
+		});
+		function outputList(dataList) {
+			$("#tableList tr:gt(0)").remove();
+			for ( var i = 0; i < dataList.length; i++) {
+				var dataItem = dataList[i];
+				outputListItem(dataItem);
+			}
+		}
+		function outputListItem(dataItem) {
+			//调用format进行时间转化
+			var  date = new Date (dataItem.createTime);
+			date.setTime(dataItem.createTime.time);
+		//	date.setHours(dataItem.createTime.hours);
+		//	date.setMinutes(dataItem.createTime.minutes);
+		//	date.setSeconds(dataItem.createTime.seconds);
+		
+		
+			var times=date.format("yyyy-MM-dd");
+			
+			var htmlTr = "<tr>";
+			htmlTr += "<td>" + dataItem.id + "</td>";
+			htmlTr += "<td>" + dataItem.roleName + "</td>";
+			htmlTr += "<td>" + times+ "</td>";
+			htmlTr += "<td>"; 
+				htmlTr += "<a href='javascript:void(0)' onclick='selectSysRole("+dataItem.id+")'>查看</a>";
+				htmlTr += "<a href='javascript:void(0)' onclick='selectSysRole("+dataItem.id+")'>修改</a>";
+			    htmlTr += "<a href='javascript:void(0)' onclick='deleteSysRole("+dataItem.id+")'>删除</a>";					
+			htmlTr += "</td>";
+			htmlTr += "</tr>";
+			console.log(htmlTr);
+			$("#tableList").append(htmlTr);
+		}
+		
+		//转化时间
+		Date.prototype.format = function(format) {
+		 /*
+		  * format="yyyy-MM-dd hh:mm:ss";
+		  */
+		 var o = {
+		  "M+" : this.getMonth() + 1,
+		  "d+" : this.getDate(),
+		//  "h+" : this.getHours(),
+		//  "m+" : this.getMinutes(),
+		//  "s+" : this.getSeconds(),
+		  "q+" : Math.floor((this.getMonth() + 3) / 3),
+		  "S" : this.getMilliseconds()
+		 }
+		 if (/(y+)/.test(format)) {
+		  format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4
+		      - RegExp.$1.length));
+		 }
+		 for (var k in o) {
+		  if (new RegExp("(" + k + ")").test(format)) {
+		   format = format.replace(RegExp.$1, RegExp.$1.length == 1
+		       ? o[k]
+		       : ("00" + o[k]).substr(("" + o[k]).length));
+		  }
+		 }
+		 return format;
+		} 
+		
+		$(function(){
+			//弹出新增页面
+			$("#btnAdd").click(function(){	
+				$("#save").show();
+				$("#btnUpdateSysRole").hide();
+			});
+			//新增
+			$("#btnSaveSysRole").click(function(){
+				var textRoleName = $("#textRole").val();
+				/* alert(textRoleName); */
+				var data = new Object();
+				data.tableName = "sys_role";
+				data.textRoleName = textRoleName;
+				call("AddSysRole",data,function(result){
+					window.location.href="SysRoleList.html";
+				});		
+			});
+		});
+		
+		//删除
+		function deleteSysRole(id){
+			var id = id;
+		//	alert(id);
+			var data = new Object();
+			data.tableName="sys_role";
+			data.id=id;
+			call("DeleteSysRole",data,function(result){
+				window.location.href="SysRoleList.html";
+			});	
+		}
+		//查看
+		function selectSysRole(id){
+			var id =id;
+			var data = new Object();
+			data.tableName = "sys_role";
+			data.id = id;
+			call("SelectSysRole",data,function(result){
+				$("#save").show();
+				$("#btnSaveSysRole").hide();
+				//alert(JSON.stringify(result.data));
+				//window.location.href="SysRoleList.html";
+				$("#textRole").val(result.data.roleName);
+				$("#hid").val(result.data.id);
+			});	
+		}
+		function updateSysRole(){
+			var id = $("#hid").val();
+			var roleName = $("#textRole").val();
+			var data = new Object();
+			data.tableName = "sys_role";
+			data.id=id;
+			data.roleName=roleName;
+			call("UpdateSysRole", data, function(result) {
+			//	alert(JSON.stringify(result.data));
+				window.location.href="SysRoleList.html";
+			});
+		}
+	</script>
+  </head>
+  
+  <body>
+ 	 <div class="title_bar">测试页面</div>
+ 	<div class="command_bar" width="500" >
+		<input id="btnAdd" value="新增" type="button"/>
+		<input type="button" id="" onclick="javascript:history.go(-1);" value="返回"/>
+	</div>
+	<div class="grid_panel">
+			<table id="tableList" width="500">
+				<tr>
+					<td>编号</td>
+					<td>名称</td>
+					<td>时间</td>
+					<td>操作</td>
+				</tr>
+			</table>
+	</div>
+	<div clas s="total_panel" ></div>
+	
+	<!--新增、查看、修改 -->
+	<div align="" id ="save" style="display:none ;"> 
+    	<table  width="500" border="1" cellpadding="0" cellspacing="0">
+        	<tr>
+            	<td colspan="2" align="center">新增</td>
+            </tr>
+            <tr>	
+            	<td align="right">角色：</td>
+                <td> <input type="text" name="textRole" id="textRole" value=""/></td>
+            </tr>
+            <tr>
+            	<td align="center" colspan="2">
+            		<input type="hidden" id="hid" value=""/>
+                	<input type="button" id="btnSaveSysRole"  value="提交"/>
+                	<input type="button" id="btnUpdateSysRole"  onclick="updateSysRole()" value="修改"/>
+                    <input type="button" id="" onclick="javascript:history.go(0);" value="取消"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+  </body>
+</html>

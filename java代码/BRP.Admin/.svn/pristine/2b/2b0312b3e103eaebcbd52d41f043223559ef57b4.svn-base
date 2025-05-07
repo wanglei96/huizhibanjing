@@ -1,0 +1,851 @@
+package strosoft.app.service;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONNull;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import org.apache.ibatis.session.SqlSession;
+import org.w3c.dom.Node;
+import strosoft.app.common.*;
+import strosoft.app.data.DataEntity;
+import strosoft.app.model.ListInfo;
+import strosoft.app.util.*;
+import strosoft.sys.data.SysOperationLog;
+import strosoft.sys.model.SysOperationLogManager;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import static com.alibaba.fastjson2.JSONWriter.Feature;
+
+public class ServiceHandlerHelper {
+
+    public static void writeSuccessResponseRaw(HttpServletResponse response, String rawData) throws IOException {
+        if (SysConfig.getReturnAdminRootUrl()) {
+            String responseText = String.format("{\"success\":true, \"data\":%s, \"adminRootUrl\":\"%s\"}", rawData,
+                    SysConfig.getAdminRootUrl());
+            response.getWriter().write(responseText);
+        } else {
+            String responseText = String.format("{\"success\":true, \"data\":%s}", rawData);
+            response.getWriter().write(responseText);
+        }
+
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response) throws IOException {
+        writeSuccessResponseRaw(response, "null");
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, Object data) throws IOException {
+        if (data == null) {
+            writeSuccessResponse(response);
+            return;
+        }
+        JsonConfig newJsonConfig = JsonHelper.getJsonConfig();
+        Object objResponseData = null;
+        if (data instanceof JSONArray) {
+            JSONArray jarrData = (JSONArray) data;
+            String strData = jarrData.toString();
+            objResponseData = com.alibaba.fastjson2.JSON.parseArray(strData);
+        } else if (data instanceof com.alibaba.fastjson2.JSONArray) {
+            objResponseData = data;
+        } else if (data instanceof ArrayList) {
+            String strData = com.alibaba.fastjson2.JSON.toJSONString(data, Feature.WriteNulls);
+            objResponseData = com.alibaba.fastjson2.JSON.parseArray(strData);
+        } else if (data instanceof ListInfo) {
+            JSONObject jResponseData = JSONObject.fromObject(data, newJsonConfig);
+            String strData = jResponseData.toString();
+            objResponseData = com.alibaba.fastjson2.JSONObject.parseObject(strData);
+        } else if (data instanceof com.alibaba.fastjson2.JSONObject) {
+            objResponseData = data;
+        } else if (data instanceof DataEntity) {
+            objResponseData = data;
+        } else {
+            String strData = com.alibaba.fastjson2.JSON.toJSONString(data, Feature.WriteNulls);
+            objResponseData = com.alibaba.fastjson2.JSON.parseObject(strData);
+        }
+        com.alibaba.fastjson2.JSONObject jResponse = new com.alibaba.fastjson2.JSONObject();
+        jResponse.put("success", true);
+        jResponse.put("data", objResponseData);
+        if (SysConfig.getReturnAdminRootUrl()) {
+            jResponse.put("adminRootUrl", SysConfig.getAdminRootUrl());
+        }
+        String responseText = jResponse.toJSONString(Feature.WriteNulls);
+        response.getWriter().write(responseText);
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, String strData) throws IOException {
+        writeSuccessResponseRaw(response, "\"" + strData + "\"");
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, int data) throws IOException {
+        String strData = String.valueOf(data);
+        writeSuccessResponseRaw(response, strData);
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, double data) throws IOException {
+        String strData = String.valueOf(data);
+        writeSuccessResponseRaw(response, strData);
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, short data) throws IOException {
+        String strData = String.valueOf(data);
+        writeSuccessResponseRaw(response, strData);
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, long data) throws IOException {
+        String strData = String.valueOf(data);
+        writeSuccessResponseRaw(response, strData);
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, byte data) throws IOException {
+        String strData = String.valueOf(data);
+        writeSuccessResponseRaw(response, strData);
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, char data) throws IOException {
+        String strData = String.valueOf(data);
+        writeSuccessResponseRaw(response, strData);
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, float data) throws IOException {
+        String strData = String.valueOf(data);
+        writeSuccessResponseRaw(response, strData);
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, Boolean data) throws IOException {
+        String strData = String.valueOf(data);
+        writeSuccessResponseRaw(response, strData);
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, BigDecimal data) throws IOException {
+        String strData = String.valueOf(data);
+        writeSuccessResponseRaw(response, strData);
+    }
+
+    public static void writeSuccessResponse(HttpServletResponse response, ArrayList alData) throws IOException {
+        JSONArray jarrData = JSONArray.fromObject(alData, JsonHelper.getJsonConfig());
+        String strData = jarrData.toString();
+        writeSuccessResponseRaw(response, strData);
+    }
+
+    /*
+     * 输出空值
+     */
+    public static void writeNullResponse(HttpServletResponse response) throws IOException {
+        JSONObject jResponse = new JSONObject();
+        jResponse.put("success", true);
+        jResponse.put("data", null);
+        String responseText = jResponse.toString();
+        response.getWriter().write(responseText);
+
+    }
+
+    /*
+     * 输出错误信息
+     */
+    public static void writeErrorResponse(HttpServletResponse response, String errorMessage) throws IOException {
+        JSONObject jResponse = new JSONObject();
+        jResponse.put("success", false);
+        jResponse.put("messageType", "error");
+        jResponse.put("errorMessage", errorMessage);
+        String responseText = jResponse.toString();
+        response.getWriter().write(responseText);
+
+    }
+
+    /*
+     * 输出警告信息
+     */
+    public static void writeWarningResponse(HttpServletResponse response, String warningMessage) throws IOException {
+        JSONObject jResponse = new JSONObject();
+        jResponse.put("success", false);
+        jResponse.put("messageType", "warning");
+        jResponse.put("errorMessage", warningMessage);
+        String responseText = jResponse.toString();
+        response.getWriter().write(responseText);
+    }
+
+    /*
+     * 输出登录超时信息
+     */
+    public static void writeLoginTimeoutResponse(HttpServletResponse response, String warningMessage)
+            throws IOException {
+        JSONObject jResponse = new JSONObject();
+        jResponse.put("success", false);
+        jResponse.put("messageType", "loginTimeout");
+        jResponse.put("responseCode", "401");
+        jResponse.put("errorMessage", warningMessage);
+        String responseText = jResponse.toString();
+        response.getWriter().write(responseText);
+    }
+
+    /*
+     * 取得数据管理类
+     */
+    public static TableDataMaster getDataManager(Node configNode)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException,
+            SecurityException, IllegalArgumentException, InvocationTargetException {
+        String dataManagerType = XmlDocumentHelper.getAttribute(configNode, "DataManagerType");
+        TableDataMaster dataManager = (TableDataMaster) ClassHelper.newInstance(dataManagerType);
+        return dataManager;
+    }
+
+    /*
+     * 取得数据实体
+     */
+    public static DataEntity getDataEntity(HttpServletRequest request, Node configNode, TableDataMaster dataManager,
+                                           Boolean isUpdate) throws Exception {
+        String data = request.getParameter("data");
+        JSONObject jData = JSONObject.fromObject(data, JsonHelper.getJsonConfig());
+        return getDataEntity(jData, configNode, dataManager, isUpdate);
+
+    }
+
+    /**
+     * 取得数据实体
+     *
+     * @param jData
+     * @param configNode
+     * @param dataManager
+     * @param isUpdate
+     * @return
+     * @throws Exception
+     */
+    public static DataEntity getDataEntity(JSONObject jData, Node configNode, TableDataMaster dataManager,
+                                           Boolean isUpdate) throws Exception {
+
+        // 数据实体类型名称
+        String dataEntityTypeName = XmlDocumentHelper.getAttribute(configNode, "DataEntityType");
+        DataEntity newDataEntity = null;
+        if (isUpdate) {
+            // 如果是更新，则从数据库中查询数据实体
+            try {
+                if (dataManager instanceof IdDataManager) {
+                    IdDataManager idDataManager = (IdDataManager) dataManager;
+                    int id = JsonHelper.getInt(jData, "primaryKey", "id", "ID");
+                    newDataEntity = idDataManager.getDataEntity(id);
+                } else if (dataManager instanceof CodeDataManager) {
+                    CodeDataManager theCodeDataManager = (CodeDataManager) dataManager;
+                    String code = JsonHelper.getString(jData, "primaryKey", "code");
+                    newDataEntity = theCodeDataManager.getDataEntity(code);
+                } else {
+                    String primaryKeyName = XmlDocumentHelper.getAttribute(configNode, "PrimaryKeys");
+                    String primaryKeyParameterName = StringHelper.getParameterName(primaryKeyName);
+                    String primaryKeyValue = JsonHelper.getString(jData, primaryKeyParameterName);
+                    String condition = primaryKeyName + "='" + primaryKeyValue + "'";
+                    List<DataEntity> lstDataEntity = dataManager.getDataEntityList(condition);
+                    if (lstDataEntity.size() > 0) {
+                        newDataEntity = lstDataEntity.get(0);
+                    }
+                    System.out.println(newDataEntity);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            newDataEntity = (DataEntity) ClassHelper.newInstance(dataEntityTypeName);
+        }
+
+        if (newDataEntity == null) {
+            return null;
+        }
+        setDataEntityByRequestData(newDataEntity, jData, configNode);
+        System.out.println(newDataEntity);
+        return newDataEntity;
+    }
+
+    /**
+     * 根据请求数据设置数据实体值
+     *
+     * @param newDataEntity
+     * @param jData
+     * @param configNode
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws NoSuchAlgorithmException
+     * @throws UnsupportedEncodingException
+     */
+    public static void setDataEntityByRequestData(DataEntity newDataEntity, JSONObject jData, Node configNode)
+            throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
+            NoSuchAlgorithmException, UnsupportedEncodingException {
+        // 取得加密字段（多个加密字段用,分隔）
+        String encryptedFields = XmlDocumentHelper.getAttribute(configNode, "EncryptFields");
+        for (Method currentMethod : newDataEntity.getClass().getMethods()) {
+            String methodName = currentMethod.getName();
+            if (!methodName.startsWith("set")) {
+                // 跳过非set方法
+                continue;
+            }
+            String fieldName = getFieldName(methodName, true);
+            if (!jData.containsKey(fieldName)) {
+                fieldName = getFieldName(methodName, false);
+                if (!jData.containsKey(fieldName)) {
+                    continue;
+                }
+            }
+            Object value = getFieldValue(jData, fieldName, currentMethod);
+            System.out.println(fieldName + ":" + value);
+            if (("," + encryptedFields + ",").indexOf("," + fieldName + ",") >= 0) {
+                if (value != null && !value.toString().equals("")) {
+                    // 如果是加密字段，则对数据进行加密
+                    value = EncryptManager.encryptPassword(value.toString());
+                    currentMethod.invoke(newDataEntity, value);
+                }
+            } else {
+                try {
+                    currentMethod.invoke(newDataEntity, value);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    /*
+     * 取得参数值
+     */
+    protected static Object getFieldValue(JSONObject jData, String fieldName, Method currentMethod) {
+        String upperCaseFieldName = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+        Object objValue = JsonHelper.getObject(jData, fieldName, upperCaseFieldName);
+        if (objValue instanceof JSONNull || objValue == null) {
+            return null;
+        }
+        String parameterTypeName = currentMethod.getParameterTypes()[0].getName();
+        if (parameterTypeName.equals("java.util.Date")) {
+            if (objValue.toString().equals("")) {
+                return null;
+            }
+            return DateHelper.toDateTime(objValue.toString());
+        } else if (parameterTypeName.equals("java.sql.Timestamp")) {
+            if (objValue.toString().equals("")) {
+                return null;
+            }
+            Timestamp ts = DateHelper.toTimestamp(objValue.toString());
+            return ts;
+
+        } else if (parameterTypeName.equals("int") || parameterTypeName.equals("java.lang.Integer")) {
+            if (objValue == null) {
+                return null;
+            }
+            if (objValue.toString().equals("")) {
+                return null;
+            }
+            if (objValue.toString().equals("null")) {
+                return null;
+            }
+            if (objValue.toString().equals("true")) {
+                return 1;
+            }
+            if (objValue.toString().equals("false")) {
+                return 0;
+            }
+            return Integer.parseInt(objValue.toString());
+        } else if (parameterTypeName.equals("long") || parameterTypeName.equals("java.lang.Long")) {
+            if (objValue.toString().equals("")) {
+                return null;
+            }
+            return Long.parseLong(objValue.toString());
+        } else if (parameterTypeName.equals("java.math.BigDecimal")) {
+            if (objValue.toString().equals("")) {
+                return null;
+            }
+            return new BigDecimal(String.valueOf(objValue));
+        } else if (parameterTypeName.equals("double")) {
+            if (objValue.toString().equals("")) {
+                return null;
+            }
+            return Double.valueOf(String.valueOf(objValue));
+        } else if (parameterTypeName.equals("boolean") || parameterTypeName.equals("java.lang.Boolean")) {
+            String strValue = String.valueOf(objValue).toLowerCase();
+            if (strValue.equals("1") || strValue.equals("yes") || strValue.equals("true") || strValue.equals("on")) {
+                return true;
+            } else {
+                return false;
+            }
+        } else if (parameterTypeName.equals("java.math.BigInteger")) {
+            if (objValue.toString().equals("")) {
+                return null;
+            }
+            return new BigInteger(String.valueOf(objValue));
+        } else if (parameterTypeName.equals("java.lang.Float")) {
+            if (objValue.toString().equals("")) {
+                return null;
+            }
+            return new Float(String.valueOf(objValue));
+        }
+        return objValue;
+    }
+
+    /*
+     * 根据字段名取得方法名
+     */
+    protected static String getFieldName(String methodName, Boolean toLower) {
+        String fieldName = methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
+        if (!toLower) {
+            fieldName = methodName.substring(3, 4) + methodName.substring(4);
+        }
+        return fieldName;
+    }
+
+    /*
+     * 增加必填字段
+     */
+    public static void addRequiredFields(ServiceHandlerValidator theServiceHandlerValidator, Node configNode,
+                                         JSONObject jData) {
+        // 检查必填字段
+        ArrayList<Node> lstRequredFieldNode = XmlDocumentHelper.selectNodesByNodeName(configNode, "RequiredField");
+        for (Node requiredFieldNode : lstRequredFieldNode) {
+            String dataName = XmlDocumentHelper.getAttribute(requiredFieldNode, "DataName");
+            String caption = XmlDocumentHelper.getAttribute(requiredFieldNode, "Caption");
+
+            theServiceHandlerValidator.addRequiredItem(jData, caption, dataName);
+        }
+    }
+
+    public static void addUniqueFields(ServiceHandlerValidator theServiceHandlerValidator, Node configNode,
+                                       JSONObject jData) throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+            NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
+        ArrayList<Node> lstUniqueFieldNode = XmlDocumentHelper.selectNodesByNodeName(configNode, "UniqueField");
+        for (Node uniqueFieldNode : lstUniqueFieldNode) {
+            String dataName = XmlDocumentHelper.getAttribute(uniqueFieldNode, "DataName");
+            String caption = XmlDocumentHelper.getAttribute(uniqueFieldNode, "Caption");
+            String fieldName = XmlDocumentHelper.getAttribute(uniqueFieldNode, "FieldName");
+            String primaryKeys = XmlDocumentHelper.getAttribute(configNode, "PrimaryKeys");
+            String[] arrPrimaryKey = primaryKeys.split(",");
+            HashMap<String, Object> hmPrimaryKey = new HashMap<String, Object>();
+            for (String primaryKey : arrPrimaryKey) {
+                String primaryKeyParameterName = StringHelper.getParameterName(primaryKey);
+                Object primaryKeyValue = jData.get(primaryKeyParameterName);
+                hmPrimaryKey.put(primaryKey, primaryKeyValue);
+            }
+            TableDataMaster dataManager = ServiceHandlerHelper.getDataManager(configNode);
+            String tableName = dataManager.getTableName();
+            theServiceHandlerValidator.addUniqueItem(jData, caption, dataName, tableName, fieldName, hmPrimaryKey);
+
+        }
+
+    }
+
+    public static void addPrimaryKeyItems(ServiceHandlerValidator theServiceHandlerValidator, Node configNode,
+                                          JSONObject jData) throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+            NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
+        ArrayList<Node> lstUniqueFieldNode = XmlDocumentHelper.selectNodesByNodeName(configNode, "PrimaryKey");
+        for (Node uniqueFieldNode : lstUniqueFieldNode) {
+            String dataName = XmlDocumentHelper.getAttribute(uniqueFieldNode, "DataName");
+            String caption = XmlDocumentHelper.getAttribute(uniqueFieldNode, "Caption");
+            String fieldName = XmlDocumentHelper.getAttribute(uniqueFieldNode, "FieldName");
+            TableDataMaster dataManager = ServiceHandlerHelper.getDataManager(configNode);
+            String tableName = dataManager.getTableName();
+            theServiceHandlerValidator.addPrimaryKeyItem(jData, caption, dataName, tableName, fieldName);
+
+        }
+
+    }
+
+    // 多主键表获取主键查询条件
+    public static String getCompositeKeyConditionWhenGetEntity(Node configNode, JSONObject jData)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException,
+            SecurityException, IllegalArgumentException, InvocationTargetException {
+        ArrayList<Node> lstPrimaryKeyNode = XmlDocumentHelper.selectNodesByNodeName(configNode, "PrimaryKey");
+        System.out.print(configNode);
+        MySqlConditionBuilder conditionBuilder = new MySqlConditionBuilder();
+        for (Node primaryKeyNode : lstPrimaryKeyNode) {
+            String dataName = XmlDocumentHelper.getAttribute(primaryKeyNode, "DataName");
+            String fieldName = XmlDocumentHelper.getAttribute(primaryKeyNode, "FieldName");
+            String value = jData.getString(dataName);
+            String condition = fieldName + " = '" + value + "' ";
+            conditionBuilder.add(condition);
+        }
+        return conditionBuilder.toString();
+    }
+
+    // 多主键表获取主键查询条件
+    public static String getCompositeKeyConditionWhenBatchDelete(Node configNode, JSONObject jData)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException,
+            SecurityException, IllegalArgumentException, InvocationTargetException {
+        System.out.println(jData);
+        ArrayList<Node> lstPrimaryKeyNode = XmlDocumentHelper.selectNodesByNodeName(configNode, "PrimaryKey");
+        if (lstPrimaryKeyNode.size() < 1) {
+            return null;
+        }
+        String conditionLeft = "concat(";
+        List<String> dataNameList = new ArrayList<String>();
+        // List<String> fieldNameList = new ArrayList<String>();
+        for (Node primaryKeyNode : lstPrimaryKeyNode) {
+            String dataName = XmlDocumentHelper.getAttribute(primaryKeyNode, "DataName");
+            String fieldName = XmlDocumentHelper.getAttribute(primaryKeyNode, "FieldName");
+            dataNameList.add(dataName);
+            // fieldNameList.add(fieldName);
+            if (conditionLeft.equals("concat(")) {
+                // 第一个拼接条件
+                conditionLeft += fieldName;
+            } else {
+                // 不是第一个拼接条件
+                conditionLeft += (",','," + fieldName);
+            }
+        }
+        conditionLeft += ")";
+        JSONArray lstPrimaryKeys = jData.getJSONArray("primaryKeys");
+        String conditionRight = "";
+        for (int i = 0; i < lstPrimaryKeys.size(); i++) {
+            JSONObject currentJsonObject = lstPrimaryKeys.getJSONObject(i);
+            if (i > 0) {
+                conditionRight += ",";
+            }
+            conditionRight += "'";
+            for (int j = 0; j < dataNameList.size(); j++) {
+                String dataName = dataNameList.get(j);
+                String value = currentJsonObject.getString(dataName);
+                if (j > 0) {
+                    conditionRight += ",";
+                }
+                conditionRight += value;
+            }
+            conditionRight += "'";
+        }
+
+        return conditionLeft + " in (" + conditionRight + ")";
+    }
+
+    /**
+     * 取得分页数量
+     *
+     * @param recordCount
+     * @param pageSize
+     * @return
+     */
+    public static int getPageCount(int recordCount, int pageSize) {
+        int pageCount = recordCount / pageSize + ((recordCount % pageSize > 0) ? 1 : 0);
+        return pageCount;
+    }
+
+    /**
+     * 修改图片路径
+     *
+     * @param content
+     * @param lstPrefix
+     * @return
+     */
+    public static String replaceImageUrl(String content, List<String> lstPrefix) {
+        String newContent = content;
+        if (newContent == null) {
+            return null;
+        }
+        for (String prefix : lstPrefix) {
+            if (content.contains("src=\"" + prefix)) {
+                newContent = content.replace("src=\"" + prefix, "src=\"" + SysConfig.getRootUrl() + prefix);
+            }
+        }
+        return newContent;
+    }
+
+    /*
+     * 取得数据列表
+     */
+    public static ArrayList<LinkedHashMap<String, Object>> getDataList(GetListServiceHandlerContext context)
+            throws Exception {
+        String sqlFields = "*";
+        if (context.getFields() != null && !context.getFields().equals("")) {
+            sqlFields = context.getFields();
+        }
+        String sqlWhere = "";
+        if (context.getCondition() != null && !context.getCondition().equals("")) {
+            sqlWhere = " where " + context.getCondition();
+        }
+
+        String sqlGroupBy = "";
+        if (context.getGroupBy() != null && !context.getGroupBy().equals("")) {
+            sqlGroupBy = " group by  " + context.getGroupBy();
+        }
+        String sqlOrderBy = "";
+        if (context.getOrderBy() != null && !context.getOrderBy().equals("")) {
+            sqlOrderBy = " order by  " + context.getOrderBy();
+        }
+        String sqlLimit = "";
+        if (context.getPageSize() > 0) {
+            sqlLimit = " limit " + String.valueOf(context.getPageIndex() * context.getPageSize()) + ","
+                    + context.getPageSize();
+        }
+        String sql = String.format("select %s from %s%s%s%s%s", sqlFields, context.getTableName(), sqlWhere, sqlGroupBy,
+                sqlOrderBy, sqlLimit);
+        // ArrayList<HashMap<String, Object>> lstData = DbHelper
+        // .executeHashMapList(sql);
+        ArrayList<LinkedHashMap<String, Object>> lstData = MyBatisManager.getInstance().executeHashMapList(sql);
+
+        return lstData;
+    }
+
+    public static GetListServiceHandlerContext getGetListServiceHandlerContext(HttpServletRequest request,
+                                                                               Node configNode, String condition) throws Exception {
+        String data = request.getParameter("data");
+        JSONObject jData = JSONObject.fromObject(data);
+        GetListServiceHandlerContext context = new GetListServiceHandlerContext();
+        // 请求
+        context.setRequest(request);
+        // 表名
+        String tableName = JsonHelper.getString(jData, "table_name", "tableName", "TableName");
+        if (tableName == null || tableName.equals("")) {
+            tableName = XmlDocumentHelper.getAttribute(configNode, "TableName");
+        }
+        context.setTableName(tableName);
+        // 条件
+        context.setCondition(condition);
+        // 排序
+        String orderBy = JsonHelper.getString(jData, "order_by", "orderBy", "OrderBy");
+        if (orderBy == null || orderBy.equals("")) {
+            orderBy = XmlDocumentHelper.getAttribute(configNode, "OrderBy");
+        }
+        context.setOrderBy(orderBy);
+        // 查询字段
+        String fields = JsonHelper.getString(jData, "fields", "Fields");
+        if (fields == null || fields.equals("")) {
+            fields = XmlDocumentHelper.getAttribute(configNode, "Fields");
+        }
+        context.setFields(fields);
+        // 分组
+        String groupBy = JsonHelper.getString(jData, "group_by", "groupBy", "GroupBy");
+        if (groupBy == null || groupBy.equals("")) {
+            groupBy = XmlDocumentHelper.getAttribute(configNode, "GroupBy");
+        }
+        context.setGroupBy(groupBy);
+        // 当前页
+        String strPageIndex = JsonHelper.getString(jData, "page_index", "pageIndex", "PageIndex");
+
+        // layUi请求处理翻页参数
+        if (null == strPageIndex && null != request.getParameter("pageIndex")) {
+            strPageIndex = request.getParameter("pageIndex");
+            strPageIndex = Integer.parseInt(strPageIndex) - 1 + "";
+        }
+        if (strPageIndex == null || strPageIndex.equals("")) {
+            strPageIndex = XmlDocumentHelper.getAttribute(configNode, "PageIndex");
+        }
+        if (strPageIndex == null || strPageIndex.equals("")) {
+            context.setPageIndex(0);
+        } else {
+            context.setPageIndex(Integer.parseInt(strPageIndex));
+        }
+        // 分页大小
+        String strPageSize = JsonHelper.getString(jData, "page_size", "pageSize", "PageSize");
+
+        // layUi请求处理翻页参数
+        if (null == strPageSize && null != request.getParameter("pageSize")) {
+            strPageSize = request.getParameter("pageSize");
+        }
+        if (strPageSize == null || strPageSize.equals("")) {
+            strPageSize = XmlDocumentHelper.getAttribute(configNode, "PageSize");
+        }
+        if (strPageSize == null || strPageSize.equals("")) {
+            context.setPageSize(SysConstants.PAGE_SIZE);
+        } else {
+            context.setPageSize(Integer.parseInt(strPageSize));
+        }
+        // 记录数
+        int recordCount = getRecordCount(context);
+        context.setRecordCount(recordCount);
+        // 页数
+        int pageCount = PagerHelper.getPageCount(context.getRecordCount(), context.getPageSize());
+        context.setPageCount(pageCount);
+        // 属性名类型
+        String propertyNameType = JsonHelper.getString(jData, "propertyNameType");
+        if (!StringHelper.isNullOrEmpty(propertyNameType)) {
+            context.setPropertyNameType(propertyNameType);
+        }
+        return context;
+    }
+
+    /*
+     * 取得记录数
+     */
+    private static int getRecordCount(GetListServiceHandlerContext context) throws Exception {
+        String sqlWhere = "";
+        if (context.getCondition() != null && !context.getCondition().equals("")) {
+            sqlWhere = " where " + context.getCondition();
+        }
+        String sqlGroupBy = "";
+
+        if (context.getGroupBy() != null && !context.getGroupBy().equals("")) {
+            sqlGroupBy = " group by " + context.getGroupBy();
+        }
+        if (StringHelper.isNullOrEmpty(context.getGroupBy())) {
+            String sql = String.format("select count(*) from %s%s%s", context.getTableName(), sqlWhere, sqlGroupBy);
+            int count = MyBatisManager.getInstance().executeInt(sql);
+            return count;
+        } else {
+            String sql = String.format("select count(*) from (select count(*) from %s%s%s) T1", context.getTableName(),
+                    sqlWhere, sqlGroupBy);
+            int count = MyBatisManager.getInstance().executeInt(sql);
+            return count;
+        }
+    }
+
+    /**
+     * 取得查询条件
+     *
+     * @param request
+     * @param configNode
+     * @return
+     * @throws Exception
+     */
+    public static String getGetListCondition(HttpServletRequest request, Node configNode) throws Exception {
+        String data = request.getParameter("data");
+        JSONObject jData = JSONObject.fromObject(data);
+
+        String condition = JsonHelper.getString(jData, "condition", "Condition");
+        if (condition == null || condition.equals("")) {
+            condition = XmlDocumentHelper.getAttribute(configNode, "Condition");
+        }
+        MySqlConditionBuilder conditionBuilder = new MySqlConditionBuilder();
+        if (condition != null && !condition.equals("")) {
+            conditionBuilder.add(condition);
+        }
+        // 从请求参数构造查询条件
+        ArrayList<Node> lstSearchItem = XmlDocumentHelper.selectNodesByNodeName(configNode, "SearchItem");
+        for (Node nodeSearchItem : lstSearchItem) {
+            // 字段名
+            String fieldName = XmlDocumentHelper.getAttribute(nodeSearchItem, "FieldName");
+            // 比较操作
+            String operation = XmlDocumentHelper.getAttribute(nodeSearchItem, "Operation");
+            // 请求参数名称
+            String parameterName = XmlDocumentHelper.getAttribute(nodeSearchItem, "ParameterName");
+            if (StringHelper.isNullOrEmpty(parameterName)) {
+                parameterName = StringHelper.toCamelCase(fieldName);
+            }
+            Boolean isBoolean = XmlDocumentHelper.getBoolAttribute(nodeSearchItem, "IsBoolean", false);
+            String value = JsonHelper.getString(jData, parameterName);
+            if (operation.toLowerCase().equals("like")) {
+                conditionBuilder.addLikeCondition(fieldName, value);
+            } else if (operation.toLowerCase().equals("equal")) {
+                conditionBuilder.addEqualCondition(fieldName, value, isBoolean);
+            } else if (operation.toLowerCase().equals("notequal")) {
+                conditionBuilder.addNotEqualCondition(fieldName, value, isBoolean);
+            } else if (operation.toLowerCase().equals("in")) {
+                conditionBuilder.addInCondition(fieldName, value);
+            } else if (operation.toLowerCase().equals("notin")) {
+                conditionBuilder.addNotInCondition(fieldName, value);
+            } else if (operation.toLowerCase().equals("idtree")) {
+                String treeTableName = XmlDocumentHelper.getAttribute(nodeSearchItem, "TreeTableName");
+                Integer parentId = JsonHelper.getInt(jData, parameterName);
+                conditionBuilder.addIDTreeCondition(fieldName, treeTableName, parentId);
+            } else if (operation.toLowerCase().equals("codetree")) {
+                String treeTableName = XmlDocumentHelper.getAttribute(nodeSearchItem, "TreeTableName");
+                String parentCode = JsonHelper.getString(jData, parameterName);
+                conditionBuilder.addCodeTreeCondition(fieldName, treeTableName, parentCode);
+            } else if (operation.toLowerCase().equals("timespan")) {
+                String beginDateParameterName = XmlDocumentHelper.getAttribute(nodeSearchItem,
+                        "BeginDateParameterName");
+                if (beginDateParameterName == null || beginDateParameterName.equals("")) {
+                    beginDateParameterName = "beginDate";
+                }
+                String endDateParameterName = XmlDocumentHelper.getAttribute(nodeSearchItem, "EndDateParameterName");
+                if (endDateParameterName == null || endDateParameterName.equals("")) {
+                    endDateParameterName = "endDate";
+                }
+                String strBeginDate = JsonHelper.getString(jData, beginDateParameterName);
+                String strEndDate = JsonHelper.getString(jData, endDateParameterName);
+                conditionBuilder.addTimeSpanCondition(strBeginDate, strEndDate, fieldName);
+            } else if (operation.toLowerCase().equals("format")) {
+                String text = XmlDocumentHelper.getAttribute(nodeSearchItem, "Text");
+                ArrayList<Node> lstText = XmlDocumentHelper.selectNodesByNodeName(nodeSearchItem, "Text");
+                if (text == null || text.equals("") && lstText.size() == 1) {
+                    // 获取Text标签Cdata数据
+                    text = lstText.get(0).getTextContent();
+                }
+                ArrayList<Node> lstArgument = XmlDocumentHelper.selectNodesByNodeName(nodeSearchItem, "Argument");
+                Boolean hasParameter = true;
+                for (int i = 0; i < lstArgument.size(); i++) {
+                    Node nodeArgument = lstArgument.get(i);
+                    String argumentName = XmlDocumentHelper.getAttribute(nodeArgument, "ParameterName");
+                    String argumentValue = JsonHelper.getString(jData, argumentName);
+                    if (argumentValue == null) {
+                        hasParameter = false;
+                        break;
+                    }
+                    text = text.replace("{" + i + "}", argumentValue);
+                }
+                if (hasParameter) {
+                    conditionBuilder.add(text);
+                }
+            }
+        }
+        condition = conditionBuilder.toString();
+        return condition;
+    }
+
+    /**
+     * 根据唯一键取得数据实体
+     *
+     * @param jData
+     * @param configNode
+     * @param dataManager
+     * @return
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
+    public static DataEntity getDataEntityByUniqueKey(JSONObject jData, Node configNode, TableDataMaster dataManager)
+            throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        // 根据页面参数获取对应实体
+        String uniqueKeyFieldName = XmlDocumentHelper.getAttribute(configNode, "UniqueKeyFieldName");
+        String methodName = "getEntityBy" + StringHelper.toPascal(uniqueKeyFieldName);
+        // 参数名称
+        String parameterName = StringHelper.toCamelCase(uniqueKeyFieldName);
+        Object uniqueKey = JsonHelper.getObject(jData, parameterName);
+        Method[] methods = dataManager.getClass().getMethods();
+        for (Method currentMethod : methods) {
+            if (currentMethod.getName().equals(methodName) && currentMethod.getParameterCount() == 1) {
+                DataEntity newDataEntity = (DataEntity) currentMethod.invoke(dataManager, uniqueKey);
+                return newDataEntity;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 添加操作日志
+     *
+     * @param request
+     * @param dataManager
+     * @param session
+     */
+    public static void addSysOperationLog(SqlSession session, String operationTypeCode, HttpServletRequest request, TableDataMaster dataManager, String content) {
+        SysOperationLog newSysOperationLog = new SysOperationLog();
+        newSysOperationLog.setOperateTime(DateHelper.getCurrentTimestamp());
+        newSysOperationLog.setContent(content);
+        JSONObject jData = getRequestData(request);
+        Integer operatorId = JsonHelper.getInt(jData, "sysUserId", "companyUserId");
+        newSysOperationLog.setOperatorId(operatorId);
+        newSysOperationLog.setOperationTypeCode(operationTypeCode);
+        String tableName = dataManager.getTableName();
+        newSysOperationLog.setOperationTargetCode(tableName);
+        if (!tableName.equals(SysOperationLogManager.getInstance().getTableName())) {
+            SysOperationLogManager.getInstance().add(session, newSysOperationLog);
+        }
+    }
+
+    /**
+     * 取得请求数据
+     *
+     * @param request
+     * @return
+     */
+    public static JSONObject getRequestData(HttpServletRequest request) {
+        String data = request.getParameter("data");
+        JSONObject jData = JSONObject.fromObject(data, JsonHelper.getJsonConfig());
+        return jData;
+    }
+}

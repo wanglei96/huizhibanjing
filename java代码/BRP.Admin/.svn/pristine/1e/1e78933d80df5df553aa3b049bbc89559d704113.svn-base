@@ -1,0 +1,622 @@
+package BRP.data;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import java.util.*;
+import BRP.data.CompanyChannel;
+import java.io.IOException;
+import strosoft.app.common.IdDataManager;
+import strosoft.app.data.DataEntity;
+import java.math.*;
+public class CompanyChannelMaster extends IdDataManager 
+{
+    public  int add(CompanyChannel entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int result = 0;
+        try        
+        {
+            result = add(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return result;
+    }
+    public  int add(SqlSession sqlSession,CompanyChannel entity)    
+    {
+        int rows = sqlSession.insert("CompanyChannel.insertCompanyChannel",entity);
+        int newId = Integer.valueOf(entity.getId().toString());
+        if (newId > 0)         
+        {
+            return newId;
+        }
+         else         
+        {
+            return rows;
+        }
+    }
+    public  int add(DataEntity dataEntity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer num = null;
+        try        
+        {
+            num  = add(sqlSession,dataEntity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return num;
+    }
+    public  int add(SqlSession sqlSession,DataEntity dataEntity)    
+    {
+        return add(sqlSession,(CompanyChannel)dataEntity);
+    }
+    public  int addList(List<CompanyChannel> list)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = addList(sqlSession,list);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int addList(SqlSession sqlSession,List<CompanyChannel> list)    
+    {
+        if(null == list || list.size() == 0)        
+        {
+            return 0;
+        }
+        int rows = sqlSession.insert("CompanyChannel.insertCompanyChannels",list);
+        return rows;
+    }
+    public  int delete(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = delete(sqlSession,id);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int delete(SqlSession sqlSession,Integer id)    
+    {
+        int rows = delete(sqlSession,getEntity(sqlSession,id));
+        return rows;
+    }
+    public  int delete(DataEntity entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = delete(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int delete(SqlSession sqlSession,DataEntity entity)    
+    {
+        int rows = sqlSession.delete("CompanyChannel.deleteCompanyChannel",entity);
+        return rows;
+    }
+    public  int batchDelete(List<Integer> list)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            for(int i=0;i<list.size();i++)            
+            {
+                rows += delete(sqlSession,list.get(i));
+            }
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            rows=0;
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int batchDelete(SqlSession sqlSession,List<Integer> list)    
+    {
+        int rows = 0;
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  int batchDeleteByEntity(SqlSession sqlSession,List<? extends DataEntity> list)    
+    {
+        int rows = 0;
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  DataEntity getDataEntity(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        DataEntity newDataEntity = null;
+        try        
+        {
+            newDataEntity = getDataEntity(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return newDataEntity;
+    }
+    public  DataEntity getDataEntity(SqlSession sqlSession,Integer id)    
+    {
+        DataEntity newDataEntity = getEntity(sqlSession,id);
+         return newDataEntity;
+    }
+    public  CompanyChannel getEntity(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        CompanyChannel newEntity = null;
+        try        
+        {
+            newEntity = getEntity(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return newEntity;
+    }
+    public  CompanyChannel getEntity(SqlSession sqlSession,Integer id)    
+    {
+        CompanyChannel entity = createEntity();
+        entity.setId(id);
+        CompanyChannel newEntity = sqlSession.selectOne("CompanyChannel.selectCompanyChannel",entity);
+        return newEntity;
+    }
+    public  List<CompanyChannel> getList()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanyChannel> getList(SqlSession sqlSession)    
+    {
+        List<CompanyChannel> list = sqlSession.selectList("CompanyChannel.selectCompanyChannels");
+        return list;
+    }
+    public  List<CompanyChannel> getList(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanyChannel> getList(SqlSession sqlSession,String condition)    
+    {
+        List<CompanyChannel> list = sqlSession.selectList("CompanyChannel.selectCompanyChannelByCondition",condition);
+        return list;
+    }
+    public  List<CompanyChannel> getList(String condition,String orderBy)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition,orderBy);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanyChannel> getList(SqlSession sqlSession,String condition,String orderBy)    
+    {
+        String conditionAndOrderBy = condition +" order by "+orderBy;
+        List<CompanyChannel> list = sqlSession.selectList("CompanyChannel.selectCompanyChannelByCondition",conditionAndOrderBy);
+        return list;
+    }
+    public  List<CompanyChannel> getList(int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession,pageIndex,pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+        finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanyChannel> getList(SqlSession sqlSession,int pageIndex,int pageSize)    
+    {
+        String sql = String.format("select * from company_channel limit %s, %s", pageSize * pageIndex, pageSize);
+        List<CompanyChannel> list = sqlSession.selectList("CompanyChannel.selectCompanyChannelBySql", sql);
+        return list;
+    }
+    public  List<CompanyChannel> getListPage(String condition,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanyChannel> getList(SqlSession sqlSession,String condition,int pageIndex,int pageSize)    
+    {
+        String sql = condition + " limit " + pageSize * pageIndex + "," + pageSize;
+        List<CompanyChannel> list = sqlSession.selectList("CompanyChannel.selectCompanyChannelByCondition",sql);
+        return list;
+    }
+    public  List<CompanyChannel> getList(String condition,String orderBy,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanyChannel> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, orderBy, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanyChannel> getList(SqlSession sqlSession,String condition,String orderBy,int pagesize,int pageindex)    
+    {
+        String sql = condition +" order by "+orderBy+" limit "+pagesize*(pageindex-1)+","+pagesize;
+        List<CompanyChannel> list = sqlSession.selectList("CompanyChannel.selectCompanyChannelByCondition",sql);
+        return list;
+    }
+    public  List<CompanyChannel> getListBySql(String sql)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanyChannel> list = null;
+        try        
+        {
+            list = getListBySql(sqlSession,sql);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<CompanyChannel> getListBySql(SqlSession sqlSession,String sql)    
+    {
+        List<CompanyChannel> list = sqlSession.selectList("CompanyChannel.selectCompanyChannelBySql",sql);
+        return list;
+    }
+    public  Integer getCount(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer count = null;
+        try        
+        {
+            count = getCount(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return count;
+    }
+    public  Integer getCount(SqlSession sqlSession,String condition)    
+    {
+        Integer rows = sqlSession.selectOne("CompanyChannel.selectCountByCondition",condition);
+        return rows;
+    }
+    public  int update(CompanyChannel entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = update(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int update(SqlSession sqlSession,CompanyChannel entity)throws IOException    
+    {
+        int rows = sqlSession.update("CompanyChannel.updateCompanyChannel",entity);
+        return rows;
+    }
+    public  CompanyChannel createEntity()    
+    {
+        return new CompanyChannel();
+    }
+    public  DataEntity createDataEntity()    
+    {
+        return new CompanyChannel();
+    }
+    public  int clear()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = clear(sqlSession);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int clear(SqlSession sqlSession)    
+    {
+        int rows = 0;
+        List<CompanyChannel> list = getList(sqlSession);
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  int deleteByCompanyId(Integer companyId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = deleteByCompanyId(sqlSession,companyId);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int deleteByCompanyId(SqlSession sqlSession,Integer companyId)    
+    {
+        List<CompanyChannel> list = getListByCompanyId(sqlSession,companyId);
+        int rows = batchDeleteByEntity(sqlSession,list);
+        return rows;
+    }
+    public  List<CompanyChannel> getListByCompanyId(Integer companyId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<CompanyChannel> entitys = null;
+         try        
+        {
+            entitys = getListByCompanyId(sqlSession,companyId);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entitys;
+    }
+    public  List<CompanyChannel> getListByCompanyId(SqlSession sqlSession,Integer companyId)    
+    {
+        List<CompanyChannel> entitys = sqlSession.selectList("CompanyChannel.selectCompanyChannelByCompanyId",companyId);
+        return entitys;
+    }
+    public  CompanyChannel getEntityById(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        CompanyChannel entity = null;
+        try        
+        {
+             entity = getEntityById(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entity;
+    }
+    public  CompanyChannel getEntityById(SqlSession sqlSession,Integer id)    
+    {
+        CompanyChannel entity = sqlSession.selectOne("selectCompanyChannelByCondition","id='"+id+"'");
+        return entity;
+    }
+    public  boolean existsId(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Boolean flag = null;
+        try        
+        {
+            flag = existsId(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return flag;
+    }
+    public  boolean existsId(SqlSession sqlSession,Integer id)    
+    {
+        Integer rows = sqlSession.selectOne("CompanyChannel.selectIntBySql","select count(*) from company_channel where id= '"+id+"'");
+        return rows>0?true:false;
+    }
+}

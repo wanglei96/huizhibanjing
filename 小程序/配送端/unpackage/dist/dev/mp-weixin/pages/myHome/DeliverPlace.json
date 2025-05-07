@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "配送点",
+  "navigationBarBackgroundColor": "#5EAC59",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "h-m-drag-sorts": "/components/HM-dragSorts/HM-dragSorts"
+  }
+}

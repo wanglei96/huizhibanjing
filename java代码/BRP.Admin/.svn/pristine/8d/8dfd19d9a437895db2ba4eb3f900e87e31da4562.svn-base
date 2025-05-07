@@ -1,0 +1,207 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+public class ViewClubActivityMember extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer memberId;//会员ID;
+    private  Timestamp joinDate;//加入时间;
+    private  Integer clubActivityId;//俱乐部活动ID;
+    private  Integer surplusQuantity;//剩余数量;
+    private  Integer retailOrderId;//订单ID;
+    private  Timestamp createTime;//创建时间;
+    private  Timestamp updateTime;//更新时间;
+    private  String memberName;//名称;
+    private  String memberMobilePhone;//联系电话;
+    private  String memberCardCardNo;//会员卡号;
+    private  String retailOrderName;//姓名;
+    private  String clubActivityName;//活动名称;
+    private  String clubActivityAddress;//地址;
+    private  Timestamp clubActivityCreateTime;//创建时间;
+    private  Timestamp expiryDate;//有效期;
+    private  Integer imageFileId;//活动图片ID;
+    private  Integer detailImageFileId;//活动详情图片ID;
+    private  String imageFilePath;//;
+    private  String detailImageFilePath;//;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setMemberId(Integer memberId)    
+    {
+        this.memberId = memberId;
+    }
+    public  Integer getMemberId()    
+    {
+        return memberId;
+    }
+    public  void setJoinDate(Timestamp joinDate)    
+    {
+        this.joinDate = joinDate;
+    }
+    public  Timestamp getJoinDate()    
+    {
+        return joinDate;
+    }
+    public  void setClubActivityId(Integer clubActivityId)    
+    {
+        this.clubActivityId = clubActivityId;
+    }
+    public  Integer getClubActivityId()    
+    {
+        return clubActivityId;
+    }
+    public  void setSurplusQuantity(Integer surplusQuantity)    
+    {
+        this.surplusQuantity = surplusQuantity;
+    }
+    public  Integer getSurplusQuantity()    
+    {
+        return surplusQuantity;
+    }
+    public  void setRetailOrderId(Integer retailOrderId)    
+    {
+        this.retailOrderId = retailOrderId;
+    }
+    public  Integer getRetailOrderId()    
+    {
+        return retailOrderId;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setUpdateTime(Timestamp updateTime)    
+    {
+        this.updateTime = updateTime;
+    }
+    public  Timestamp getUpdateTime()    
+    {
+        return updateTime;
+    }
+    public  void setMemberName(String memberName)    
+    {
+        this.memberName = memberName;
+    }
+    public  String getMemberName()    
+    {
+        return memberName;
+    }
+    public  void setMemberMobilePhone(String memberMobilePhone)    
+    {
+        this.memberMobilePhone = memberMobilePhone;
+    }
+    public  String getMemberMobilePhone()    
+    {
+        return memberMobilePhone;
+    }
+    public  void setMemberCardCardNo(String memberCardCardNo)    
+    {
+        this.memberCardCardNo = memberCardCardNo;
+    }
+    public  String getMemberCardCardNo()    
+    {
+        return memberCardCardNo;
+    }
+    public  void setRetailOrderName(String retailOrderName)    
+    {
+        this.retailOrderName = retailOrderName;
+    }
+    public  String getRetailOrderName()    
+    {
+        return retailOrderName;
+    }
+    public  void setClubActivityName(String clubActivityName)    
+    {
+        this.clubActivityName = clubActivityName;
+    }
+    public  String getClubActivityName()    
+    {
+        return clubActivityName;
+    }
+    public  void setClubActivityAddress(String clubActivityAddress)    
+    {
+        this.clubActivityAddress = clubActivityAddress;
+    }
+    public  String getClubActivityAddress()    
+    {
+        return clubActivityAddress;
+    }
+    public  void setClubActivityCreateTime(Timestamp clubActivityCreateTime)    
+    {
+        this.clubActivityCreateTime = clubActivityCreateTime;
+    }
+    public  Timestamp getClubActivityCreateTime()    
+    {
+        return clubActivityCreateTime;
+    }
+    public  void setExpiryDate(Timestamp expiryDate)    
+    {
+        this.expiryDate = expiryDate;
+    }
+    public  Timestamp getExpiryDate()    
+    {
+        return expiryDate;
+    }
+    public  void setImageFileId(Integer imageFileId)    
+    {
+        this.imageFileId = imageFileId;
+    }
+    public  Integer getImageFileId()    
+    {
+        return imageFileId;
+    }
+    public  void setDetailImageFileId(Integer detailImageFileId)    
+    {
+        this.detailImageFileId = detailImageFileId;
+    }
+    public  Integer getDetailImageFileId()    
+    {
+        return detailImageFileId;
+    }
+    public  void setImageFilePath(String imageFilePath)    
+    {
+        this.imageFilePath = imageFilePath;
+    }
+    public  String getImageFilePath()    
+    {
+        return imageFilePath;
+    }
+    public  void setDetailImageFilePath(String detailImageFilePath)    
+    {
+        this.detailImageFilePath = detailImageFilePath;
+    }
+    public  String getDetailImageFilePath()    
+    {
+        return detailImageFilePath;
+    }
+    public  ViewClubActivityMember copy()    
+    {
+        ViewClubActivityMember entity = null;
+        try        
+        {
+            entity = (ViewClubActivityMember) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

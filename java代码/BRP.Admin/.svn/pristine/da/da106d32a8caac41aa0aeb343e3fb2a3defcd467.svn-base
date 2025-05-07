@@ -1,0 +1,30 @@
+<Services>
+	<!-- 检查登录状态 -->
+	<Service Name="CheckLogin"/>
+	<!-- 登录 -->
+	<Service Name="Login"/>
+	<!-- 添加登录信息 -->
+	<Service Name="AddActiveUser"/>
+	<!-- 获取登录信息列表 -->
+	<Service Name="GetActiveUserList"/>
+	<!-- 判断是否为活跃用户 -->
+	<Service Name="IsActiveUser"/>
+	<!-- 更新最后活跃时间 -->
+	<Service Name="UpdateActiveTime"/>
+	<!-- 踢出登录用户 -->
+	<Service Name="KickOutActiveUser"/>
+	<!-- 设置验证配置信息 -->
+	<Service Name="AddApplication"/>
+	<!-- 设置验证配置信息 -->
+	<Service Name="GetApplicationsUserList"/>
+	<!-- 手机端登陆 -->
+	<Service Name="MobileCustomerOperatorLogin"/>
+	<!-- pc端登录 -->
+	<Service Name="OperatorLogin"></Service>
+	<!-- pc端重置密码 -->
+	<Service Name="OperatorResetPwd"></Service>
+	<!-- 添加应用信息 -->
+	<Service Name="SysAddApplication"></Service>
+	<!-- 获取登录类型列表 -->
+	<Service Name="GetLoginTypeList"></Service>
+</Services>

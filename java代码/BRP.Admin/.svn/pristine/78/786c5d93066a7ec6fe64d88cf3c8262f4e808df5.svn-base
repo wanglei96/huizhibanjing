@@ -1,0 +1,81 @@
+package BRP.service;
+
+import BRP.data.ViewBookOrderItem;
+import BRP.data.ViewBookOutOrder;
+import BRP.model.MemberManager;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.model.ListInfo;
+import strosoft.app.service.GetListServiceHandler;
+import strosoft.app.util.JsonHelper;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * 查询借阅记录，按照日分组
+ */
+public class GetBookOrderItemInfoListServiceHandler extends GetListServiceHandler {
+    @Override
+    protected void processListInfo(ListInfo listInfo) throws Exception {
+        super.processListInfo(listInfo);
+        ArrayList<LinkedHashMap<String, Object>> dataList = (ArrayList<LinkedHashMap<String, Object>>) listInfo.getDataList();
+        // 从dataList提取所有唯一的ids
+        List<String> allIds = new ArrayList<>();
+        for (LinkedHashMap<String, Object> item : dataList) {
+            String ids = (String) item.get("ids");
+            if (ids != null && !ids.isEmpty()) {
+                for (String id : ids.split(",")) {
+                    if (!allIds.contains(id.trim())) {
+                        allIds.add(id.trim());
+                    }
+                }
+            }
+        }
+
+        // 构建SQL查询语句一次性获取所有ids对应的书籍信息
+        StringBuilder sql = new StringBuilder("SELECT id, book_name AS bookName, image_file_path AS imageFilePath,book_sku_id AS bookSkuId FROM view_book_order_item WHERE 1=1");
+
+        // 添加 WHERE 条件
+        if (!allIds.isEmpty()) {
+            sql.append(" AND ("); // 开始括号
+
+            for (int i = 0; i < allIds.size(); i++) {
+                if (i > 0) {
+                    sql.append(" OR ");
+                }
+                sql.append("id = ").append(allIds.get(i));
+            }
+
+            sql.append(")"); // 结束括号
+        }
+
+        String finalSql = sql.toString();
+
+        List<LinkedHashMap<String, Object>> booksList = MyBatisManager.getInstance().executeHashMapList(finalSql);
+
+        // 根据每个项目中的ids映射检索到的数据回dataList
+        List<LinkedHashMap<String, Object>> bookOrderItemInfoList = new ArrayList<>();
+        for (LinkedHashMap<String, Object> item : dataList) {
+            String ids = (String) item.get("ids");
+            String createDate = (String) item.get("create_date");
+
+            LinkedHashMap<String, Object> bookOrderItemInfo = new LinkedHashMap<>();
+            bookOrderItemInfo.put("year", createDate);
+
+            // 为当前项目中的特定ids过滤booksList
+            List<LinkedHashMap<String, Object>> filteredBooksList = new ArrayList<>();
+            for (LinkedHashMap<String, Object> book : booksList) {
+                String itemId = String.valueOf(book.get("id"));
+                if (ids.contains(itemId)) {
+                    filteredBooksList.add(book);
+                }
+            }
+
+            bookOrderItemInfo.put("booksList", filteredBooksList);
+            bookOrderItemInfoList.add(bookOrderItemInfo);
+        }
+        listInfo.setDataList(bookOrderItemInfoList);
+    }
+}

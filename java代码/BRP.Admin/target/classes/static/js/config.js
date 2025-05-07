@@ -1,0 +1,10 @@
+var config = new Object();
+config.serviceUrl = "/api/Service";
+config.adminRootUrl = "/";
+//config.serviceUrl = "/RNAdmin/api/Service";
+//config.adminRootUrl = "/RNAdmin";
+config.defaultPageSize = 10;
+config.systemName = "思卓内容管理系统";
+config.applicationId = "JApp";
+config.companyUrl = "http://www.strosoft.com";
+config.copyright = "北京思卓软件有限公司 版权所有 Copyright © 2010 -"

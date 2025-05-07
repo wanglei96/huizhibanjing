@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ScheduledTasks Default="NoneServiceHandler">
+    <!-- <ScheduledTask Name="PindDatabase" Period="30000"
+                    Type="strosoft.app.model.PindDatabaseScheduledTask"/>-->
+    <!--处理每日订单的定时任务-->
+    <ScheduledTask Name="PindDatabase" Period="30000"
+                   Type="BRP.model.DisposeOnlineBookOrderScheduledTask"/>
+    <!--修改会员最大借阅数量-->
+    <!--<ScheduledTask Name="PindDatabase" Period="3000000"
+                   Type="BRP.model.UpdateMemberBorrowableQuantityScheduledTask"/>-->
+    <!--会员每周借阅增加积分-->
+    <ScheduledTask Name="PindDatabase" Period="21600000"
+                   Type="BRP.model.AddMemberBorrowScoreScheduledTask"/>
+    <!--总部结算-->
+    <ScheduledTask Name="PindDatabase" Period="21600000"
+                   Type="BRP.model.AddSettlementOrderScheduledTask"/>
+    <!--会员停卡任务-->
+    <ScheduledTask Name="PindDatabase" Period="7200000"
+                   Type="BRP.model.MemberCardDisableScheduledTask"/>
+    <!--书箱订单完成-->
+    <ScheduledTask Name="PindDatabase" Period="21600000"
+                   Type="BRP.model.FinishedSalesOrderScheduledTask"/>
+    <!--借阅15归还通知-->
+   <!-- <ScheduledTask Name="PindDatabase" Period="30000"
+                   Type="BRP.model.BookBorrowedReturnScheduledTask"/>-->
+    <!--借阅30归还通知-->
+    <ScheduledTask Name="PindDatabase" Period="30000"
+                   Type="BRP.model.BookBorrowedReturnThirtyScheduledTask"/>
+    <!--会员到期提醒-->
+    <ScheduledTask Name="PindDatabase" Period="30000"
+                   Type="BRP.model.MemberExpirationScheduledTask"/>
+</ScheduledTasks>

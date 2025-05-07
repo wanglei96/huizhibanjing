@@ -1,0 +1,53 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+public class BookStocksLog extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer bookSkuId;//SKUID;
+    private  Timestamp createTime;//创建时间;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setBookSkuId(Integer bookSkuId)    
+    {
+        this.bookSkuId = bookSkuId;
+    }
+    public  Integer getBookSkuId()    
+    {
+        return bookSkuId;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  BookStocksLog copy()    
+    {
+        BookStocksLog entity = null;
+        try        
+        {
+            entity = (BookStocksLog) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

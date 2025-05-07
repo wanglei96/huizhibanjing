@@ -1,0 +1,674 @@
+package BRP.data;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import java.util.*;
+import BRP.data.MemberBrowsedStoryVideo;
+import java.io.IOException;
+import strosoft.app.common.IdDataManager;
+import strosoft.app.data.DataEntity;
+import java.math.*;
+public class MemberBrowsedStoryVideoMaster extends IdDataManager 
+{
+    public  int add(MemberBrowsedStoryVideo entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int result = 0;
+        try        
+        {
+            result = add(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return result;
+    }
+    public  int add(SqlSession sqlSession,MemberBrowsedStoryVideo entity)    
+    {
+        int rows = sqlSession.insert("MemberBrowsedStoryVideo.insertMemberBrowsedStoryVideo",entity);
+        int newId = Integer.valueOf(entity.getId().toString());
+        if (newId > 0)         
+        {
+            return newId;
+        }
+         else         
+        {
+            return rows;
+        }
+    }
+    public  int add(DataEntity dataEntity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer num = null;
+        try        
+        {
+            num  = add(sqlSession,dataEntity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return num;
+    }
+    public  int add(SqlSession sqlSession,DataEntity dataEntity)    
+    {
+        return add(sqlSession,(MemberBrowsedStoryVideo)dataEntity);
+    }
+    public  int addList(List<MemberBrowsedStoryVideo> list)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = addList(sqlSession,list);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int addList(SqlSession sqlSession,List<MemberBrowsedStoryVideo> list)    
+    {
+        if(null == list || list.size() == 0)        
+        {
+            return 0;
+        }
+        int rows = sqlSession.insert("MemberBrowsedStoryVideo.insertMemberBrowsedStoryVideos",list);
+        return rows;
+    }
+    public  int delete(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = delete(sqlSession,id);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int delete(SqlSession sqlSession,Integer id)    
+    {
+        int rows = delete(sqlSession,getEntity(sqlSession,id));
+        return rows;
+    }
+    public  int delete(DataEntity entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = delete(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int delete(SqlSession sqlSession,DataEntity entity)    
+    {
+        int rows = sqlSession.delete("MemberBrowsedStoryVideo.deleteMemberBrowsedStoryVideo",entity);
+        return rows;
+    }
+    public  int batchDelete(List<Integer> list)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            for(int i=0;i<list.size();i++)            
+            {
+                rows += delete(sqlSession,list.get(i));
+            }
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            rows=0;
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int batchDelete(SqlSession sqlSession,List<Integer> list)    
+    {
+        int rows = 0;
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  int batchDeleteByEntity(SqlSession sqlSession,List<? extends DataEntity> list)    
+    {
+        int rows = 0;
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  DataEntity getDataEntity(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        DataEntity newDataEntity = null;
+        try        
+        {
+            newDataEntity = getDataEntity(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return newDataEntity;
+    }
+    public  DataEntity getDataEntity(SqlSession sqlSession,Integer id)    
+    {
+        DataEntity newDataEntity = getEntity(sqlSession,id);
+         return newDataEntity;
+    }
+    public  MemberBrowsedStoryVideo getEntity(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        MemberBrowsedStoryVideo newEntity = null;
+        try        
+        {
+            newEntity = getEntity(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return newEntity;
+    }
+    public  MemberBrowsedStoryVideo getEntity(SqlSession sqlSession,Integer id)    
+    {
+        MemberBrowsedStoryVideo entity = createEntity();
+        entity.setId(id);
+        MemberBrowsedStoryVideo newEntity = sqlSession.selectOne("MemberBrowsedStoryVideo.selectMemberBrowsedStoryVideo",entity);
+        return newEntity;
+    }
+    public  List<MemberBrowsedStoryVideo> getList()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<MemberBrowsedStoryVideo> list = null;
+        try        
+        {
+            list = getList(sqlSession);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getList(SqlSession sqlSession)    
+    {
+        List<MemberBrowsedStoryVideo> list = sqlSession.selectList("MemberBrowsedStoryVideo.selectMemberBrowsedStoryVideos");
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getList(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<MemberBrowsedStoryVideo> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getList(SqlSession sqlSession,String condition)    
+    {
+        List<MemberBrowsedStoryVideo> list = sqlSession.selectList("MemberBrowsedStoryVideo.selectMemberBrowsedStoryVideoByCondition",condition);
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getList(String condition,String orderBy)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<MemberBrowsedStoryVideo> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition,orderBy);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getList(SqlSession sqlSession,String condition,String orderBy)    
+    {
+        String conditionAndOrderBy = condition +" order by "+orderBy;
+        List<MemberBrowsedStoryVideo> list = sqlSession.selectList("MemberBrowsedStoryVideo.selectMemberBrowsedStoryVideoByCondition",conditionAndOrderBy);
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getList(int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<MemberBrowsedStoryVideo> list = null;
+        try        
+        {
+            list = getList(sqlSession,pageIndex,pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+        finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getList(SqlSession sqlSession,int pageIndex,int pageSize)    
+    {
+        String sql = String.format("select * from member_browsed_story_video limit %s, %s", pageSize * pageIndex, pageSize);
+        List<MemberBrowsedStoryVideo> list = sqlSession.selectList("MemberBrowsedStoryVideo.selectMemberBrowsedStoryVideoBySql", sql);
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getListPage(String condition,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<MemberBrowsedStoryVideo> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getList(SqlSession sqlSession,String condition,int pageIndex,int pageSize)    
+    {
+        String sql = condition + " limit " + pageSize * pageIndex + "," + pageSize;
+        List<MemberBrowsedStoryVideo> list = sqlSession.selectList("MemberBrowsedStoryVideo.selectMemberBrowsedStoryVideoByCondition",sql);
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getList(String condition,String orderBy,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<MemberBrowsedStoryVideo> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, orderBy, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getList(SqlSession sqlSession,String condition,String orderBy,int pageIndex,int pageSize)    
+    {
+        String sql = condition +" order by " + orderBy + " limit " + pageSize * pageIndex + " , " + pageSize;
+        List<MemberBrowsedStoryVideo> list = sqlSession.selectList("MemberBrowsedStoryVideo.selectMemberBrowsedStoryVideoByCondition",sql);
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getListBySql(String sql)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<MemberBrowsedStoryVideo> list = null;
+        try        
+        {
+            list = getListBySql(sqlSession,sql);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<MemberBrowsedStoryVideo> getListBySql(SqlSession sqlSession,String sql)    
+    {
+        List<MemberBrowsedStoryVideo> list = sqlSession.selectList("MemberBrowsedStoryVideo.selectMemberBrowsedStoryVideoBySql",sql);
+        return list;
+    }
+    public  Integer getCount(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer count = null;
+        try        
+        {
+            count = getCount(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return count;
+    }
+    public  Integer getCount(SqlSession sqlSession,String condition)    
+    {
+        Integer rows = sqlSession.selectOne("MemberBrowsedStoryVideo.selectCountByCondition",condition);
+        return rows;
+    }
+    public  int update(MemberBrowsedStoryVideo entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = update(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int update(SqlSession sqlSession,MemberBrowsedStoryVideo entity)throws IOException    
+    {
+        int rows = sqlSession.update("MemberBrowsedStoryVideo.updateMemberBrowsedStoryVideo",entity);
+        return rows;
+    }
+    public  MemberBrowsedStoryVideo createEntity()    
+    {
+        return new MemberBrowsedStoryVideo();
+    }
+    public  DataEntity createDataEntity()    
+    {
+        return new MemberBrowsedStoryVideo();
+    }
+    public  int clear()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = clear(sqlSession);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int clear(SqlSession sqlSession)    
+    {
+        int rows = 0;
+        List<MemberBrowsedStoryVideo> list = getList(sqlSession);
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  int deleteByStoryVideoId(Integer storyVideoId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = deleteByStoryVideoId(sqlSession,storyVideoId);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int deleteByMemberId(Integer memberId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = deleteByMemberId(sqlSession,memberId);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int deleteByStoryVideoId(SqlSession sqlSession,Integer storyVideoId)    
+    {
+        List<MemberBrowsedStoryVideo> list = getListByStoryVideoId(sqlSession,storyVideoId);
+        int rows = batchDeleteByEntity(sqlSession,list);
+        return rows;
+    }
+    public  int deleteByMemberId(SqlSession sqlSession,Integer memberId)    
+    {
+        List<MemberBrowsedStoryVideo> list = getListByMemberId(sqlSession,memberId);
+        int rows = batchDeleteByEntity(sqlSession,list);
+        return rows;
+    }
+    public  List<MemberBrowsedStoryVideo> getListByStoryVideoId(Integer storyVideoId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<MemberBrowsedStoryVideo> entitys = null;
+         try        
+        {
+            entitys = getListByStoryVideoId(sqlSession,storyVideoId);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entitys;
+    }
+    public  List<MemberBrowsedStoryVideo> getListByMemberId(Integer memberId)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<MemberBrowsedStoryVideo> entitys = null;
+         try        
+        {
+            entitys = getListByMemberId(sqlSession,memberId);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entitys;
+    }
+    public  List<MemberBrowsedStoryVideo> getListByStoryVideoId(SqlSession sqlSession,Integer storyVideoId)    
+    {
+        List<MemberBrowsedStoryVideo> entitys = sqlSession.selectList("MemberBrowsedStoryVideo.selectMemberBrowsedStoryVideoByStoryVideoId",storyVideoId);
+        return entitys;
+    }
+    public  List<MemberBrowsedStoryVideo> getListByMemberId(SqlSession sqlSession,Integer memberId)    
+    {
+        List<MemberBrowsedStoryVideo> entitys = sqlSession.selectList("MemberBrowsedStoryVideo.selectMemberBrowsedStoryVideoByMemberId",memberId);
+        return entitys;
+    }
+    public  MemberBrowsedStoryVideo getEntityById(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        MemberBrowsedStoryVideo entity = null;
+        try        
+        {
+             entity = getEntityById(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entity;
+    }
+    public  MemberBrowsedStoryVideo getEntityById(SqlSession sqlSession,Integer id)    
+    {
+        MemberBrowsedStoryVideo entity = sqlSession.selectOne("selectMemberBrowsedStoryVideoByCondition","id='"+id+"'");
+        return entity;
+    }
+    public  boolean existsId(Integer id)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Boolean flag = null;
+        try        
+        {
+            flag = existsId(sqlSession,id);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return flag;
+    }
+    public  boolean existsId(SqlSession sqlSession,Integer id)    
+    {
+        Integer rows = sqlSession.selectOne("MemberBrowsedStoryVideo.selectIntBySql","select count(*) from member_browsed_story_video where id= '"+id+"'");
+        return rows>0?true:false;
+    }
+}

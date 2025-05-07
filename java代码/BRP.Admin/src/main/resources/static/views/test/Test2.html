@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Test.html</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<link rel="stylesheet" href="../../themes/default/easyui.css"
+	type="text/css"></link>
+<script>
+	$(function() {
+		//$("#cmbCmsCommentStatus").combobox("loadData", {});
+
+		bindComboBox("cmbCmsCommentStatus", "cms_comment_status", "code",
+				"name", "display_order", "", "");
+	});
+</script>
+</head>
+
+<body>
+	<input id="cmbCmsCommentStatus" class="easyui-combobox" />
+</body>
+</html>

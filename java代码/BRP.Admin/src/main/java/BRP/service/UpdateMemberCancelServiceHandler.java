@@ -1,0 +1,62 @@
+package BRP.service;
+
+import BRP.data.BookOrderTypeCodes;
+import BRP.data.Member;
+import BRP.data.MemberCard;
+import BRP.data.ViewBookOrderItem;
+import BRP.model.*;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.UpdateServiceHandler;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.sql.Timestamp;
+
+/**
+ * 会员注销
+ */
+public class UpdateMemberCancelServiceHandler extends UpdateServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+            JSONObject jData = this.getRequestData(request);
+            Integer memberId = JsonHelper.getInt(jData, "memberId");
+            Integer memberCardId = JsonHelper.getInt(jData, "memberCardId");
+            String companyUserName = JsonHelper.getString(jData, "companyUserName");
+            //校验当前会员是否存在未还书籍
+            Integer bookCount = BookManager.getInstance().getCount(sqlSession, "member_id=" + memberId);
+            String condition = String.format(
+                    " member_id = %d and is_returned is not true and book_order_type_code='%s'",
+                    memberId, BookOrderTypeCodes.Borrow);
+            Integer itemCount = ViewBookOrderItemManager.getInstance().getCount(sqlSession, condition);
+            if (bookCount > 0 || itemCount > 0) {
+                this.writeErrorResponse(response, "当前会员存在未还书籍");
+                return;
+            }
+
+
+            Member member = MemberManager.getInstance().getEntity(sqlSession, memberId);
+            member.setIsCancel(true); // 改为注销会员状态
+            member.setIsSign(true); // 改为预登记会员可重新绑卡
+            member.setCancelTime(new Timestamp(System.currentTimeMillis())); // 注销时间
+            member.setCancelOperator(companyUserName); // 操作人
+            MemberManager.getInstance().update(sqlSession, member);
+
+            MemberCard theMemberCard = MemberCardManager.getInstance().getEntity(sqlSession, memberCardId);
+            theMemberCard.setDisabled(true);
+            MemberCardManager.getInstance().update(sqlSession, theMemberCard);
+
+            sqlSession.commit();
+            this.writeSuccessResponse(response);
+        } catch (Exception e) {
+            sqlSession.rollback();
+            e.printStackTrace();
+        } finally {
+            sqlSession.close();
+        }
+    }
+}

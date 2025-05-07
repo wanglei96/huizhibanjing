@@ -1,0 +1,13 @@
+{
+  "navigationBarTitleText": "配送路线管理",
+  "navigationBarBackgroundColor": "#5EAC59",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "unitable": "/components/uni-table/uni-table",
+    "unitbody": "/components/uni-tbody/uni-tbody",
+    "unitr": "/components/uni-tr/uni-tr",
+    "unitd": "/components/uni-td/uni-td",
+    "unith": "/components/uni-th/uni-th",
+    "unithead": "/components/uni-thead/uni-thead"
+  }
+}

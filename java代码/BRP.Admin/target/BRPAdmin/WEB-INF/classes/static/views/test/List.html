@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>List.html</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script>
+	var pageIndex = 0;
+	$(function() {
+		$("#btnQuery").click(function() {
+			var data = new Object();
+			data.tableName = "view_sys_user";
+			data.orderBy = "create_time desc";
+			data.condition = getCondition();
+			data.pageIndex = pageIndex;//可选
+			data.pageSize = 10;//可选
+			alert(JSON.stringify(data));
+			call("GetTable", data, function(result) {
+				alert(JSON.stringify(result.data));
+				outputList(result.data);
+			});
+		})
+	});
+	function outputList(dataList) {
+		$("#tableList tr:gt(0)").remove();
+		for ( var i = 0; i < dataList.length; i++) {
+			var dataItem = dataList[i];
+			outputListItem(dataItem);
+		}
+	}
+	function outputListItem(dataItem) {
+		var htmlTr = "<tr>";
+		htmlTr += "<td>" + dataItem.login_name + "</td>";
+		htmlTr += "<td>"
+				+ (dataItem.true_name == null ? "" : dataItem.true_name)
+				+ "</td>";
+		htmlTr += "<td>"
+				+ (dataItem.sys_organization_name == null ? ""
+						: dataItem.sys_organization_name) + "</td>";
+		htmlTr += "<td>";
+		htmlTr += "<a href='javascript:void(0)' onclick='return openDialog(\"SysUserDetail.html?mode=view&id="
+				+ dataItem.id + "\", 800, 500)'>查看</a>";
+		htmlTr += "</td>";
+		htmlTr += "</tr>";
+		$("#tableList").append(htmlTr);
+	}
+
+	function getCondition() {
+		var condition = "";
+		if ($("#txtLoginName").val() != "") {
+			condition += "login_name like '%" + $("#txtLoginName").val() + "%'";
+		}
+		if ($("#txtTrueName").val() != "") {
+			if (condition != "") {
+				condition += " and "
+			}
+			condition += "true_name like '%" + $("#txtTrueName").val() + "%'";
+		}
+		return condition;
+	}
+</script>
+</head>
+
+<body>
+	<div class="title_bar">测试页面</div>
+	<div class="command_bar">
+		<input id="btnQuery" value="查询" type="button" />
+	</div>
+	<div class="query_panel">
+		<div class="query_item">
+			<div class="query_item_caption">账号：</div>
+			<div class="query_item_value">
+				<input type="text" class="query_item_textbox" id="txtLoginName">
+			</div>
+		</div>
+		<div class="query_item">
+			<div class="query_item_caption">姓名：</div>
+			<div class="query_item_value">
+				<input type="text" class="query_item_textbox" id="txtTrueName">
+			</div>
+		</div>
+	</div>
+	<div class="grid_panel">
+		<table id="tableList">
+			<tr>
+				<td>账号</td>
+				<td>姓名</td>
+				<td>部门</td>
+				<td>操作</td>
+			</tr>
+		</table>
+	</div>
+	<div clas s="total_panel"></div>
+</body>
+</html>

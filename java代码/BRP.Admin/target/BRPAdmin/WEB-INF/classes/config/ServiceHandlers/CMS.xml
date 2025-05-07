@@ -1,0 +1,1176 @@
+<ServiceHandlers>
+    <ServiceHandler Name="AddCmsChannel" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager" DataEntityType="strosoft.cms.data.CmsChannel"
+                    TableName="cms_channel" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="name" Caption="标题"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsChannel" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager" DataEntityType="strosoft.cms.data.CmsChannel"
+                    TableName="cms_channel">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsChannelList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager" DataEntityType="strosoft.cms.data.CmsChannel"
+                    TableName="cms_channel">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsChannel" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager" DataEntityType="strosoft.cms.data.CmsChannel"
+                    TableName="cms_channel" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="id"></RequiredField>
+            <RequiredField DataName="name" Caption="标题"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsChannel" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager" DataEntityType="strosoft.cms.data.CmsChannel"
+                    TableName="cms_channel">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsChannel" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager" DataEntityType="strosoft.cms.data.CmsChannel"
+                    TableName="cms_channel">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsChannelChannelGroup" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelChannelGroup" TableName="cms_channel_channel_group"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="cmsChannelId" Caption="栏目ID"></RequiredField>
+            <RequiredField DataName="cmsChannelGroupCode" Caption="栏目分类编码"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsChannelChannelGroup" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelChannelGroup" TableName="cms_channel_channel_group">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsChannelChannelGroupList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelChannelGroup" TableName="cms_channel_channel_group">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsChannelChannelGroup" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelChannelGroup" TableName="cms_channel_channel_group"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="id"></RequiredField>
+            <RequiredField DataName="cmsChannelId" Caption="栏目ID"></RequiredField>
+            <RequiredField DataName="cmsChannelGroupCode" Caption="栏目分类编码"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsChannelChannelGroup" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelChannelGroup" TableName="cms_channel_channel_group">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsChannelChannelGroup" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelChannelGroup" TableName="cms_channel_channel_group">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsChannelGroup" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelGroup" TableName="cms_channel_group" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+            <RequiredField DataName="name" Caption="name"></RequiredField>
+            <RequiredField DataName="cmsSiteId" Caption="cmsSiteId"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsChannelGroup" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelGroup" TableName="cms_channel_group">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsChannelGroupList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelGroup" TableName="cms_channel_group">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsChannelGroup" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelGroup" TableName="cms_channel_group" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+            <RequiredField DataName="name" Caption="name"></RequiredField>
+            <RequiredField DataName="cmsSiteId" Caption="cmsSiteId"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsChannelGroup" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelGroup" TableName="cms_channel_group">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsChannelGroup" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelGroup" TableName="cms_channel_group">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsChannelLanguage" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsChannelLanguage" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsChannelLanguageList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsChannelLanguage" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsChannelLanguage" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsChannelLanguage" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsComment" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentManager" DataEntityType="strosoft.cms.data.CmsComment"
+                    TableName="cms_comment" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsComment" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentManager" DataEntityType="strosoft.cms.data.CmsComment"
+                    TableName="cms_comment">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsCommentList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentManager" DataEntityType="strosoft.cms.data.CmsComment"
+                    TableName="cms_comment">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsComment" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentManager" DataEntityType="strosoft.cms.data.CmsComment"
+                    TableName="cms_comment" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="id"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsComment" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentManager" DataEntityType="strosoft.cms.data.CmsComment"
+                    TableName="cms_comment">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsComment" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentManager" DataEntityType="strosoft.cms.data.CmsComment"
+                    TableName="cms_comment">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsCommentStatus" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentStatus" TableName="cms_comment_status"
+                    PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsCommentStatus" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentStatus" TableName="cms_comment_status">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsCommentStatusList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentStatus" TableName="cms_comment_status">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsCommentStatus" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentStatus" TableName="cms_comment_status"
+                    PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsCommentStatus" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentStatus" TableName="cms_comment_status">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsCommentStatus" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentStatus" TableName="cms_comment_status">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsCommentType" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentType" TableName="cms_comment_type" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+            <RequiredField DataName="name" Caption="name"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsCommentType" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentType" TableName="cms_comment_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsCommentTypeList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentType" TableName="cms_comment_type">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsCommentType" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentType" TableName="cms_comment_type" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+            <RequiredField DataName="name" Caption="name"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsCommentType" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentType" TableName="cms_comment_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsCommentType" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsCommentType" TableName="cms_comment_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsContent" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager" DataEntityType="strosoft.cms.data.CmsContent"
+                    TableName="cms_content" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContent" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager" DataEntityType="strosoft.cms.data.CmsContent"
+                    TableName="cms_content">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager" DataEntityType="strosoft.cms.data.CmsContent"
+                    TableName="cms_content">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsContent" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager" DataEntityType="strosoft.cms.data.CmsContent"
+                    TableName="cms_content" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="id"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsContent" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager" DataEntityType="strosoft.cms.data.CmsContent"
+                    TableName="cms_content">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsContent" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager" DataEntityType="strosoft.cms.data.CmsContent"
+                    TableName="cms_content">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsContentGroup" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsContentGroup" TableName="cms_content_group"
+                    PrimaryKeys="code,cms_site_id">
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+            <RequiredField DataName="name" Caption="name"></RequiredField>
+            <RequiredField DataName="cmsSiteId" Caption="cmsSiteId"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+            <PrimaryKey FieldName="cms_site_id" Caption="" DataName="cmsSiteId"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentGroup" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsContentGroup" TableName="cms_content_group">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+            <PrimaryKey FieldName="cms_site_id" Caption="" DataName="cmsSiteId"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentGroupList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsContentGroup" TableName="cms_content_group">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsContentGroup" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsContentGroup" TableName="cms_content_group"
+                    PrimaryKeys="code,cms_site_id">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+            <UniqueField FieldName="cms_site_id" DataName="cmsSiteId" Caption="cmsSiteId"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+            <RequiredField DataName="name" Caption="name"></RequiredField>
+            <RequiredField DataName="cmsSiteId" Caption="cmsSiteId"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsContentGroup" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsContentGroup" TableName="cms_content_group">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+            <PrimaryKey FieldName="cms_site_id" Caption="" DataName="cmsSiteId"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsContentGroup" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentGroupManager"
+                    DataEntityType="strosoft.cms.data.CmsContentGroup" TableName="cms_content_group">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+            <PrimaryKey FieldName="cms_site_id" Caption="" DataName="cmsSiteId"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsContentLanguage" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentLanguage" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentLanguageList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsContentLanguage" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsContentLanguage" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsContentLanguage" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="ID" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsContentStatus" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsContentStatus" TableName="cms_content_status"
+                    PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentStatus" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsContentStatus" TableName="cms_content_status">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentStatusList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsContentStatus" TableName="cms_content_status">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsContentStatus" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsContentStatus" TableName="cms_content_status"
+                    PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsContentStatus" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsContentStatus" TableName="cms_content_status">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsContentStatus" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentStatusManager"
+                    DataEntityType="strosoft.cms.data.CmsContentStatus" TableName="cms_content_status">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsContentTag" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTagManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTag" TableName="cms_content_tag"
+                    PrimaryKeys="cms_content_id,tag">
+        <RequredFields>
+            <RequiredField DataName="cmsContentId" Caption="内容id"></RequiredField>
+            <RequiredField DataName="tag" Caption="标签"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="cms_content_id" Caption="内容id" DataName="cmsContentId"></PrimaryKey>
+            <PrimaryKey FieldName="tag" Caption="标签" DataName="tag"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentTag" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTagManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTag" TableName="cms_content_tag">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="cms_content_id" Caption="内容id" DataName="cmsContentId"></PrimaryKey>
+            <PrimaryKey FieldName="tag" Caption="标签" DataName="tag"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentTagList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTagManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTag" TableName="cms_content_tag">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsContentTag" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTagManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTag" TableName="cms_content_tag"
+                    PrimaryKeys="cms_content_id,tag">
+        <UniqueFields>
+            <UniqueField FieldName="cms_content_id" DataName="cmsContentId" Caption="内容id"></UniqueField>
+            <UniqueField FieldName="tag" DataName="tag" Caption="标签"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="cmsContentId" Caption="内容id"></RequiredField>
+            <RequiredField DataName="tag" Caption="标签"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsContentTag" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTagManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTag" TableName="cms_content_tag">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="cms_content_id" Caption="内容id" DataName="cmsContentId"></PrimaryKey>
+            <PrimaryKey FieldName="tag" Caption="标签" DataName="tag"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsContentTag" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTagManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTag" TableName="cms_content_tag">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="cms_content_id" Caption="内容id" DataName="cmsContentId"></PrimaryKey>
+            <PrimaryKey FieldName="tag" Caption="标签" DataName="tag"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsContentTransferType" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTransferTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTransferType" TableName="cms_content_transfer_type"
+                    PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentTransferType" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTransferTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTransferType" TableName="cms_content_transfer_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentTransferTypeList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTransferTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTransferType" TableName="cms_content_transfer_type">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsContentTransferType" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTransferTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTransferType" TableName="cms_content_transfer_type"
+                    PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsContentTransferType" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTransferTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTransferType" TableName="cms_content_transfer_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsContentTransferType" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentTransferTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsContentTransferType" TableName="cms_content_transfer_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsInclude" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager" DataEntityType="strosoft.cms.data.CmsInclude"
+                    TableName="cms_include" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsInclude" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager" DataEntityType="strosoft.cms.data.CmsInclude"
+                    TableName="cms_include">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsIncludeList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager" DataEntityType="strosoft.cms.data.CmsInclude"
+                    TableName="cms_include">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsInclude" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager" DataEntityType="strosoft.cms.data.CmsInclude"
+                    TableName="cms_include" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="id"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsInclude" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager" DataEntityType="strosoft.cms.data.CmsInclude"
+                    TableName="cms_include">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsInclude" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager" DataEntityType="strosoft.cms.data.CmsInclude"
+                    TableName="cms_include">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsLanguage" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="编码"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="编码"></RequiredField>
+            <RequiredField DataName="name" Caption="名称"></RequiredField>
+            <RequiredField DataName="cmsSiteId" Caption="站点ID"></RequiredField>
+            <RequiredField DataName="path" Caption="生成路径"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="编码" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsLanguage" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="编码" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsLanguageList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsLanguage" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="编码"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="编码"></RequiredField>
+            <RequiredField DataName="name" Caption="名称"></RequiredField>
+            <RequiredField DataName="cmsSiteId" Caption="站点ID"></RequiredField>
+            <RequiredField DataName="path" Caption="生成路径"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsLanguage" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="编码" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsLanguage" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="编码" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsLinkType" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLinkTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsLinkType" TableName="cms_link_type" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+            <RequiredField DataName="name" Caption="name"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsLinkType" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLinkTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsLinkType" TableName="cms_link_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsLinkTypeList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLinkTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsLinkType" TableName="cms_link_type">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsLinkType" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLinkTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsLinkType" TableName="cms_link_type" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+            <RequiredField DataName="name" Caption="name"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsLinkType" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLinkTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsLinkType" TableName="cms_link_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsLinkType" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLinkTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsLinkType" TableName="cms_link_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsSite" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteManager" DataEntityType="strosoft.cms.data.CmsSite"
+                    TableName="cms_site" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="name" Caption="站点名称"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsSite" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteManager" DataEntityType="strosoft.cms.data.CmsSite"
+                    TableName="cms_site">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsSiteList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteManager" DataEntityType="strosoft.cms.data.CmsSite"
+                    TableName="cms_site">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsSite" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteManager" DataEntityType="strosoft.cms.data.CmsSite"
+                    TableName="cms_site" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="id"></RequiredField>
+            <RequiredField DataName="name" Caption="站点名称"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsSite" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteManager" DataEntityType="strosoft.cms.data.CmsSite"
+                    TableName="cms_site">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsSite" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteManager" DataEntityType="strosoft.cms.data.CmsSite"
+                    TableName="cms_site">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsSiteType" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsSiteType" TableName="cms_site_type" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+            <RequiredField DataName="name" Caption="name"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsSiteType" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsSiteType" TableName="cms_site_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsSiteTypeList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsSiteType" TableName="cms_site_type">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsSiteType" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsSiteType" TableName="cms_site_type" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+            <RequiredField DataName="name" Caption="name"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsSiteType" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsSiteType" TableName="cms_site_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsSiteType" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsSiteType" TableName="cms_site_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsTemplate" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplate" TableName="cms_template" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+            <UniqueField FieldName="path" DataName="path" Caption="path"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsTemplate" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplate" TableName="cms_template">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsTemplateList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplate" TableName="cms_template">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsTemplate" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplate" TableName="cms_template" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+            <UniqueField FieldName="path" DataName="path" Caption="path"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="id"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsTemplate" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplate" TableName="cms_template">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsTemplate" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplate" TableName="cms_template">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsTemplateTag" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateTag" TableName="cms_template_tag" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="name" Caption="标签名称"></RequiredField>
+            <RequiredField DataName="elementName" Caption="html元素名称"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsTemplateTag" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateTag" TableName="cms_template_tag">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsTemplateTagList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateTag" TableName="cms_template_tag">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsTemplateTag" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateTag" TableName="cms_template_tag" PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="id"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="id" Caption="id"></RequiredField>
+            <RequiredField DataName="name" Caption="标签名称"></RequiredField>
+            <RequiredField DataName="elementName" Caption="html元素名称"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsTemplateTag" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateTag" TableName="cms_template_tag">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsTemplateTag" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateTag" TableName="cms_template_tag">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsTemplateType" Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateType" TableName="cms_template_type" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsTemplateType" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateType" TableName="cms_template_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsTemplateTypeList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateType" TableName="cms_template_type">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsTemplateType" Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateType" TableName="cms_template_type" PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="code"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="code"></RequiredField>
+        </RequredFields>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsTemplateType" Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateType" TableName="cms_template_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteCmsTemplateType" Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTypeManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateType" TableName="cms_template_type">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="code" Caption="" DataName="code"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsChannel" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsChannelManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsChannel" TableName="view_cms_channel">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="id" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsChannelList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsChannelManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsChannel" TableName="view_cms_channel">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsChannelLanguage" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsChannelLanguage" TableName="view_cms_channel_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="id" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsChannelLanguageList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsChannelLanguage" TableName="view_cms_channel_language">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsComment" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsCommentManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsComment" TableName="view_cms_comment">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="id" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsCommentList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsCommentManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsComment" TableName="view_cms_comment">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsContent" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsContentManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsContent" TableName="view_cms_content">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="id" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsContentList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsContentManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsContent" TableName="view_cms_content">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsContentLanguage" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsContentLanguage" TableName="view_cms_content_language">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="id" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsContentLanguageList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsContentLanguage" TableName="view_cms_content_language">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsSite" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsSiteManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsSite" TableName="view_cms_site">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="id" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsSiteList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsSiteManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsSite" TableName="view_cms_site">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsTemplate" Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsTemplateManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsTemplate" TableName="view_cms_template">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" Caption="id" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsTemplateList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsTemplateManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsTemplate" TableName="view_cms_template">
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+</ServiceHandlers>

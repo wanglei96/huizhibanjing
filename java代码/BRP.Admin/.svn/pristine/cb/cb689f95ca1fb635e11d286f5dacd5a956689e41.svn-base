@@ -1,0 +1,79 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.model.*;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.util.StringUtils;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/*
+ * 会员书箱信息登记
+ */
+public class UpdateBookcaseInfoServiceHandler extends ServiceHandler {
+
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+
+        SqlSession sqlSession = null;
+        try {
+            sqlSession = MyBatisManager.getInstance().openSession();
+            JSONObject jData = this.getRequestData(request);
+            Integer memberId = JsonHelper.getInt(jData, "memberId"); // 会员id
+            String paymentMethodCode = JsonHelper.getString(jData, "paymentMethodCode"); // 支付方式
+            BigDecimal bookboxAmount = JsonHelper.getDecimal(jData, "bookboxAmount"); // 书箱费
+            BigDecimal addAmount = JsonHelper.getDecimal(jData, "addAmount"); // 增加收费
+            Integer employeeId = JsonHelper.getInt(jData, "employeeId"); // 办理人
+            String bookboxRemark = JsonHelper.getString(jData, "bookboxRemark"); // 支付方式
+            String bookboxPlace = JsonHelper.getString(jData, "bookboxPlace"); // 书箱位置
+
+            Member member = MemberManager.getInstance().getEntity(memberId);
+            member.setBookboxAmount(bookboxAmount.add(addAmount));
+            member.setPaymentMethodCode(paymentMethodCode);
+            if (!StringUtils.isEmpty(bookboxRemark) && !bookboxRemark.equals("null")) {
+                member.setBookboxRemark(bookboxRemark);
+            } else {
+                member.setBookboxRemark(null);
+            }
+            if(!StringHelper.isNullOrEmpty(bookboxPlace)){
+                member.setBookboxPlace(bookboxPlace);
+            }
+            MemberManager.getInstance().update(sqlSession, member);
+            //添加pay_order账单
+            PayOrder newPayOrder = new PayOrder();
+            newPayOrder.setCompanyId(member.getCompanyId());
+            newPayOrder.setAmount(addAmount);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            newPayOrder.setMemberId(memberId);
+            Date now = new Date();
+            String payOrderNo = sdf.format(now);
+            newPayOrder.setPayOrderNo(payOrderNo);
+            Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+            newPayOrder.setBusinessDate(currentTimestamp);
+            newPayOrder.setPaymentItemCode("BookcaseFee");
+            newPayOrder.setPayTime(currentTimestamp);
+            newPayOrder.setOperatorId(employeeId);
+            newPayOrder.setPaymentMethodCode(member.getPaymentMethodCode());
+            newPayOrder.setIsFinished(true);
+            newPayOrder.setIsPaid(true);
+            PayOrderManager.getInstance().add(sqlSession, newPayOrder);
+            sqlSession.commit();
+            this.writeSuccessResponse(response);
+        } catch (Exception e) {
+            sqlSession.rollback();
+            e.printStackTrace();
+        } finally {
+            sqlSession.close();
+        }
+    }
+}

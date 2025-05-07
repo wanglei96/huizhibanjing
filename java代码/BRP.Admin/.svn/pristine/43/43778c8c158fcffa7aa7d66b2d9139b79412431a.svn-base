@@ -1,0 +1,37 @@
+package BRP.service;
+
+import BRP.model.TimeTypes;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.jaad.aac.tools.IS;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+
+public class GetMemberCardListByInfoServiceHandler extends ServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        Integer companyId = JsonHelper.getInt(jData, "companyId");
+        String memberInfoQuery = JsonHelper.getString(jData, "memberInfoQuery");
+        String sql = "select member_card.id,\n" +
+                "member_card.card_no as cardNo,\n" +
+                "\t\t\t member.name as memberName,\n" +
+                "\t\t\t member.gender as gender,\n" +
+                "\t\t\t member.mobile_phone as mobilePhone,\n" +
+                "\t\t\t member_card_type.name as memberCardTypeName\n" +
+                "from member_card\n" +
+                "LEFT JOIN member ON member_card.member_id = member.id\n" +
+                "LEFT JOIN member_card_type ON member_card_type.id =member_card.member_card_type_id\n" +
+                "where member_card.company_id = " + companyId + " and member_id is not null and disabled IS NOT TRUE and\n" +
+                "member.name like '%" + memberInfoQuery + "%'  or member_card.card_no  like '%" + memberInfoQuery + "%' or member.mobile_phone like '%" + memberInfoQuery + "%'";
+        ArrayList<LinkedHashMap<String, Object>> lhmData = MyBatisManager.getInstance().executeHashMapList(sql);
+        //JSONArray jarrData =JsonHelper.toJSONArray(lhmData);
+        this.writeSuccessResponse(response, lhmData);
+    }
+}

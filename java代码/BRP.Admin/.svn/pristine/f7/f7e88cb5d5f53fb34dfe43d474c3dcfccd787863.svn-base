@@ -1,0 +1,157 @@
+package BRP.data;
+
+import java.util.List;
+
+public class BookOutOrderInfo {
+    public Integer getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(Integer memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
+
+    public String getMemberMobilePhone() {
+        return memberMobilePhone;
+    }
+
+    public void setMemberMobilePhone(String memberMobilePhone) {
+        this.memberMobilePhone = memberMobilePhone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getDeliverAreaName() {
+        return deliverAreaName;
+    }
+
+    public void setDeliverAreaName(String deliverAreaName) {
+        this.deliverAreaName = deliverAreaName;
+    }
+
+    public Integer getDeliverAreaId() {
+        return deliverAreaId;
+    }
+
+    public void setDeliverAreaId(Integer deliverAreaId) {
+        this.deliverAreaId = deliverAreaId;
+    }
+
+    public List<ViewBookOutOrder> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<ViewBookOutOrder> children) {
+        this.children = children;
+    }
+
+    public String getMemberNo() {
+        return memberNo;
+    }
+
+    public void setMemberNo(String memberNo) {
+        this.memberNo = memberNo;
+    }
+
+    public String getDeliverLineName() {
+        return deliverLineName;
+    }
+
+    public void setDeliverLineName(String deliverLineName) {
+        this.deliverLineName = deliverLineName;
+    }
+
+    public Integer getPickTotal() {
+        return pickTotal;
+    }
+
+    public void setPickTotal(Integer pickTotal) {
+        this.pickTotal = pickTotal;
+    }
+
+    public Integer getyPicKNum() {
+        return yPicKNum;
+    }
+
+    public void setyPicKNum(Integer yPicKNum) {
+        this.yPicKNum = yPicKNum;
+    }
+
+    public Integer getnPicKNum() {
+        return nPicKNum;
+    }
+
+    public void setnPicKNum(Integer nPicKNum) {
+        this.nPicKNum = nPicKNum;
+    }
+
+    public Integer getBookOrderId() {
+        return bookOrderId;
+    }
+
+    public void setBookOrderId(Integer bookOrderId) {
+        this.bookOrderId = bookOrderId;
+    }
+
+    private Integer bookOrderId;
+    private Integer memberId;
+    private String memberName;
+    private String memberMobilePhone;
+    private String address;
+    private String deliverAreaName;
+    private Integer deliverAreaId;
+
+    private String memberNo;
+    private String deliverLineName; // 配送线路
+    private Integer pickTotal; // 总共需拣本数
+
+    private Integer yPicKNum; // 已拣本数
+
+    private Integer nPicKNum; // 未拣本数
+
+    private String bookcaseName; // 书柜名称
+
+    private String deliverTimeText; //配送时间
+
+    private String errorRemark; // 异常信息
+
+    public String getBookcaseName() {
+        return bookcaseName;
+    }
+
+    public void setBookcaseName(String bookcaseName) {
+        this.bookcaseName = bookcaseName;
+    }
+
+    private List<ViewBookOutOrder> children;
+
+    public String getDeliverTimeText() {
+        return deliverTimeText;
+    }
+
+    public void setDeliverTimeText(String deliverTimeText) {
+        this.deliverTimeText = deliverTimeText;
+    }
+
+    public String getErrorRemark() {
+        return errorRemark;
+    }
+
+    public void setErrorRemark(String errorRemark) {
+        this.errorRemark = errorRemark;
+    }
+}

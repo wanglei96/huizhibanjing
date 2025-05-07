@@ -1,0 +1,576 @@
+package BRP.data;
+import BRP.data.PaymentMethod;
+import org.apache.ibatis.session.SqlSession;
+import BRP.model.BookCompensationManager;
+import BRP.model.PayOrderManager;
+import BRP.model.MemberCardServiceTimeLogManager;
+import strosoft.app.common.MyBatisManager;
+import java.util.*;
+import BRP.model.MemberManager;
+import java.io.IOException;
+import strosoft.app.data.DataEntity;
+import BRP.model.BookDamageManager;
+import strosoft.app.common.CodeDataManager;
+import BRP.model.SalesOrderManager;
+import BRP.model.MemberCardManager;
+import java.math.*;
+public class PaymentMethodMaster extends CodeDataManager 
+{
+    public  int add(PaymentMethod entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = add(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int add(SqlSession sqlSession,PaymentMethod entity)    
+    {
+        int rows = sqlSession.insert("PaymentMethod.insertPaymentMethod",entity);
+        return rows;
+    }
+    public  int add(DataEntity dataEntity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer num = null;
+        try        
+        {
+            num  = add(sqlSession,dataEntity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return num;
+    }
+    public  int add(SqlSession sqlSession,DataEntity dataEntity)    
+    {
+        return add(sqlSession,(PaymentMethod)dataEntity);
+    }
+    public  int addList(List<PaymentMethod> list)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = addList(sqlSession,list);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int addList(SqlSession sqlSession,List<PaymentMethod> list)    
+    {
+        if(null == list || list.size() == 0)        
+        {
+            return 0;
+        }
+        int rows = sqlSession.insert("PaymentMethod.insertPaymentMethods",list);
+        return rows;
+    }
+    public  int delete(String code)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = delete(sqlSession,code);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int delete(SqlSession sqlSession,String code)    
+    {
+        int rows = delete(sqlSession,getEntity(sqlSession,code));
+        return rows;
+    }
+    public  int delete(DataEntity entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = delete(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int delete(SqlSession sqlSession,DataEntity entity)    
+    {
+        BookCompensationManager.getInstance().deleteByPaymentMethodCode(sqlSession,((PaymentMethod)entity).getCode());
+        BookDamageManager.getInstance().deleteByPaymentMethodCode(sqlSession,((PaymentMethod)entity).getCode());
+        MemberManager.getInstance().deleteByPaymentMethodCode(sqlSession,((PaymentMethod)entity).getCode());
+        MemberCardManager.getInstance().deleteByPaymentMethodCode(sqlSession,((PaymentMethod)entity).getCode());
+        MemberCardServiceTimeLogManager.getInstance().deleteByPaymentMethodCode(sqlSession,((PaymentMethod)entity).getCode());
+        PayOrderManager.getInstance().deleteByPaymentMethodCode(sqlSession,((PaymentMethod)entity).getCode());
+        SalesOrderManager.getInstance().deleteByPaymentMethodCode(sqlSession,((PaymentMethod)entity).getCode());
+        int rows = sqlSession.delete("PaymentMethod.deletePaymentMethod",entity);
+        return rows;
+    }
+    public  int batchDelete(List<String> list)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            for(int i=0;i<list.size();i++)            
+            {
+                rows += delete(sqlSession,list.get(i));
+            }
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            rows=0;
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int batchDelete(SqlSession sqlSession,List<String> list)    
+    {
+        int rows = 0;
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  int batchDeleteByEntity(SqlSession sqlSession,List<? extends DataEntity> list)    
+    {
+        int rows = 0;
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  DataEntity getDataEntity(String code)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        DataEntity newDataEntity = null;
+        try        
+        {
+            newDataEntity = getDataEntity(sqlSession,code);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return newDataEntity;
+    }
+    public  DataEntity getDataEntity(SqlSession sqlSession,String code)    
+    {
+        DataEntity newDataEntity = getEntity(sqlSession,code);
+         return newDataEntity;
+    }
+    public  PaymentMethod getEntity(String code)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        PaymentMethod newEntity = null;
+        try        
+        {
+            newEntity = getEntity(sqlSession,code);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return newEntity;
+    }
+    public  PaymentMethod getEntity(SqlSession sqlSession,String code)    
+    {
+        PaymentMethod entity = createEntity();
+        entity.setCode(code);
+        PaymentMethod newEntity = sqlSession.selectOne("PaymentMethod.selectPaymentMethod",entity);
+        return newEntity;
+    }
+    public  List<PaymentMethod> getList()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<PaymentMethod> list = null;
+        try        
+        {
+            list = getList(sqlSession);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<PaymentMethod> getList(SqlSession sqlSession)    
+    {
+        List<PaymentMethod> list = sqlSession.selectList("PaymentMethod.selectPaymentMethods");
+        return list;
+    }
+    public  List<PaymentMethod> getList(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<PaymentMethod> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<PaymentMethod> getList(SqlSession sqlSession,String condition)    
+    {
+        List<PaymentMethod> list = sqlSession.selectList("PaymentMethod.selectPaymentMethodByCondition",condition);
+        return list;
+    }
+    public  List<PaymentMethod> getList(String condition,String orderBy)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<PaymentMethod> list = null;
+        try        
+        {
+            list = getList(sqlSession,condition,orderBy);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<PaymentMethod> getList(SqlSession sqlSession,String condition,String orderBy)    
+    {
+        String conditionAndOrderBy = condition +" order by "+orderBy;
+        List<PaymentMethod> list = sqlSession.selectList("PaymentMethod.selectPaymentMethodByCondition",conditionAndOrderBy);
+        return list;
+    }
+    public  List<PaymentMethod> getList(int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<PaymentMethod> list = null;
+        try        
+        {
+            list = getList(sqlSession,pageIndex,pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+        finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<PaymentMethod> getList(SqlSession sqlSession,int pageIndex,int pageSize)    
+    {
+        String sql = String.format("select * from payment_method limit %s, %s", pageSize * pageIndex, pageSize);
+        List<PaymentMethod> list = sqlSession.selectList("PaymentMethod.selectPaymentMethodBySql", sql);
+        return list;
+    }
+    public  List<PaymentMethod> getListPage(String condition,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<PaymentMethod> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<PaymentMethod> getList(SqlSession sqlSession,String condition,int pageIndex,int pageSize)    
+    {
+        String sql = condition + " limit " + pageSize * pageIndex + "," + pageSize;
+        List<PaymentMethod> list = sqlSession.selectList("PaymentMethod.selectPaymentMethodByCondition",sql);
+        return list;
+    }
+    public  List<PaymentMethod> getList(String condition,String orderBy,int pageIndex,int pageSize)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<PaymentMethod> list = null;
+        try        
+        {
+            list = getList(sqlSession, condition, orderBy, pageIndex, pageSize);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<PaymentMethod> getList(SqlSession sqlSession,String condition,String orderBy,int pagesize,int pageindex)    
+    {
+        String sql = condition +" order by "+orderBy+" limit "+pagesize*(pageindex-1)+","+pagesize;
+        List<PaymentMethod> list = sqlSession.selectList("PaymentMethod.selectPaymentMethodByCondition",sql);
+        return list;
+    }
+    public  List<PaymentMethod> getListBySql(String sql)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        List<PaymentMethod> list = null;
+        try        
+        {
+            list = getListBySql(sqlSession,sql);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return list;
+    }
+    public  List<PaymentMethod> getListBySql(SqlSession sqlSession,String sql)    
+    {
+        List<PaymentMethod> list = sqlSession.selectList("PaymentMethod.selectPaymentMethodBySql",sql);
+        return list;
+    }
+    public  Integer getCount(String condition)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Integer count = null;
+        try        
+        {
+            count = getCount(sqlSession,condition);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return count;
+    }
+    public  Integer getCount(SqlSession sqlSession,String condition)    
+    {
+        Integer rows = sqlSession.selectOne("PaymentMethod.selectCountByCondition",condition);
+        return rows;
+    }
+    public  int update(PaymentMethod entity)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = update(sqlSession,entity);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int update(SqlSession sqlSession,PaymentMethod entity)throws IOException    
+    {
+        int rows = sqlSession.update("PaymentMethod.updatePaymentMethod",entity);
+        return rows;
+    }
+    public  PaymentMethod createEntity()    
+    {
+        return new PaymentMethod();
+    }
+    public  DataEntity createDataEntity()    
+    {
+        return new PaymentMethod();
+    }
+    public  int clear()throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        int rows = 0;
+        try        
+        {
+            rows = clear(sqlSession);
+            sqlSession.commit();
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return rows;
+    }
+    public  int clear(SqlSession sqlSession)    
+    {
+        int rows = 0;
+        List<PaymentMethod> list = getList(sqlSession);
+        for(int i=0;i<list.size();i++)        
+        {
+            rows += delete(sqlSession,list.get(i));
+        }
+        return rows;
+    }
+    public  PaymentMethod getEntityByCode(String code)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        PaymentMethod entity = null;
+        try        
+        {
+             entity = getEntityByCode(sqlSession,code);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return entity;
+    }
+    public  PaymentMethod getEntityByCode(SqlSession sqlSession,String code)    
+    {
+        PaymentMethod entity = sqlSession.selectOne("selectPaymentMethodByCondition","code='"+code+"'");
+        return entity;
+    }
+    public  boolean existsCode(String code)throws Exception    
+    {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        Boolean flag = null;
+        try        
+        {
+            flag = existsCode(sqlSession,code);
+        }
+        catch(Exception  e)        
+        {
+            e.printStackTrace();
+            sqlSession.rollback();
+            throw e;
+        }
+         finally         
+        {
+            sqlSession.close();
+        }
+        return flag;
+    }
+    public  boolean existsCode(SqlSession sqlSession,String code)    
+    {
+        Integer rows = sqlSession.selectOne("PaymentMethod.selectIntBySql","select count(*) from payment_method where code= '"+code+"'");
+        return rows>0?true:false;
+    }
+}

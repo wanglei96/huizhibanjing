@@ -1,0 +1,145 @@
+package strosoft.sys.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import java.lang.Boolean;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+public class ViewSysUser extends DataEntity implements Cloneable
+{
+    private  Integer id;//;
+    private  String employeeNo;//;
+    private  String loginName;//;
+    private  String password;//;
+    private  String trueName;//;
+    private  Integer sysOrganizationId;//;
+    private  Timestamp createTime;//;
+    private  String description;//;
+    private  Boolean enabled;//是否启用;
+    private  String mobilePhone;//手机号;
+    private  Integer wrongPasswordCount;
+    private  Boolean isDeleted;
+    private  String sysOrganizationName;//;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setEmployeeNo(String employeeNo)    
+    {
+        this.employeeNo = employeeNo;
+    }
+    public  String getEmployeeNo()    
+    {
+        return employeeNo;
+    }
+    public  void setLoginName(String loginName)    
+    {
+        this.loginName = loginName;
+    }
+    public  String getLoginName()    
+    {
+        return loginName;
+    }
+    public  void setPassword(String password)    
+    {
+        this.password = password;
+    }
+    public  String getPassword()    
+    {
+        return password;
+    }
+    public  void setTrueName(String trueName)    
+    {
+        this.trueName = trueName;
+    }
+    public  String getTrueName()    
+    {
+        return trueName;
+    }
+    public  void setSysOrganizationId(Integer sysOrganizationId)    
+    {
+        this.sysOrganizationId = sysOrganizationId;
+    }
+    public  Integer getSysOrganizationId()    
+    {
+        return sysOrganizationId;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setDescription(String description)    
+    {
+        this.description = description;
+    }
+    public  String getDescription()    
+    {
+        return description;
+    }
+    public  void setEnabled(Boolean enabled)    
+    {
+        this.enabled = enabled;
+    }
+    public  Boolean getEnabled()    
+    {
+        return enabled;
+    }
+    public  void setMobilePhone(String mobilePhone)    
+    {
+        this.mobilePhone = mobilePhone;
+    }
+    public  String getMobilePhone()    
+    {
+        return mobilePhone;
+    }
+    public  void setWrongPasswordCount(Integer wrongPasswordCount)    
+    {
+        this.wrongPasswordCount = wrongPasswordCount;
+    }
+    public  Integer getWrongPasswordCount()    
+    {
+        return wrongPasswordCount;
+    }
+    public  void setIsDeleted(Boolean isDeleted)    
+    {
+        this.isDeleted = isDeleted;
+    }
+    public  Boolean getIsDeleted()    
+    {
+        return isDeleted;
+    }
+    public  void setSysOrganizationName(String sysOrganizationName)    
+    {
+        this.sysOrganizationName = sysOrganizationName;
+    }
+    public  String getSysOrganizationName()    
+    {
+        return sysOrganizationName;
+    }
+    public  ViewSysUser copy()    
+    {
+        ViewSysUser entity = null;
+        try        
+        {
+            entity = (ViewSysUser) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>数据管理</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.uploader.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/management.js"></script>
+<script type="text/javascript">
+	managementContext.dataName = "DataDocumentBuilder";
+	//managementContext.tableName = "cms_site";
+	managementContext.operationColumnWidth = 200;
+	managementContext.primaryKeyName = "id";
+	managementContext.customTableColumns = [{
+		field : 'name',
+		title : '备份文件名称',
+		fixed : true,
+		width : 600,
+		align : 'center'
+	}, {
+		field : 'time',
+		title : '创建时间',
+		fixed : true,
+		width : 300,
+		align : 'center'
+	}, {
+		field : 'description',
+		title : '描述',
+		width : 200,
+		align : 'left'
+	} ];
+	/*
+	 取得请求参数
+	 */
+	function getParameters() {
+		var parameters = getParametersBase();
+		return parameters;
+	}
+	$(function(){
+		$("#uploadifysql").uploadify(
+					{
+						isImage : true,
+						fileUploadID : "imgAutoUploadFileUpload",
+						uploading : function() {
+							showProgressBar();
+						},
+						success : function(result) {
+							hideProgressBar();
+							var data = new Object();
+							 data.id=result.data.id;
+							 data.name=result.data.id;
+							 data.time=(new Date()).Format("yyyy-M-d h:m:s.S");
+							 data.description=result.data.id;
+							 call("AddDataDocumentBuilder",data,function(result) {
+					       		  closeDetailDialog();
+								   refreshControls();
+									bindData(); 
+							}); 
+						},
+						fail : function(result) {
+							hideProgressBar();
+					}
+			});
+	})
+	/*
+	 * 取得操作按钮列表，默认为查看，修改，删除三个按钮
+	 */
+	function getOperationButtonHtmlArrayBase(dataItem) {
+		var arrOpeartionButtonHtml = new Array();
+		var lnkDownloadHtml = getGridDownloadButtonHtml(dataItem);
+		var lnkRecoverHtml = getGridRecoverButtonHtml(dataItem);
+		var lnkDeleteHtml = getGridDeleteButtonHtml(dataItem);
+		arrOpeartionButtonHtml.push(lnkDownloadHtml);
+		arrOpeartionButtonHtml.push(lnkRecoverHtml);
+		arrOpeartionButtonHtml.push(lnkDeleteHtml);
+		return arrOpeartionButtonHtml;
+	}
+	/*
+	 * 取得下载按钮Html
+	 */
+	function getGridDownloadButtonHtml(dataItem) {
+		//debugger
+		var buttonType = "Download";
+		return getGridButtonHtml(dataItem, "downloadDataItem", "下载",buttonType);
+	}
+	function downloadDataItem(){
+		alert(0)
+		//downloadCanvas({ type: 'sql', fileName: "传播路径", elementID: "divSpreadPathBox" });
+		//return "<a href='"+config.adminRootUrl+row.upload_file_path+"' download="test.png">点击下载</a>"
+	}
+	/*
+	 * 取得恢复数据库按钮Html
+	 */
+	function getGridRecoverButtonHtml(dataItem) {
+		//debugger
+		var buttonType = "Recover";
+		return getGridButtonHtml(dataItem, "recoverDataItem", "恢复数据库",buttonType);
+	}
+	/*
+	 * 恢复数据库
+	 */
+	function recoverDataItem(primaryKey) {
+		if(primaryKey){
+			if (!confirm("确定要恢复吗?")) {
+				return;
+			}
+		}else{
+			if (!confirm("确定要初始化吗?")) {
+					return;
+				}
+		}
+		var data = new Object();
+		data.primaryKey = primaryKey;
+		call("RestoreDataDocumentBuilder", data, function(result) {
+			refreshControls();
+			bindData();
+		});
+		return false;
+	}
+	/*
+	 * 取得按钮Html
+	 */
+	function getGridButtonHtml(dataItem, functionName, buttonText,buttonType) {
+		// alert(JSON.stringify(dataItem));
+		var primaryKey = getPrimaryKey(dataItem);
+		var buttonId = "btn"+buttonType+"_"+primaryKey;
+		var buttonIdHtml="";
+		if(typeof(buttonType) != "undefined"){
+			buttonIdHtml = "id='"+buttonId+"'";
+		}
+		var lnkViewHtml = "<a "+buttonIdHtml+" class='easyui-linkbutton grid_button' href='#' onclick=\"return "
+				+ functionName + "('" + primaryKey + "')\">" + buttonText + "</a>";
+		return lnkViewHtml;
+	}
+	/*
+ * 绑定数据
+ */
+function bindData() {
+
+	var requestParameters = getParameters();
+	// alert(JSON.stringify(requestParameters));
+	call(managementContext.getListServiceName, requestParameters, function(
+			result) {
+		outputData(result.data.dataList);
+		/* //设置功能权限
+		if(!managementContext.isBasicTable){
+			bindTableGridFunctionPermission();
+		} */
+		// 设置分页
+		if (managementContext.allowPaging) {
+			setPager(result.data);
+		}
+	});
+	}
+	function openAddDialog() {
+		$("#formDetail").form("clear");
+		$("#txtName").textbox("setValue",formateDateAndTimeToString(new Date()));
+		$("#txtTime").textbox("setValue",(new Date()).Format("yyyy-M-d h:m:s.S"));
+		$("#txtTime").textbox("readonly", true);
+		openDialog("divDetailDialog", "备份信息");
+	}
+	/*
+	 * 关闭明细对话框
+	 */
+	function closeDetailDialog() {
+		$("#formDetail").form("clear");
+		$("#divDetailDialog").dialog("close");
+	}
+	function save() {
+	  var data = getEntity("formDetail");
+        data.id=(data.name).substring(0,data.name.length-4);
+        console.log(data);
+         call("AddDataDocumentBuilder",data,function(result) {
+       		  closeDetailDialog();
+			   refreshControls();
+				bindData(); 
+		}); 
+	}
+	/**
+	 * 编号自动生成
+	 * @param date
+	 * @returns
+	 */
+	function formatDateToString(date){
+		var year = date.getFullYear();
+		var month = date.getMonth()+1;
+		var day = date.getDate();
+		if(month<10) month = "0"+month;
+		if(day<10) day = "0"+day;
+		return year+month+day;
+	}
+	function formateDateAndTimeToString(date)
+	{
+		var hours = date.getHours();
+		var mins = date.getMinutes();
+		var secs = date.getSeconds();
+		var msecs = date.getMilliseconds();
+		if(hours<10) hours = "0"+hours;
+		if(mins<10) mins = "0"+mins;
+		if(secs<10) secs = "0"+secs;
+		if(msecs<10) secs = "0"+msecs;
+		return formatDateToString(date)+hours+mins+secs+msecs;
+		}
+</script>
+</head>
+
+<body>
+	<div class="easyui-layout" style="width:100%;" fit="true">
+		<div id="content" region="center" style="padding:1px;">
+			<div class="toolbar_panel" id="divToolbar">
+					<a id="exportDatabaseTool" href="#"
+					class="easyui-linkbutton"  plain="true"
+					onclick="openAddDialog()">备份数据库</a>
+					<a id="recover" href="#"
+					class="easyui-linkbutton"  plain="true"
+					onclick="recoverDataItem(null)">系统初始化</a>
+					<a id="uploadifysql" href="#"
+					class="easyui-linkbutton"  plain="true"
+					>上传备份文件</a>
+					<a id="lnkRefreshPage" href="#"
+					class="easyui-linkbutton"  plain="true"
+					onclick="refreshPage()">执行语句</a>
+					<a id="lnkRefreshPage" href="#"
+					class="easyui-linkbutton"  plain="true"
+					onclick="refreshPage()">刷新</a>
+			</div>
+			<div id="divSearchPanel" class="search_panel easyui-panel">
+				<div class="search_item">
+					<span class="search_item_caption">查询条件:</span> <input
+						id="txtSearchName" class="search_item_textbox easyui-textbox">
+				</div>	
+				<div class="search_item_command">
+					<a href="#" class="easyui-linkbutton" plain="true"
+						iconCls="icon-search" onclick="query()">查询</a>
+				</div>
+			</div>
+			<table id="tableGrid">
+			</table>
+			<!-- 基本信息 -->
+			<div id="divDetailDialog" class="easyui-dialog" style="width:450px"
+				closed="true" buttons="#dlg-buttons">
+				<form id="formDetail" method="post" novalidate
+					style="margin:0;padding:20px 20px">
+					<div title="基本信息" data-options="closable:false"
+						style="padding:10px">
+						<div style="margin-bottom:10px">
+							<input id="txtName" name="txtName" class="easyui-textbox"
+								label="名称:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="txtTime" name="txtPath" class="easyui-textbox"
+								label="时间:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="txtDescription" name="txtDescription"
+								class="easyui-textbox" label="描述:" multiline="true"
+								labelPosition="left" style="width:100%;height:120px;">
+						</div>
+					</div>
+				</form>
+				<div id="dlg-buttons">
+					<a href="javascript:void(0)" class="easyui-linkbutton"
+						iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+					<a href="javascript:void(0)" class="easyui-linkbutton"
+						iconCls="icon-cancel" onclick="javascript:closeDetailDialog();"
+						style="width:90px">取消</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

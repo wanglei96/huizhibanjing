@@ -1,0 +1,264 @@
+package BRP.data;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+public class DeliveryOrderInfo {
+
+    private Integer bookOrderId;
+    private Integer memberId;
+    private Integer memberCardId;
+    private String memberName;
+    private String memberMobilePhone;
+    private String memberEntranceGuard;
+    private String memberAddress;
+    private String deliverAreaName;
+    private Integer deliverAreaId;
+    private String bookOrderBorrowStatusCode; // 借书状态
+
+    private String bookOrderBorrowStatusName; // 借书状态
+    private String bookOrderReturnStatusCode; // 还书状态编码
+    private String bookOrderReturnStatusName; // 还书状态名称
+    private String memberCardStatusCode;//会员卡状态
+    private Integer delivererId;//配送员ID
+    private String delivererName;//配送员名称
+    private String memberNo;
+    private String memberCardNo;
+    private Integer deliverLineId; // 配送线路
+    private String deliverLineName; // 配送线路
+    private Integer deliverPlaceId; // 配送点
+    private String deliverPlaceName; // 配送点
+    private long sendCount; // 送书数量
+    private long fetchCount; // 取书数量
+    private Timestamp deliverTime; // 配送时间
+
+    private String deliverTimeText; // 配送时间
+    private String errorRemark; // 异常信息
+
+    private List<ViewBookOrderItem> children;
+
+    public Integer getBookOrderId() {
+        return bookOrderId;
+    }
+
+    public void setBookOrderId(Integer bookOrderId) {
+        this.bookOrderId = bookOrderId;
+    }
+
+    public Integer getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(Integer memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
+
+    public String getMemberMobilePhone() {
+        return memberMobilePhone;
+    }
+
+    public void setMemberMobilePhone(String memberMobilePhone) {
+        this.memberMobilePhone = memberMobilePhone;
+    }
+
+    public String getMemberEntranceGuard() {
+        return memberEntranceGuard;
+    }
+
+    public void setMemberEntranceGuard(String memberEntranceGuard) {
+        this.memberEntranceGuard = memberEntranceGuard;
+    }
+
+    public String getMemberAddress() {
+        return memberAddress;
+    }
+
+    public void setMemberAddress(String memberAddress) {
+        this.memberAddress = memberAddress;
+    }
+
+    public String getDeliverAreaName() {
+        return deliverAreaName;
+    }
+
+    public void setDeliverAreaName(String deliverAreaName) {
+        this.deliverAreaName = deliverAreaName;
+    }
+
+    public Integer getDeliverAreaId() {
+        return deliverAreaId;
+    }
+
+    public void setDeliverAreaId(Integer deliverAreaId) {
+        this.deliverAreaId = deliverAreaId;
+    }
+
+    public String getMemberNo() {
+        return memberNo;
+    }
+
+    public void setMemberNo(String memberNo) {
+        this.memberNo = memberNo;
+    }
+
+    public String getDeliverLineName() {
+        return deliverLineName;
+    }
+
+    public void setDeliverLineName(String deliverLineName) {
+        this.deliverLineName = deliverLineName;
+    }
+
+    public long getSendCount() {
+        return sendCount;
+    }
+
+    public void setSendCount(long sendCount) {
+        this.sendCount = sendCount;
+    }
+
+    public long getFetchCount() {
+        return fetchCount;
+    }
+
+    public void setFetchCount(long fetchCount) {
+        this.fetchCount = fetchCount;
+    }
+
+
+    public Integer getDeliverLineId() {
+        return deliverLineId;
+    }
+
+    public void setDeliverLineId(Integer deliverLineId) {
+        this.deliverLineId = deliverLineId;
+    }
+
+    public Integer getDelivererId() {
+        return delivererId;
+    }
+
+    public void setDelivererId(Integer delivererId) {
+        this.delivererId = delivererId;
+    }
+
+    public String getDelivererName() {
+        return delivererName;
+    }
+
+    public void setDelivererName(String delivererName) {
+        this.delivererName = delivererName;
+    }
+
+    public List<ViewBookOrderItem> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<ViewBookOrderItem> children) {
+        this.children = children;
+    }
+
+    public Integer getMemberCardId() {
+        return memberCardId;
+    }
+
+    public void setMemberCardId(Integer memberCardId) {
+        this.memberCardId = memberCardId;
+    }
+
+    public Timestamp getDeliverTime() {
+        return deliverTime;
+    }
+
+    public void setDeliverTime(Timestamp deliverTime) {
+        this.deliverTime = deliverTime;
+    }
+
+    public String getBookOrderBorrowStatusCode() {
+        return bookOrderBorrowStatusCode;
+    }
+
+    public void setBookOrderBorrowStatusCode(String bookOrderBorrowStatusCode) {
+        this.bookOrderBorrowStatusCode = bookOrderBorrowStatusCode;
+    }
+
+    public String getBookOrderReturnStatusCode() {
+        return bookOrderReturnStatusCode;
+    }
+
+    public void setBookOrderReturnStatusCode(String bookOrderReturnStatusCode) {
+        this.bookOrderReturnStatusCode = bookOrderReturnStatusCode;
+    }
+
+    public String getMemberCardStatusCode() {
+        return memberCardStatusCode;
+    }
+
+    public void setMemberCardStatusCode(String memberCardStatusCode) {
+        this.memberCardStatusCode = memberCardStatusCode;
+    }
+
+    public String getBookOrderBorrowStatusName() {
+        return bookOrderBorrowStatusName;
+    }
+
+    public void setBookOrderBorrowStatusName(String bookOrderBorrowStatusName) {
+        this.bookOrderBorrowStatusName = bookOrderBorrowStatusName;
+    }
+
+    public String getBookOrderReturnStatusName() {
+        return bookOrderReturnStatusName;
+    }
+
+    public void setBookOrderReturnStatusName(String bookOrderReturnStatusName) {
+        this.bookOrderReturnStatusName = bookOrderReturnStatusName;
+    }
+
+    public String getMemberCardNo() {
+        return memberCardNo;
+    }
+
+    public void setMemberCardNo(String memberCardNo) {
+        this.memberCardNo = memberCardNo;
+    }
+
+    public String getDeliverTimeText() {
+        return deliverTimeText;
+    }
+
+    public void setDeliverTimeText(String deliverTimeText) {
+        this.deliverTimeText = deliverTimeText;
+    }
+
+    public String getErrorRemark() {
+        return errorRemark;
+    }
+
+    public void setErrorRemark(String errorRemark) {
+        this.errorRemark = errorRemark;
+    }
+
+    public Integer getDeliverPlaceId() {
+        return deliverPlaceId;
+    }
+
+    public void setDeliverPlaceId(Integer deliverPlaceId) {
+        this.deliverPlaceId = deliverPlaceId;
+    }
+
+    public String getDeliverPlaceName() {
+        return deliverPlaceName;
+    }
+
+    public void setDeliverPlaceName(String deliverPlaceName) {
+        this.deliverPlaceName = deliverPlaceName;
+    }
+}

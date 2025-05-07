@@ -1,0 +1,7 @@
+<TranslateServiceProviders Default="HX">
+	<TranslateServiceProvider Name="None"
+		Type="strosoft.tools.translate.NoneTranslateProvider" />
+	<TranslateServiceProvider Name="BD"
+		Type="strosoft.tools.translate.BDTranslateProvider" AppID="20200601000482348"
+		SecurityKey="zoQ524yASWF9G8NEpGdZ" />
+</TranslateServiceProviders>

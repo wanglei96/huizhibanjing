@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>角色管理</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css"></link>
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css"></link>
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/management.js?v=1"></script>
+
+<link rel="stylesheet" href="../../css/common.css" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script>
+	managementContext.dataName = "SysRole";
+	managementContext.tableName = "sys_role";
+
+	managementContext.operationColumnWidth = 300;
+	managementContext.customTableColumns = [ {
+		field : 'name',
+		title : '名称',
+		fixed : true,
+		width : 150,
+		align : 'left'
+	}, {
+		field : 'description',
+		title : '描述',
+		width : 100,
+		align : 'left'
+	} ];
+
+	function bindControls() {
+		//绑定菜单
+		bindTree("ulSysMenu", "view_sys_menu_sys_function", "id", "name", "parent_id", "菜单", 0,
+			"iconCls,display_order", true, function(node) {
+		});
+	}
+	/*
+	取得操作按钮列表
+	 */
+	function getOperationButtonHtmlArray(dataItem) {
+		var arrOpeartionButtonHtml = getOperationButtonHtmlArrayBase(dataItem);
+		var lnkMenuHtml = getGridMenuButtonHtml(dataItem);
+		arrOpeartionButtonHtml.push(lnkMenuHtml);
+		return arrOpeartionButtonHtml;
+	}
+
+	/*
+	 * 打开菜单权限 
+	 */
+	function openMenuDialog(primaryKey) {
+		//获取id放到隐藏域中
+		$('#hfSysRoleId').attr("value", primaryKey);
+		//根据ID查询节点
+		var sysRoleId = $('#hfSysRoleId').val();
+		var data = new Object();
+		data.tableName = "sys_role_permission";
+		data.sysRoleId = sysRoleId;
+		call("GetSysRolePermissionListById", data, function(result) {
+			//alert(JSON.stringify(result));
+			checkTree("ulSysMenu", result.data, "permission", "value");
+		});
+		//打开Dialog
+		$('#divMenuDialog').dialog('open').dialog('center').dialog('setTitle',
+				'菜单权限');
+		//event.stopPropagation();
+	}
+	/*
+	 * 取得设置菜单权限Html
+	 */
+	function getGridMenuButtonHtml(dataItem) {
+		var primaryKey = getPrimaryKey(dataItem);
+		var buttonId = "btnSetPermission_"+primaryKey;
+		return "<a id='"+buttonId+"' class='easyui-linkbutton grid_button' href='#' onclick=\"return openMenuDialog('"
+				+ primaryKey + "')\">设置菜单权限</a>";
+	}
+	/*
+	 * 关闭菜单Dialog对话框
+	 */
+	function closeMenuDialog() {
+		$('#divMenuDialog').dialog('close');
+	}
+	/*
+	 * 保存菜单权限
+	 */
+	function saveMenu() {
+		var data = getEntitySysRolePermission();
+		call("AddSysRolePermission", data, function(result) {
+			closeMenuDialog();
+		});
+	}
+	/*
+	 *取得菜单选中数据
+	 */
+	function getEntitySysRolePermission() {
+		//获取角色id
+		var id = $('#hfSysRoleId').val();
+		//alert(id);
+		//选中的菜单信息
+		var values = getTreeCheckedValues("ulSysMenu", "value");
+		//	alert(values);
+		var newSysRolePermission = new Object();
+		newSysRolePermission.sysRoleId = id;
+		newSysRolePermission.value = values;
+		return newSysRolePermission;
+	}
+	/*
+	 * 取得树数据,添加图片属性
+	 */
+	function getTreeData(lstData, parentValue, valueFieldName, textFieldName,
+			parentFieldName) {
+		var treeData = new Array();
+		var lstSubDataList = getSubDataList(lstData, parentValue, parentFieldName);
+		for ( var i = 0; i < lstSubDataList.length; i++) {
+			var dataItem = lstSubDataList[i];
+			var treeNode = new Object();
+			treeNode.id = dataItem[valueFieldName];
+			treeNode.text = dataItem[textFieldName];
+			treeNode.iconCls = dataItem["iconCls"];
+			treeNode.attributes = dataItem;
+			treeData.push(treeNode);
+			var childrenTreeData = getTreeData(lstData, dataItem[valueFieldName],
+					valueFieldName, textFieldName, parentFieldName);
+			if (childrenTreeData.length > 0) {
+				treeNode.children = new Array();
+				for ( var j = 0; j < childrenTreeData.length; j++) {
+					treeNode.children.push(childrenTreeData[j]);
+				}
+				treeNode.state = "closed";
+			}
+		}
+		return treeData;
+	}
+</script>
+</head>
+
+<body>
+	<!-- 存放sysRoleId -->
+	<input type="hidden" id="hfSysRoleId" value="" />
+	<div class="easyui-layout" style="width:100%;" fit="true">
+		<div class="toolbar_panel" id="divToolbar">
+			<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+				onclick="openAddDialog()" id="btnAdd">新增</a> <a href="#"
+				class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+				onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a id="lnkRefreshPage" href="#"
+				class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+				onclick="refreshPage()">刷新</a>
+		</div>
+		<table id="tableGrid">
+		</table>
+		<div>
+			<div id="divDetailDialog" class="easyui-dialog" style="width:400px"
+				closed="true" buttons="#dlg-buttons">
+				<input type="hidden" id="hid" value="" />
+				<form id="formDetail" method="post" novalidate
+					style="margin:0;padding:20px 50px">
+
+					<div style="margin-bottom:10px">
+						<input id="txtName" name="txtName" class="easyui-textbox"
+							label="名称:" style="width:100%">
+					</div>
+					<div style="margin-bottom:10px">
+						<input id="txtDescription" name="txtDescription"
+							class="easyui-textbox" label="描述:" multiline="true"
+							labelPosition="left" style="width:100%;height:120px;">
+					</div>
+				</form>
+			</div>
+			<div id="dlg-buttons">
+				<a href="javascript:void(0)" class="easyui-linkbutton c6"
+					iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton"
+					iconCls="icon-cancel" onclick="javascript:closeDetailDialog();">取消</a>
+			</div>
+		</div>
+		<div>
+			<!-- 菜单权限 -->
+			<div id="divMenuDialog" class="easyui-dialog"
+				style="width:400px;height:450px;" closed="true"
+				buttons="#dlg-menu-buttons" resizable="true">
+				<form id="formDetail" method="post" novalidate
+					style="margin:0;padding:20px 50px">
+					<ul id="ulSysMenu" class="easyui-tree" style = "width:220px">
+					</ul>
+				</form>
+			</div>
+			<div id="dlg-menu-buttons">
+				<a href="javascript:void(0)" class="easyui-linkbutton"
+					iconCls="icon-ok" onclick="saveMenu()" id="btnsaveMenu">保存</a> <a
+					href="javascript:void(0)" class="easyui-linkbutton"
+					iconCls="icon-cancel" onclick="javascript:closeMenuDialog();">取消</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

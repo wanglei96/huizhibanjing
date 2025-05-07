@@ -1,0 +1,10 @@
+{
+  "transparentTitle": "auto",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "uni-search-bar": "/components/uni-search-bar/uni-search-bar",
+    "cc-nav-swiper": "/components/cc-nav-swiper/cc-nav-swiper",
+    "searchbar": "/components/uni-search-bar/uni-search-bar",
+    "nav-swiper": "/components/cc-nav-swiper/cc-nav-swiper"
+  }
+}

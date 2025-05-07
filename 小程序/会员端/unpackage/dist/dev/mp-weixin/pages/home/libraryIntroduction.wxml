@@ -1,0 +1,1 @@
+<view class="content"><view class="contentPanel"><mp-html vue-id="5eaeec88-1" content="{{content}}" bind:__l="__l"></mp-html></view></view>

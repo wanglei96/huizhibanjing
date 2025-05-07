@@ -1,0 +1,118 @@
+package BRP.model;
+
+import BRP.data.BookSkuContext;
+import net.sf.json.JSONObject;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.common.MySqlConditionBuilder;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+import strosoft.sys.model.ExportContext;
+import strosoft.sys.model.ExportHandler;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+
+public class ExportMemberHandler extends ExportHandler {
+    /**
+     * 取得数据
+     *
+     * @param exportContext
+     * @return
+     * @throws Exception
+     */
+    protected Object getData(ExportContext context) throws Exception {
+        String data = context.getRequest().getParameter("data");
+        JSONObject jData = JSONObject.fromObject(data);
+        Integer companyId = JsonHelper.getInt(jData, "companyId");
+        String memberName = JsonHelper.getString(jData, "memberName");
+        String cardNo = JsonHelper.getString(jData, "cardNo");
+        String address = JsonHelper.getString(jData, "address");
+        String mobilePhone = JsonHelper.getString(jData, "mobilePhone");
+        Integer memberCardBatchId = JsonHelper.getInt(jData, "memberCardBatchId");
+        Integer memberCardTypeId = JsonHelper.getInt(jData, "memberCardTypeId");
+        Integer isExpire = JsonHelper.getInt(jData, "isExpire");
+        String isBook = JsonHelper.getString(jData, "isBook");
+        String memberCardStatusCode = JsonHelper.getString(jData, "memberCardStatusCode");
+        String distanceCode = JsonHelper.getString(jData, "distanceCode");
+
+        Date employeeTimeBegin = JsonHelper.getDate(jData, "employeeTimeBegin");
+        Date employeeTimeEnd = JsonHelper.getDate(jData, "employeeTimeEnd");
+
+        Date effectiveDateBegin = JsonHelper.getDate(jData, "effectiveDateBegin");
+        Date effectiveDateEnd = JsonHelper.getDate(jData, "effectiveDateEnd");
+
+        Date expireDateBegin = JsonHelper.getDate(jData, "expireDateBegin");
+        Date expireDateEnd = JsonHelper.getDate(jData, "expireDateEnd");
+
+        Date lockDateBegin = JsonHelper.getDate(jData, "lockDateBegin");
+        Date lockDateEnd = JsonHelper.getDate(jData, "lockDateEnd");
+
+        Date lastCommunicaDateBegin = JsonHelper.getDate(jData, "lastCommunicaDateBegin");
+        Date lastCommunicaDateEnd = JsonHelper.getDate(jData, "lastCommunicaDateEnd");
+
+        Date birthdayBegin = JsonHelper.getDate(jData, "birthdayBegin");
+        Date birthdayEnd = JsonHelper.getDate(jData, "birthdayEnd");
+
+        Integer pageIndex = JsonHelper.getInt(jData, "pageIndex");
+        Integer pageSize = JsonHelper.getInt(jData, "pageSize");
+        String orderBy = JsonHelper.getString(jData, "orderBy");
+
+        String condition = JsonHelper.getString(jData, "condition");
+
+        MySqlConditionBuilder conditionBuilder = new MySqlConditionBuilder();
+        conditionBuilder.add(condition);
+        conditionBuilder.addEqualCondition("view_member_card.company_id", companyId);
+        conditionBuilder.addLikeCondition("view_member_card.member_name", memberName);
+        conditionBuilder.addLikeCondition("view_member_card.card_no", cardNo);
+        conditionBuilder.addLikeCondition("view_member_card.address", address);
+        conditionBuilder.addLikeCondition("view_member_card.mobile_phone", mobilePhone);
+        conditionBuilder.addEqualCondition("view_member_card.member_card_batch_id", memberCardBatchId);
+        conditionBuilder.addEqualCondition("view_member_card.member_card_type_id", memberCardTypeId);
+        conditionBuilder.addEqualCondition("view_member_card.is_expire", isExpire);
+        conditionBuilder.addEqualCondition("view_member_card.is_book", isBook);
+        conditionBuilder.addEqualCondition("view_member_card.member_card_status_code", memberCardStatusCode);
+        conditionBuilder.addEqualCondition("view_member_card.distance_code", distanceCode);
+        conditionBuilder.addTimeSpanCondition(employeeTimeBegin, employeeTimeEnd, "view_member_card.employee_time");
+        conditionBuilder.addTimeSpanCondition(effectiveDateBegin, effectiveDateEnd, "view_member_card.effective_date");
+        conditionBuilder.addTimeSpanCondition(expireDateBegin, expireDateEnd, "view_member_card.expire_date");
+        conditionBuilder.addTimeSpanCondition(lockDateBegin, lockDateEnd, "view_member_card.lock_date");
+        conditionBuilder.addTimeSpanCondition(lastCommunicaDateBegin, lastCommunicaDateEnd,
+                "view_member_card.last_communica_date");
+        conditionBuilder.addTimeSpanCondition(birthdayBegin, birthdayEnd, "view_member_card.birthday");
+
+        String strCondition = conditionBuilder.toString();
+
+        String sql = String.format("SELECT\n" +
+                "\tview_member_card.*,(\n" +
+                "\tCASE\n" +
+                "\t\t\t\n" +
+                "\t\t\tWHEN ( view_member_card.gender IS TRUE ) THEN\n" +
+                "\t\t\t'男' ELSE '女' \n" +
+                "\t\tEND \n" +
+                "\t\t\t) AS `gender_name`,(\n" +
+                "\t\tCASE\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\tWHEN ( view_member_card.is_stop_card IS TRUE ) THEN\n" +
+                "\t\t\t\t'是' ELSE '否' \n" +
+                "\t\t\tEND \n" +
+                "\t\t\t) AS `stop_card_name`,\n" +
+                "\t\t\treferrer_card.card_no AS referrer_card_no,\n" +
+                "\t\t\tdeliver_area.NAME AS deliver_area_name,\n" +
+                "\t\t\tmember_card_disable_log.stop_date AS member_card_disable_stop_date,\n" +
+                "\t\t\tmember_card_disable_log.stop_end_date AS member_card_disable_stop_end_date \n" +
+                "\t\tFROM\n" +
+                "\t\t\tview_member_card\n" +
+                "\t\t\tLEFT JOIN member_card_disable_log ON member_card_disable_log.member_card_id = view_member_card.id \n" +
+                "\t\t\tAND member_card_disable_log.`status` IN ( 'reissue', 'transact' ) \n" +
+                "\t\t\tAND member_card_disable_log.is_relieve = 0\n" +
+                "\t\t\tLEFT JOIN member_card referrer_card ON referrer_card.member_id = view_member_card.referrer_id\n" +
+                "\t\t\tLEFT JOIN deliver_area ON deliver_area.id = view_member_card.deliver_area_id \n" +
+                "\t\t\tAND referrer_card.disabled IS NOT TRUE \n" +
+                "\t\tWHERE\n" +
+                "\t\tview_member_card.member_id IS NOT NULL \n" +
+                "\tAND view_member_card.disabled IS NOT TRUE AND %s", strCondition);
+        ArrayList<LinkedHashMap<String, Object>> alData = MyBatisManager.getInstance().executeHashMapList(sql);
+        return alData;
+    }
+}

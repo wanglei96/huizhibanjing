@@ -1,0 +1,26 @@
+<ServiceHandlers>
+	<ServiceHandler Name="GetWXSession"
+					Type="strosoft.wx.service.GetWxSessionServiceHandler"/>
+	<ServiceHandler Name="GetWxSession"
+					Type="strosoft.wx.service.GetWxSessionServiceHandler"/>
+	<ServiceHandler Name="GetWxaSession"
+					Type="strosoft.wx.service.GetWxaSessionServiceHandler"/>
+	<ServiceHandler Name="DecryptWXData"
+					Type="strosoft.wx.service.DecryptWxDataServiceHandler"/>
+	<ServiceHandler Name="DecryptWxData"
+					Type="strosoft.wx.service.DecryptWxDataServiceHandler"/>
+	<ServiceHandler Name="GetWxUserInfo"
+					Type="strosoft.wx.service.GetWxUserInfoServiceHandler"/>
+	<ServiceHandler Name="GetWXUserInfo"
+					Type="strosoft.wx.service.GetWxUserInfoServiceHandler"/>
+	<ServiceHandler Name="GetWXQRCode"
+					Type="strosoft.wx.service.GetWxQRCodeServiceHandler"/>
+	<ServiceHandler Name="GetWxQRCode"
+					Type="strosoft.wx.service.GetWxQRCodeServiceHandler"/>
+	<ServiceHandler Name="GetWxaPaymentInfo"
+					Type="strosoft.wx.service.GetWxaPaymentInfoServiceHandler"/>
+	<ServiceHandler Name="PCWxPay"
+					Type="strosoft.wx.service.PCWxPayServiceHandler"/>
+	<ServiceHandler Name="SendWxTemplateMessage"
+					Type="strosoft.wx.service.SendWxTemplateMessageServiceHandler"/>
+</ServiceHandlers>

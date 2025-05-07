@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>jQuery UI 进度条（Progressbar） - 自定义标签</title>
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<link rel="stylesheet" href="../../js/jqueryui/jquery-ui.min.css"
+	type="text/css"></link>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="../../themes/bootstrap/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+
+
+
+<script>
+	$(function() {
+		//想要修改进度条的颜色去css文件中去修改  
+		$('#box').progressbar({
+			width : 500, //设置进度条宽度 默认400  
+			height : 36, //设置进度条高度 默认22  
+			value : 0, //设置进度条值 默认0  
+			text : '{value}%', //设置进度条百分比模板 默认 {value}%  
+
+			//在value改变的时候触发  
+			onChange : function(newValue, oldValue) {
+				console.log('新:' + newValue + ',旧:' + oldValue);
+			},
+		});
+		setInterval(function() {
+			//getValue  setValue 分别是返回当前进度值  和 设置一个进度值  
+			$('#box').progressbar('setValue',
+					$('#box').progressbar('getValue') + 10);
+		}, 100);
+		console.log($('#box').progressbar('options'));
+		//$('#box').progressbar('resize', 80);  没啥大用  
+
+	});
+</script>
+</head>
+<body style="margin:100px;">
+	<!-- 
+    <div class="easyui-progressbar" data-options="value:60" style="width:400px"></div> 
+    -->
+	<div id="box"></div>
+</body>
+</html>

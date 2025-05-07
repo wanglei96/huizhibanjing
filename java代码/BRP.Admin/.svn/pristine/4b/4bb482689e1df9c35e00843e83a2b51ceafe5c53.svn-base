@@ -1,0 +1,110 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.model.*;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * 批量修改配送时间配送员
+ */
+public class BatchUpdateBookOrderServiceHandler extends ServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        String deliverTime = JsonHelper.getString(jData, "deliverTime");
+        Integer delivererId = JsonHelper.getInt(jData, "delivererId");
+        Integer bookpickerId = JsonHelper.getInt(jData, "bookpickerId");
+        Integer companyId = JsonHelper.getInt(jData, "companyId");
+        List<Integer> bookOrderIds = JsonHelper.getIntArray(jData, "bookOrderIds");
+        String bookIdsString = bookOrderIds.stream().map(Object::toString).collect(Collectors.joining(","));
+
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+            //获取参数
+            //String returnButNotBorrowed = CompanySettingManager.getInstance().getCompanySettingValueByCode(sqlSession, companyId, "ReturnButNotBorrowed");
+            /*String sql = String.format("UPDATE book_order SET update_time=now() %s %s %s WHERE id in (%s)",
+                    StringHelper.isNullOrEmpty(deliverTime) ? "" : String.format(" , deliver_time = '%s'", deliverTime),
+                    delivererId != null ? String.format(" , deliverer_id = %d", delivererId) : "",
+                    delivererId != null ? String.format(" , bookpicker_id = %d", bookpickerId) : "",
+                    bookIdsString);
+            MyBatisManager.getInstance().executeUpdate(sqlSession, sql);*/
+            //获取所有订单Item
+            String condition = String.format("book_order_id in (%s)", bookIdsString);
+            List<BookOrderItem> bookOrderItemList = BookOrderItemManager.getInstance().getList(sqlSession, condition);
+            List<BookOutOrder> newBookOutOrderList = new ArrayList<>();
+            Map<Integer, List<BookOrderItem>> bookOrderItemMap = bookOrderItemList.stream()
+                    .collect(Collectors.groupingBy(BookOrderItem::getBookOrderId));
+            // 遍历Map
+            for (Map.Entry<Integer, List<BookOrderItem>> entry : bookOrderItemMap.entrySet()) {
+                Integer bookOrderId = entry.getKey();
+                List<BookOrderItem> itemList = entry.getValue();
+                // 遍历值（List<BookOrderItem>）
+                int borrowCount = 0;
+                int returnCount = 0;
+                for (BookOrderItem item : itemList) {
+                    if (item.getBookOrderTypeCode().equals(BookOrderTypeCodes.Borrow)) {
+                        borrowCount++;
+                        //修改配送订单
+                        if (item.getDeliverStatusCode().equals(DeliverStatusCodes.Approving)) {
+                            item.setDeliverStatusCode(DeliverStatusCodes.Outing);
+                            BookOrderItemManager.getInstance().update(sqlSession, item);
+                            BookOutOrder bookOutOrder = new BookOutOrder();
+                            bookOutOrder.setBookOrderItemId(item.getId());
+                            bookOutOrder.setBookOutOrderStatusCode(BookOutOrderStatusCodes.NotFound);
+                            newBookOutOrderList.add(bookOutOrder);
+                        }
+                    } else if (item.getBookOrderTypeCode().equals(BookOrderTypeCodes.Return)) {
+                        returnCount++;
+                        item.setDeliverStatusCode(DeliverStatusCodes.Delivering);
+                        BookOrderItemManager.getInstance().update(sqlSession, item);
+                    }
+                }
+                BookOrder theBookOrder = BookOrderManager.getInstance().getEntity(sqlSession, bookOrderId);
+                if (borrowCount > 0 && theBookOrder.getBookOrderBorrowStatusCode().
+                        equals(BookOrderBorrowStatusCodes.Submitting)) {
+                    theBookOrder.setBookOrderBorrowStatusCode(BookOrderBorrowStatusCodes.StockOuting);
+                }
+                if (returnCount > 0 && borrowCount == 0) {
+                    theBookOrder.setBookOrderBorrowStatusCode(BookOrderBorrowStatusCodes.Delivering);
+                }
+                if (returnCount > 0) {
+                    theBookOrder.setBookOrderReturnStatusCode(BookOrderReturnStatusCodes.Retrieving);
+                }
+                if (!StringHelper.isNullOrEmpty(deliverTime)) {
+                    theBookOrder.setDeliverTime(DateHelper.toTimestamp(deliverTime));
+                }
+                if (delivererId != null) {
+                    theBookOrder.setDelivererId(delivererId);
+                }
+                if (bookpickerId != null) {
+                    theBookOrder.setBookpickerId(bookpickerId);
+                }
+                BookOrderManager.getInstance().update(sqlSession, theBookOrder);
+            }
+            BookOutOrderManager.getInstance().addList(sqlSession, newBookOutOrderList);
+            this.writeSuccessResponse(response);
+            MyBatisManager.getInstance().commitSession(sqlSession);
+        } catch (Exception e) {
+            MyBatisManager.getInstance().rollbackSession(sqlSession);
+            throw new RuntimeException(e);
+        } finally {
+            MyBatisManager.getInstance().closeSession(sqlSession);
+        }
+
+
+    }
+}

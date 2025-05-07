@@ -1,0 +1,473 @@
+package BRP.model;
+
+import BRP.data.*;
+import org.apache.ibatis.session.SqlSession;
+import org.slf4j.LoggerFactory;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.common.ScheduledTask;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+import strosoft.app.util.Tracer;
+import strosoft.main.boot.JAppApplication;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class DisposeOnlineBookOrderScheduledTask extends ScheduledTask {
+    public static final org.slf4j.Logger logger = LoggerFactory.getLogger(JAppApplication.class);
+
+    /**
+     * 处理定时任务
+     */
+    @Override
+    protected void process() {
+        try {
+            LocalTime currentTime = LocalTime.now();
+            int currentHour = currentTime.getHour();
+            int currentMinute = currentTime.getMinute();
+            boolean isMidnight = currentHour == 0 && currentMinute == 0;
+            if (isMidnight) {
+                this.disposeOnlineBookOrder();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 零点处理昨日订单生成配送单
+     */
+    public void disposeOnlineBookOrder() throws Exception {
+        SqlSession session = MyBatisManager.getInstance().openSession();
+        try {
+            //获取昨天所有线上待处理订单
+            List<BookOrderInfo> lstBookOrderInfo = this.getYesterdaySubmittingBookOrder(session);
+            //获取所有门店参数
+            List<CompanySettingValueInfo> CompanySettingValueInfoList = this.getCompanySetting(session);
+            if (lstBookOrderInfo != null && lstBookOrderInfo.size() > 0) {
+                // 声明一个 Map 用于存储 companyId 和对应的 strDeliveryTime
+                Map<CompanyDeliveryKey, String> companyIdToDeliveryTimeMap = new HashMap<>();
+
+                for (BookOrderInfo bookOrderInfo : lstBookOrderInfo) {
+
+                    Integer companyId = bookOrderInfo.getCompanyId();
+
+                    //单个门店参数
+                    CompanySettingValueInfo companySettingValueInfo = this.getCompanySettingValue(CompanySettingValueInfoList, bookOrderInfo.getCompanyId());
+                    //获取订单
+                    String bookOrderBorrowStatusCode = "";
+                    String bookOrderReturnStatusCode = "";
+                    String strBusinessSate = "";
+                    Integer deliverAreaNumber = null;
+                    //获取配送单配送时间
+                    String strDeliveryTime = this.setDeliveryTime(session, bookOrderInfo, companySettingValueInfo);
+
+                    // 创建 CompanyDeliveryKey 对象
+                    CompanyDeliveryKey key = new CompanyDeliveryKey(companyId, strDeliveryTime);
+
+                    // 检查 Map 中是否已存在该键
+                    if (!companyIdToDeliveryTimeMap.containsKey(key)) {
+                        companyIdToDeliveryTimeMap.put(key, strDeliveryTime);
+                    }
+
+                    //Tracer.writeLine("配送时间为：" + strDeliveryTime);
+                    if (StringHelper.isNullOrEmpty(companySettingValueInfo.getReturnButNotBorrowed()) ||
+                            companySettingValueInfo.getReturnButNotBorrowed().equals("false")) {
+                        if (bookOrderInfo.getBorrowCount() > 0) {
+                            bookOrderBorrowStatusCode = BookOrderBorrowStatusCodes.StockOuting;
+                            //修改itme并且添加找书出库单
+                            //this.addBookOutOrder(session, bookOrderInfo);
+                        }
+                        if (bookOrderInfo.getReturnCount() > 0 && bookOrderInfo.getBorrowCount() > 0) {
+                            bookOrderReturnStatusCode = BookOrderReturnStatusCodes.Retrieving;
+                            /*String sql = String.format("update book_order_item set deliver_status_code='%s' where book_order_id=%d " +
+                                            "and book_order_type_code = '%s'",
+                                    DeliverStatusCodes.Delivering, bookOrderInfo.getId(), BookOrderTypeCodes.Return);
+                            MyBatisManager.getInstance().executeUpdate(session, sql);*/
+                        }
+                        if (bookOrderInfo.getReturnCount() > 0 && bookOrderInfo.getBorrowCount() == 0) {
+                            bookOrderReturnStatusCode = BookOrderReturnStatusCodes.Submitting;
+                            strDeliveryTime = "";
+                            strBusinessSate = ",business_date = DATE_ADD(business_date, INTERVAL 1 DAY)";
+                        }
+                    } else if (companySettingValueInfo.getReturnButNotBorrowed().equals("true")) {
+                        if (bookOrderInfo.getReturnCount() > 0) {
+                            bookOrderReturnStatusCode = BookOrderReturnStatusCodes.Retrieving;
+                            /*String sql = String.format("update book_order_item set deliver_status_code='%s' where book_order_id=%d " +
+                                            "and book_order_type_code = '%s'",
+                                    DeliverStatusCodes.Delivering, bookOrderInfo.getId(), BookOrderTypeCodes.Return);
+                            MyBatisManager.getInstance().executeUpdate(session, sql);*/
+
+                            //获取大区排序
+                            ViewBookOrder theAreaViewBookOrder = BookOrderManager.getInstance().getViewBookOrderByArea(session, bookOrderInfo.getCompanyId(), bookOrderInfo.getDeliverAreaId(), strDeliveryTime);
+                            if (theAreaViewBookOrder == null) {
+                                deliverAreaNumber = 1;
+                            } else {
+                                deliverAreaNumber = theAreaViewBookOrder.getDeliverAreaNumber() + 1;
+                            }
+                        }
+                        if (bookOrderInfo.getBorrowCount() > 0) {
+                            bookOrderBorrowStatusCode = BookOrderBorrowStatusCodes.StockOuting;
+                            //修改itme并且添加找书出库单
+                            //this.addBookOutOrder(session, bookOrderInfo);
+                        } else if (bookOrderInfo.getReturnCount() > 0) {
+                            bookOrderBorrowStatusCode = BookOrderBorrowStatusCodes.Delivering;
+                        }
+                    }
+                    String sql = String.format(
+                            "update book_order set update_time=now() %s %s %s %s %s %s where id=%d",
+                            StringHelper.isNullOrEmpty(strDeliveryTime) ? "" : String.format(" ,deliver_time='%s'", strDeliveryTime),
+                            StringHelper.isNullOrEmpty(bookOrderBorrowStatusCode) ? "" : String.format(",book_order_borrow_status_code='%s'", bookOrderBorrowStatusCode),
+                            StringHelper.isNullOrEmpty(bookOrderReturnStatusCode) ? "" : String.format(",book_order_return_status_code='%s'", bookOrderReturnStatusCode),
+                            StringHelper.isNullOrEmpty(strBusinessSate) ? "" : strBusinessSate,
+                            deliverAreaNumber!=null ? String.format(",deliver_area_number=%d", deliverAreaNumber) : "",
+                            bookOrderInfo.getId());
+                    MyBatisManager.getInstance().executeUpdate(session, sql);
+                }
+
+                //遍历companyIdToDeliveryTimeMap执行排序语句
+                for (Map.Entry<CompanyDeliveryKey, String> entry : companyIdToDeliveryTimeMap.entrySet()) {
+                    CompanyDeliveryKey key = entry.getKey();
+                    Integer companyId = key.getCompanyId();
+                    String deliveryTime = key.getStrDeliveryTime();
+
+                    String sql = "SET @row_number = 0; " +
+                            "UPDATE book_order bo " +
+                            "JOIN ( " +
+                            "    SELECT id, @row_number := @row_number + 1 AS row_num " +
+                            "    FROM view_book_order " +
+                            "    WHERE company_id = " + companyId + " AND DATE(deliver_time) = '" + deliveryTime + "' " +
+                            "    ORDER BY deliver_area_id, id " +
+                            ") AS ranked_orders ON bo.id = ranked_orders.id " +
+                            "SET bo.display_order = ranked_orders.row_num;";
+                    MyBatisManager.getInstance().executeUpdate(session, sql);
+                }
+            }
+
+            MyBatisManager.getInstance().commitSession(session);
+        } catch (Exception ex) {
+            MyBatisManager.getInstance().rollbackSession(session);
+            throw ex;
+        } finally {
+            MyBatisManager.getInstance().closeSession(session);
+        }
+    }
+
+    /**
+     * 添加找书出库单
+     *
+     * @param session
+     * @param bookOrderInfo
+     */
+    private void addBookOutOrder(SqlSession session, BookOrderInfo bookOrderInfo) throws IOException {
+        //修改item
+        String sql = String.format("update book_order_item set deliver_status_code='%s' where book_order_id=%d " +
+                        "and book_order_type_code = '%s'",
+                DeliverStatusCodes.Outing, bookOrderInfo.getId(), BookOrderTypeCodes.Borrow);
+        MyBatisManager.getInstance().executeUpdate(session, sql);
+        //获取所有类型为借阅的item
+        String condition = String.format("book_order_id = %s and book_order_type_code = '%s'",
+                bookOrderInfo.getId(), BookOrderTypeCodes.Borrow);
+        List<BookOrderItem> lstBookOrderItem = BookOrderItemManager.getInstance().getList(session, condition);
+
+        List<BookOutOrder> lstBookOutOrder = new ArrayList<BookOutOrder>();
+        for (BookOrderItem bookOrderItem : lstBookOrderItem) {
+            BookOutOrder newBookOutOrder = new BookOutOrder();
+            newBookOutOrder.setBookOrderItemId(bookOrderItem.getId());
+            newBookOutOrder.setBookOutOrderStatusCode(BookOutOrderStatusCodes.NotFound);
+            lstBookOutOrder.add(newBookOutOrder);
+        }
+        BookOutOrderManager.getInstance().addList(session, lstBookOutOrder);
+    }
+
+    /**
+     * 设置配送时间
+     *
+     * @param bookOrderInfo
+     * @param companySettingValueInfo
+     */
+    private String setDeliveryTime(SqlSession session, BookOrderInfo bookOrderInfo, CompanySettingValueInfo companySettingValueInfo) throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        TimeZone chinaTimeZone = TimeZone.getTimeZone("Asia/Shanghai"); // 代表中国/上海时区
+        calendar.setTimeZone(chinaTimeZone);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setTimeZone(chinaTimeZone);
+        String strDeliveryTime = dateFormat.format(calendar.getTime());
+        //如果远距离配送
+        if (!StringHelper.isNullOrEmpty(bookOrderInfo.getDistanceCode())
+                && bookOrderInfo.getDistanceCode().equals("yuan")) {
+            strDeliveryTime = this.setWeeklyYuanBookOrderDeliveryTime(companySettingValueInfo, calendar, dateFormat);
+        }
+        //获取暂停模式
+        String pauseMode = companySettingValueInfo.getPauseMode();
+        if (StringHelper.isNullOrEmpty(pauseMode)) {
+            return strDeliveryTime;
+        }
+        if (pauseMode.contains("Holiday")) {
+            strDeliveryTime = this.setHolidayBookOrderDeliveryTime(session, strDeliveryTime);
+        }
+        if (pauseMode.contains("Temp")) {
+            strDeliveryTime = this.setTempBookOrderDeliveryTime(companySettingValueInfo, calendar, dateFormat, strDeliveryTime);
+        }
+        if (pauseMode.contains("Weekly")) {
+            strDeliveryTime = this.setWeeklyJinBookOrderDeliveryTime(companySettingValueInfo, calendar, dateFormat, strDeliveryTime);
+        }
+        return strDeliveryTime;
+    }
+
+    /**
+     * 暂停模式为节假日，设置配送时间
+     *
+     * @return
+     */
+    private String setHolidayBookOrderDeliveryTime(SqlSession session, String strCurrentTime) throws Exception {
+
+        //获取法定节假日列表
+        List<Holiday> lstHoliday = HolidayManager.getInstance().getList(session);
+
+        // 创建一个存放所有 vacation 的列表
+        ArrayList<String> vacationList = new ArrayList<>();
+
+        // 遍历节假日列表，获取每个节假日的 vacation 并添加到列表中
+        for (Holiday holiday : lstHoliday) {
+            String vacation = holiday.getVacation();
+            String[] vacations = vacation.split("\\|");
+            Collections.addAll(vacationList, vacations);
+        }
+        // 判断当前日期是否为节假日
+        String deliveryTime = "";
+        if (!vacationList.contains(strCurrentTime)) {
+            // 如果当前日期不是节假日，直接返回当前日期
+            deliveryTime = strCurrentTime;
+        } else {
+            // 找到节假日后的第一个工作日
+            deliveryTime = findNextWorkDay(strCurrentTime, vacationList);
+        }
+        return deliveryTime;
+    }
+
+    /**
+     * 寻找节假日后的第一个工作日的方法
+     */
+    private static String findNextWorkDay(String strCurrentTime, ArrayList<String> vacationList) {
+        LocalDate nextDay = LocalDate.parse(strCurrentTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        while (vacationList.contains(nextDay.toString())) {
+            // 如果是节假日，继续往后找
+            nextDay = nextDay.plusDays(1);
+        }
+        return nextDay.toString();
+    }
+
+    /**
+     * 暂定模式为临时，设置配送时间
+     *
+     * @param companySettingValueInfo
+     * @param calendar
+     * @param dateFormat
+     * @throws ParseException
+     */
+    private String setTempBookOrderDeliveryTime(
+            CompanySettingValueInfo companySettingValueInfo, Calendar calendar, SimpleDateFormat dateFormat, String strCurrentTime) throws ParseException {
+        String pauseDateRangeArr = companySettingValueInfo.getPauseDateRangeArr();
+        if (!StringHelper.isNullOrEmpty(pauseDateRangeArr)) {
+            String[] pauseDateRange = pauseDateRangeArr.split("[,，]");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date currentDate = sdf.parse(strCurrentTime);
+            // 判断当前日期是否在休息日期范围内
+            Date startDate = sdf.parse(pauseDateRange[0]);
+            Date endDate = sdf.parse(pauseDateRange[1]);
+            boolean isRestDay = currentDate.compareTo(startDate) >= 0 && currentDate.compareTo(endDate) <= 0;
+
+            // 根据判断结果决定配送时间
+            if (isRestDay) {
+                // 如果当前日期在休息日期范围内，找到最近的下一个工作日作为配送时间
+                calendar.setTime(endDate);
+                calendar.add(Calendar.DAY_OF_MONTH, 1); // 将结束日期的下一天作为配送时间
+                String strDeliveryTime = dateFormat.format(calendar.getTime());
+                //Tracer.writeLine("模式（时间段）配送时间为最近的下一个工作日：" + strDeliveryTime);
+                return strDeliveryTime;
+            } else {
+                // 如果当前日期不在休息日期范围内，配送时间为当前日期
+                return strCurrentTime;
+            }
+        } else {
+            return strCurrentTime;
+        }
+    }
+
+    /**
+     * 暂定模式为星期，近距离订单设置配送时间
+     *
+     * @param companySettingValueInfo
+     * @param calendar
+     * @param dateFormat
+     */
+    private String setWeeklyJinBookOrderDeliveryTime(
+            CompanySettingValueInfo companySettingValueInfo, Calendar calendar, SimpleDateFormat dateFormat, String strCurrentTime) {
+        String pauseDayArr = companySettingValueInfo.getPauseDayArr();
+        if (!StringHelper.isNullOrEmpty(pauseDayArr)) {
+            String[] pauseDayArrs = pauseDayArr.split("[,，]");
+            // 获取当前日期的星期几
+            //int currentWeekday = calendar.get(Calendar.DAY_OF_WEEK);
+            LocalDate currentDate = LocalDate.parse(strCurrentTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+            int currentWeekday = (dayOfWeek.getValue() % 7) + 1;
+            // 判断当前星期是否在数组里
+            boolean isRestDay = false;
+            for (String day : pauseDayArrs) {
+                if (Integer.parseInt(day) == currentWeekday) {
+                    isRestDay = true;
+                    break;
+                }
+            }
+
+            // 根据判断结果决定配送时间
+            if (isRestDay) {
+                // 如果当前星期在数组里，找到最近下一个工作日的日期为配送时间
+                int daysToAdd = 1;
+                while (true) {
+                    currentWeekday = (currentWeekday % 7) + 1; // 将星期几循环在1到7之间
+                    boolean found = false;
+                    for (String day : pauseDayArrs) {
+                        if (Integer.parseInt(day) == currentWeekday) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        break;
+                    }
+                    daysToAdd++;
+                }
+                calendar.add(Calendar.DAY_OF_MONTH, daysToAdd);
+                String strDeliveryTime = dateFormat.format(calendar.getTime());
+                return strDeliveryTime;
+
+            } else {
+                // 如果当前星期不在数组里，配送时间为当前日期
+                return strCurrentTime;
+            }
+        } else {
+            return strCurrentTime;
+        }
+    }
+
+    /**
+     * 暂定模式为星期，远距离订单设置配送时间
+     *
+     * @param companySettingValueInfo
+     * @param calendar
+     * @param dateFormat
+     * @return
+     */
+    private String setWeeklyYuanBookOrderDeliveryTime(
+            CompanySettingValueInfo companySettingValueInfo, Calendar calendar, SimpleDateFormat dateFormat) {
+        //获取远距离配送时间
+        String longDistanceRrderDeliveryTime = companySettingValueInfo.getLongDistanceRrderDeliveryTime();
+        if (!StringHelper.isNullOrEmpty(longDistanceRrderDeliveryTime)) {
+            //获取远距离配送星期
+            int intLongDistanceRrderDeliveryTime = Integer.parseInt(longDistanceRrderDeliveryTime) + 1;
+
+            // 根据给定的星期几，计算距离该日期最近的日期
+            int currentWeekday = calendar.get(Calendar.DAY_OF_WEEK);
+            int intervalDays = intLongDistanceRrderDeliveryTime - currentWeekday;
+            if (intervalDays < 0) {
+                intervalDays += 7;
+            }
+            calendar.add(Calendar.DAY_OF_MONTH, intervalDays);
+            String strDeliveryTime = dateFormat.format(calendar.getTime());
+            return strDeliveryTime;
+        }
+        return dateFormat.format(calendar.getTime());
+    }
+
+    /**
+     * 获取单个门店参数
+     *
+     * @param CompanySettingValueInfoList
+     * @param companyId
+     */
+    private CompanySettingValueInfo getCompanySettingValue(List<CompanySettingValueInfo> CompanySettingValueInfoList, Integer companyId) {
+        for (CompanySettingValueInfo companySettingValueInfo : CompanySettingValueInfoList) {
+            if (companySettingValueInfo.getCompanyId().equals(companyId)) {
+                return companySettingValueInfo;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 获取门店参数
+     *
+     * @param session
+     */
+    private List<CompanySettingValueInfo> getCompanySetting(SqlSession session) {
+        List<CompanySetting> lstCompanySetting = CompanySettingManager.getInstance().getList(session);
+        Map<Integer, List<CompanySetting>> companySettingMap = lstCompanySetting.stream()
+                .collect(Collectors.groupingBy(CompanySetting::getCompanyId));
+        List<CompanySettingValueInfo> companySettings = new ArrayList<>();
+        companySettingMap.forEach((companyId, settings) -> {
+            CompanySettingValueInfo companySettingValueInfo = new CompanySettingValueInfo();
+            settings.forEach(companySetting -> {
+                switch (companySetting.getSysSettingCode()) {
+                    case "LongDistanceRrderDeliveryTime":
+                        companySettingValueInfo.setLongDistanceRrderDeliveryTime(companySetting.getValue());
+                        break;
+                    case "ReturnButNotBorrowed":
+                        companySettingValueInfo.setReturnButNotBorrowed(companySetting.getValue());
+                        break;
+                    case "PauseMode":
+                        companySettingValueInfo.setPauseMode(companySetting.getValue());
+                        break;
+                    case "PauseDayArr":
+                        companySettingValueInfo.setPauseDayArr(companySetting.getValue());
+                        break;
+                    case "PauseDateRangeArr":
+                        companySettingValueInfo.setPauseDateRangeArr(companySetting.getValue());
+                        break;
+                    case "BorrowingPrompt":
+                        companySettingValueInfo.setBorrowingPrompt(companySetting.getValue());
+                        break;
+                    case "SilentBorrowing":
+                        companySettingValueInfo.setSilentBorrowing(companySetting.getValue());
+                        break;
+                }
+            });
+            companySettingValueInfo.setCompanyId(companyId);
+            companySettings.add(companySettingValueInfo);
+        });
+        return companySettings;
+    }
+
+    /**
+     * 获取昨天待提交订单
+     */
+    public List<BookOrderInfo> getYesterdaySubmittingBookOrder(SqlSession session) throws Exception {
+       /* String condition = String.format(
+                "is_offline is not true and DATE(create_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)\n" +
+                        " and book_order_borrow_status_code='%s'",
+                BookOrderBorrowStatusCodes.Submitting);*/
+        String sql = "select bo.*,\n" +
+                "      (select count(1) from book_order_item boi where boi.book_order_id = bo.id and boi.book_order_type_code = 'Borrow') \n" +
+                "\t\t\tas borrowCount,\n" +
+                "      (select count(1) from book_order_item boi where boi.book_order_id = bo.id and boi.book_order_type_code = 'Return') \n" +
+                "\t\t\tas returnCount\n" +
+                "      from view_book_order bo \n" +
+                "      where bo.is_offline is not true and DATE(bo.business_date) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)\n" +
+                "      and (bo.book_order_borrow_status_code = 'Submitting' OR bo.book_order_return_status_code = 'Submitting')";
+        ArrayList<LinkedHashMap<String, Object>> alData = MyBatisManager.getInstance().executeHashMapList(session, sql);
+        List<BookOrderInfo> lstBookOrderInfo = JsonHelper.toJavaList(BookOrderInfo.class, alData);
+        return lstBookOrderInfo;
+    }
+}

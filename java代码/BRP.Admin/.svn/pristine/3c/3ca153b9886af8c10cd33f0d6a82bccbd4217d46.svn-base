@@ -1,0 +1,746 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BookmarksViewState">
+    <option name="proportionPopup" value="0.29506642" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="36f41c94-1681-4891-894f-ce73740a2de4" name="Default Changelist" comment="WS">
+      <change afterPath="$PROJECT_DIR$/src/main/java/BRP/service/UpdateBookDamageServiceHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BRP.Admin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/BRP.Admin.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/ActivityMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/ActivityMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/BookDamage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/BookDamage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/BookDamageMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/BookDamageMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/CompanyMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/CompanyMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/CompanyUserMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/CompanyUserMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/MemberCardServiceTimeLog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/MemberCardServiceTimeLog.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/MemberCardServiceTimeLogMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/MemberCardServiceTimeLogMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/PaymentMethodMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/PaymentMethodMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/Product.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/SalesOrder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/SalesOrder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/ViewBookDamage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/ViewBookDamage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/ViewMember.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/ViewMember.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/ViewMemberCard.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/ViewMemberCard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/data/ViewSalesOrder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/data/ViewSalesOrder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/mapper/BookDamageMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/mapper/BookDamageMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/mapper/MemberCardServiceTimeLogMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/mapper/MemberCardServiceTimeLogMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/mapper/ProductMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/mapper/ProductMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/mapper/SalesOrderMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/mapper/SalesOrderMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/mapper/ViewBookDamageMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/mapper/ViewBookDamageMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/mapper/ViewMemberCardMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/mapper/ViewMemberCardMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/mapper/ViewMemberMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/mapper/ViewMemberMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/mapper/ViewSalesOrderMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/mapper/ViewSalesOrderMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/model/ViewCompanyProductStocksManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/model/ViewCompanyProductStocksManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/model/ViewMemberCardManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/model/ViewMemberCardManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/service/AddBookDamageServiceHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/service/AddBookDamageServiceHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/service/GetMemberBookboxTotalServiceHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/service/GetMemberBookboxTotalServiceHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/BRP/service/SalesOrderFinishedServiceHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/BRP/service/SalesOrderFinishedServiceHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/config/ServiceHandlers/BRP.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config/ServiceHandlers/BRP.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/config/ServiceHandlers/CustomBRP.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config/ServiceHandlers/CustomBRP.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" show_ignored="true">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="module" />
+    </option>
+  </component>
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="MAKE_PROJECT_ON_SAVE" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="5" />
+  </component>
+  <component name="JRebelWorkspace">
+    <option name="jrebelEnabledAutocompile" value="true" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="localRepository" value="D:\Software\apache-maven-3.8.6\repository" />
+        <option name="mavenHome" value="D:\Software\apache-maven-3.8.6" />
+        <option name="userSettingsFile" value="D:\Software\apache-maven-3.8.6\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2TVw4ycGjHYpF2aj2nSFp8kPxyY" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="false" id="Update" />
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder0&quot;: &quot;0&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder1&quot;: &quot;1&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder2&quot;: &quot;2&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder3&quot;: &quot;3&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder4&quot;: &quot;4&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder5&quot;: &quot;5&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth0&quot;: &quot;218&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth1&quot;: &quot;219&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth2&quot;: &quot;218&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth3&quot;: &quot;218&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth4&quot;: &quot;219&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth5&quot;: &quot;218&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder0&quot;: &quot;0&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder1&quot;: &quot;1&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder2&quot;: &quot;2&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder3&quot;: &quot;3&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder4&quot;: &quot;4&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder5&quot;: &quot;5&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth0&quot;: &quot;218&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth1&quot;: &quot;219&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth2&quot;: &quot;218&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth3&quot;: &quot;218&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth4&quot;: &quot;219&quot;,
+    &quot;FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth5&quot;: &quot;218&quot;,
+    &quot;Maven.BRP.Admin [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.BRP.Admin [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.BRP.Admin [package].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.JAppApplication (2).executor&quot;: &quot;Run&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Program Files/TortoiseSVN/bin/svn.exe&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.ide.settings.new.ui&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RebelAgentSelection">
+    <selection>jr</selection>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Work\BRP\SVN\BRP.Admin\src\main\java\BRP\service" />
+      <recent name="D:\Work\BRP\SVN\BRP.Admin\src\main\java\strosoft\sys\model" />
+      <recent name="D:\Work\BRP\SVN\BRP.Admin\src\main\java\strosoft\sys\mapper" />
+      <recent name="D:\Work\BRP\SVN\BRP.Admin\src\main\java\strosoft\sys\data" />
+      <recent name="D:\Work\BRP\SVN\BRP.Admin\src\main\java\BRP\model" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="BRP.service" />
+      <recent name="BRP.model" />
+      <recent name="strosoft.wx.controller" />
+      <recent name="BRP.data" />
+      <recent name="BRP.controller" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="JAppApplication (2)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="BRP.Admin" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="strosoft.main.boot.JAppApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-1.8.0_402-corretto-1.8.0_402-4caba194b151-ae57be32" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>C:\Users\隗松\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="SvnFileUrlMappingImpl">
+    <option name="myMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\Work\BRP\SVN\BRP.Admin" />
+          <option name="myCopyRoot" value="D:\Work\BRP\SVN\BRP.Admin" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+    <option name="myMoreRealMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\Work\BRP\SVN\BRP.Admin" />
+          <option name="myCopyRoot" value="D:\Work\BRP\SVN\BRP.Admin" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="36f41c94-1681-4891-894f-ce73740a2de4" name="Default Changelist" comment="" />
+      <created>1691141374088</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1691141374088</updated>
+      <workItem from="1691141375955" duration="3646000" />
+      <workItem from="1691146558315" duration="1870000" />
+      <workItem from="1691200279223" duration="2750000" />
+      <workItem from="1691208252290" duration="239000" />
+      <workItem from="1691209328216" duration="196000" />
+      <workItem from="1691209538474" duration="915000" />
+      <workItem from="1691210488733" duration="127000" />
+      <workItem from="1691210633332" duration="11425000" />
+      <workItem from="1691233181672" duration="1452000" />
+      <workItem from="1693208130251" duration="175000" />
+      <workItem from="1701142261124" duration="1361000" />
+      <workItem from="1701153663049" duration="1373000" />
+      <workItem from="1701156320382" duration="15809000" />
+      <workItem from="1701256451205" duration="576000" />
+      <workItem from="1701258704815" duration="2097000" />
+      <workItem from="1701311712238" duration="2724000" />
+      <workItem from="1701326884552" duration="7895000" />
+      <workItem from="1701401041677" duration="3290000" />
+      <workItem from="1701425361681" duration="3201000" />
+      <workItem from="1701654216557" duration="10774000" />
+      <workItem from="1702696321120" duration="27000" />
+      <workItem from="1702696367165" duration="9102000" />
+      <workItem from="1702864010792" duration="530000" />
+      <workItem from="1702864575220" duration="45917000" />
+      <workItem from="1703467976066" duration="5310000" />
+      <workItem from="1703650811023" duration="38000" />
+      <workItem from="1703743425928" duration="2672000" />
+      <workItem from="1703746417742" duration="899000" />
+      <workItem from="1703747493956" duration="4570000" />
+      <workItem from="1703822540906" duration="4739000" />
+      <workItem from="1704158598996" duration="2655000" />
+      <workItem from="1704266930552" duration="3132000" />
+      <workItem from="1704436708451" duration="264000" />
+      <workItem from="1704437204458" duration="589000" />
+      <workItem from="1704515580464" duration="7947000" />
+      <workItem from="1704678328816" duration="25341000" />
+      <workItem from="1707051527400" duration="99000" />
+      <workItem from="1707053258308" duration="597000" />
+      <workItem from="1707053874202" duration="30972000" />
+      <workItem from="1707110815377" duration="4147000" />
+      <workItem from="1707129568254" duration="16908000" />
+      <workItem from="1707180409186" duration="2085000" />
+      <workItem from="1707285300740" duration="2715000" />
+      <workItem from="1708221003207" duration="778000" />
+      <workItem from="1708221800118" duration="34215000" />
+      <workItem from="1708393449857" duration="16680000" />
+      <workItem from="1708419744673" duration="5700000" />
+      <workItem from="1708480237866" duration="21474000" />
+      <workItem from="1708566134305" duration="276000" />
+      <workItem from="1708566429468" duration="606000" />
+      <workItem from="1708571321607" duration="23532000" />
+      <workItem from="1708652613325" duration="25481000" />
+      <workItem from="1708739754578" duration="75373000" />
+      <workItem from="1709171178089" duration="19074000" />
+      <workItem from="1709257322659" duration="19614000" />
+      <workItem from="1709450916098" duration="6359000" />
+      <workItem from="1709513012333" duration="26073000" />
+      <workItem from="1709604095069" duration="5819000" />
+      <workItem from="1709617084790" duration="12497000" />
+      <workItem from="1709695234126" duration="20908000" />
+      <workItem from="1709735355832" duration="386000" />
+      <workItem from="1709776646944" duration="18009000" />
+      <workItem from="1709862282209" duration="4614000" />
+      <workItem from="1709875204294" duration="11730000" />
+      <workItem from="1709948980260" duration="20417000" />
+      <workItem from="1710048745802" duration="15971000" />
+      <workItem from="1710221097035" duration="278000" />
+      <workItem from="1710221614767" duration="47973000" />
+      <workItem from="1710380263044" duration="13214000" />
+      <workItem from="1710491918338" duration="2900000" />
+      <workItem from="1710662083417" duration="25436000" />
+      <workItem from="1710819044077" duration="22319000" />
+      <workItem from="1710858588166" duration="1698000" />
+      <workItem from="1710894923826" duration="11793000" />
+      <workItem from="1710911248127" duration="50125000" />
+      <workItem from="1711069555862" duration="27999000" />
+      <workItem from="1711355990142" duration="1746000" />
+      <workItem from="1711419085632" duration="31945000" />
+      <workItem from="1711588085241" duration="12882000" />
+      <workItem from="1711674347833" duration="41349000" />
+      <workItem from="1711948129903" duration="22030000" />
+      <workItem from="1711980701633" duration="10806000" />
+      <workItem from="1712021572458" duration="25985000" />
+      <workItem from="1712081692954" duration="349000" />
+      <workItem from="1712111801037" duration="10502000" />
+      <workItem from="1712128942859" duration="5954000" />
+      <workItem from="1712502631176" duration="1122000" />
+      <workItem from="1712533415691" duration="24688000" />
+      <workItem from="1712617632733" duration="5308000" />
+      <workItem from="1712638768295" duration="10087000" />
+      <workItem from="1712712079729" duration="37816000" />
+      <workItem from="1712822001551" duration="45867000" />
+      <workItem from="1713071074095" duration="205000" />
+    </task>
+    <task id="LOCAL-00161" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711508339734</created>
+      <option name="number" value="00161" />
+      <option name="presentableId" value="LOCAL-00161" />
+      <option name="project" value="LOCAL" />
+      <updated>1711508339734</updated>
+    </task>
+    <task id="LOCAL-00162" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711612822752</created>
+      <option name="number" value="00162" />
+      <option name="presentableId" value="LOCAL-00162" />
+      <option name="project" value="LOCAL" />
+      <updated>1711612822753</updated>
+    </task>
+    <task id="LOCAL-00163" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711614574877</created>
+      <option name="number" value="00163" />
+      <option name="presentableId" value="LOCAL-00163" />
+      <option name="project" value="LOCAL" />
+      <updated>1711614574877</updated>
+    </task>
+    <task id="LOCAL-00164" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711617120026</created>
+      <option name="number" value="00164" />
+      <option name="presentableId" value="LOCAL-00164" />
+      <option name="project" value="LOCAL" />
+      <updated>1711617120026</updated>
+    </task>
+    <task id="LOCAL-00165" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711627771999</created>
+      <option name="number" value="00165" />
+      <option name="presentableId" value="LOCAL-00165" />
+      <option name="project" value="LOCAL" />
+      <updated>1711627771999</updated>
+    </task>
+    <task id="LOCAL-00166" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711680827910</created>
+      <option name="number" value="00166" />
+      <option name="presentableId" value="LOCAL-00166" />
+      <option name="project" value="LOCAL" />
+      <updated>1711680827910</updated>
+    </task>
+    <task id="LOCAL-00167" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711687756063</created>
+      <option name="number" value="00167" />
+      <option name="presentableId" value="LOCAL-00167" />
+      <option name="project" value="LOCAL" />
+      <updated>1711687756063</updated>
+    </task>
+    <task id="LOCAL-00168" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711698117798</created>
+      <option name="number" value="00168" />
+      <option name="presentableId" value="LOCAL-00168" />
+      <option name="project" value="LOCAL" />
+      <updated>1711698117799</updated>
+    </task>
+    <task id="LOCAL-00169" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711700305364</created>
+      <option name="number" value="00169" />
+      <option name="presentableId" value="LOCAL-00169" />
+      <option name="project" value="LOCAL" />
+      <updated>1711700305364</updated>
+    </task>
+    <task id="LOCAL-00170" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711709924047</created>
+      <option name="number" value="00170" />
+      <option name="presentableId" value="LOCAL-00170" />
+      <option name="project" value="LOCAL" />
+      <updated>1711709924047</updated>
+    </task>
+    <task id="LOCAL-00171" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711712466422</created>
+      <option name="number" value="00171" />
+      <option name="presentableId" value="LOCAL-00171" />
+      <option name="project" value="LOCAL" />
+      <updated>1711712466422</updated>
+    </task>
+    <task id="LOCAL-00172" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711784097056</created>
+      <option name="number" value="00172" />
+      <option name="presentableId" value="LOCAL-00172" />
+      <option name="project" value="LOCAL" />
+      <updated>1711784097056</updated>
+    </task>
+    <task id="LOCAL-00173" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711787615020</created>
+      <option name="number" value="00173" />
+      <option name="presentableId" value="LOCAL-00173" />
+      <option name="project" value="LOCAL" />
+      <updated>1711787615020</updated>
+    </task>
+    <task id="LOCAL-00174" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711814880857</created>
+      <option name="number" value="00174" />
+      <option name="presentableId" value="LOCAL-00174" />
+      <option name="project" value="LOCAL" />
+      <updated>1711814880857</updated>
+    </task>
+    <task id="LOCAL-00175" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711818340877</created>
+      <option name="number" value="00175" />
+      <option name="presentableId" value="LOCAL-00175" />
+      <option name="project" value="LOCAL" />
+      <updated>1711818340877</updated>
+    </task>
+    <task id="LOCAL-00176" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711822174075</created>
+      <option name="number" value="00176" />
+      <option name="presentableId" value="LOCAL-00176" />
+      <option name="project" value="LOCAL" />
+      <updated>1711822174075</updated>
+    </task>
+    <task id="LOCAL-00177" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711825500977</created>
+      <option name="number" value="00177" />
+      <option name="presentableId" value="LOCAL-00177" />
+      <option name="project" value="LOCAL" />
+      <updated>1711825500977</updated>
+    </task>
+    <task id="LOCAL-00178" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711952951121</created>
+      <option name="number" value="00178" />
+      <option name="presentableId" value="LOCAL-00178" />
+      <option name="project" value="LOCAL" />
+      <updated>1711952951122</updated>
+    </task>
+    <task id="LOCAL-00179" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711958598778</created>
+      <option name="number" value="00179" />
+      <option name="presentableId" value="LOCAL-00179" />
+      <option name="project" value="LOCAL" />
+      <updated>1711958598778</updated>
+    </task>
+    <task id="LOCAL-00180" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711964599296</created>
+      <option name="number" value="00180" />
+      <option name="presentableId" value="LOCAL-00180" />
+      <option name="project" value="LOCAL" />
+      <updated>1711964599296</updated>
+    </task>
+    <task id="LOCAL-00181" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711965670435</created>
+      <option name="number" value="00181" />
+      <option name="presentableId" value="LOCAL-00181" />
+      <option name="project" value="LOCAL" />
+      <updated>1711965670435</updated>
+    </task>
+    <task id="LOCAL-00182" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711970130109</created>
+      <option name="number" value="00182" />
+      <option name="presentableId" value="LOCAL-00182" />
+      <option name="project" value="LOCAL" />
+      <updated>1711970130109</updated>
+    </task>
+    <task id="LOCAL-00183" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711976735806</created>
+      <option name="number" value="00183" />
+      <option name="presentableId" value="LOCAL-00183" />
+      <option name="project" value="LOCAL" />
+      <updated>1711976735806</updated>
+    </task>
+    <task id="LOCAL-00184" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711979774050</created>
+      <option name="number" value="00184" />
+      <option name="presentableId" value="LOCAL-00184" />
+      <option name="project" value="LOCAL" />
+      <updated>1711979774050</updated>
+    </task>
+    <task id="LOCAL-00185" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711988226965</created>
+      <option name="number" value="00185" />
+      <option name="presentableId" value="LOCAL-00185" />
+      <option name="project" value="LOCAL" />
+      <updated>1711988226966</updated>
+    </task>
+    <task id="LOCAL-00186" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711989748874</created>
+      <option name="number" value="00186" />
+      <option name="presentableId" value="LOCAL-00186" />
+      <option name="project" value="LOCAL" />
+      <updated>1711989748874</updated>
+    </task>
+    <task id="LOCAL-00187" summary="WS">
+      <option name="closed" value="true" />
+      <created>1711994129837</created>
+      <option name="number" value="00187" />
+      <option name="presentableId" value="LOCAL-00187" />
+      <option name="project" value="LOCAL" />
+      <updated>1711994129838</updated>
+    </task>
+    <task id="LOCAL-00188" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712045612537</created>
+      <option name="number" value="00188" />
+      <option name="presentableId" value="LOCAL-00188" />
+      <option name="project" value="LOCAL" />
+      <updated>1712045612537</updated>
+    </task>
+    <task id="LOCAL-00189" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712045743825</created>
+      <option name="number" value="00189" />
+      <option name="presentableId" value="LOCAL-00189" />
+      <option name="project" value="LOCAL" />
+      <updated>1712045743825</updated>
+    </task>
+    <task id="LOCAL-00190" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712046728267</created>
+      <option name="number" value="00190" />
+      <option name="presentableId" value="LOCAL-00190" />
+      <option name="project" value="LOCAL" />
+      <updated>1712046728267</updated>
+    </task>
+    <task id="LOCAL-00191" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712053397449</created>
+      <option name="number" value="00191" />
+      <option name="presentableId" value="LOCAL-00191" />
+      <option name="project" value="LOCAL" />
+      <updated>1712053397449</updated>
+    </task>
+    <task id="LOCAL-00192" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712056943858</created>
+      <option name="number" value="00192" />
+      <option name="presentableId" value="LOCAL-00192" />
+      <option name="project" value="LOCAL" />
+      <updated>1712056943858</updated>
+    </task>
+    <task id="LOCAL-00193" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712080612536</created>
+      <option name="number" value="00193" />
+      <option name="presentableId" value="LOCAL-00193" />
+      <option name="project" value="LOCAL" />
+      <updated>1712080612536</updated>
+    </task>
+    <task id="LOCAL-00194" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712129067014</created>
+      <option name="number" value="00194" />
+      <option name="presentableId" value="LOCAL-00194" />
+      <option name="project" value="LOCAL" />
+      <updated>1712129067015</updated>
+    </task>
+    <task id="LOCAL-00195" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712138591903</created>
+      <option name="number" value="00195" />
+      <option name="presentableId" value="LOCAL-00195" />
+      <option name="project" value="LOCAL" />
+      <updated>1712138591903</updated>
+    </task>
+    <task id="LOCAL-00196" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712492798790</created>
+      <option name="number" value="00196" />
+      <option name="presentableId" value="LOCAL-00196" />
+      <option name="project" value="LOCAL" />
+      <updated>1712492798790</updated>
+    </task>
+    <task id="LOCAL-00197" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712533496422</created>
+      <option name="number" value="00197" />
+      <option name="presentableId" value="LOCAL-00197" />
+      <option name="project" value="LOCAL" />
+      <updated>1712533496424</updated>
+    </task>
+    <task id="LOCAL-00198" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712536559568</created>
+      <option name="number" value="00198" />
+      <option name="presentableId" value="LOCAL-00198" />
+      <option name="project" value="LOCAL" />
+      <updated>1712536559568</updated>
+    </task>
+    <task id="LOCAL-00199" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712572380961</created>
+      <option name="number" value="00199" />
+      <option name="presentableId" value="LOCAL-00199" />
+      <option name="project" value="LOCAL" />
+      <updated>1712572380961</updated>
+    </task>
+    <task id="LOCAL-00200" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712633932017</created>
+      <option name="number" value="00200" />
+      <option name="presentableId" value="LOCAL-00200" />
+      <option name="project" value="LOCAL" />
+      <updated>1712633932017</updated>
+    </task>
+    <task id="LOCAL-00201" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712638263829</created>
+      <option name="number" value="00201" />
+      <option name="presentableId" value="LOCAL-00201" />
+      <option name="project" value="LOCAL" />
+      <updated>1712638263829</updated>
+    </task>
+    <task id="LOCAL-00202" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712731970147</created>
+      <option name="number" value="00202" />
+      <option name="presentableId" value="LOCAL-00202" />
+      <option name="project" value="LOCAL" />
+      <updated>1712731970147</updated>
+    </task>
+    <task id="LOCAL-00203" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712746503985</created>
+      <option name="number" value="00203" />
+      <option name="presentableId" value="LOCAL-00203" />
+      <option name="project" value="LOCAL" />
+      <updated>1712746503985</updated>
+    </task>
+    <task id="LOCAL-00204" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712748272980</created>
+      <option name="number" value="00204" />
+      <option name="presentableId" value="LOCAL-00204" />
+      <option name="project" value="LOCAL" />
+      <updated>1712748272980</updated>
+    </task>
+    <task id="LOCAL-00205" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712809374900</created>
+      <option name="number" value="00205" />
+      <option name="presentableId" value="LOCAL-00205" />
+      <option name="project" value="LOCAL" />
+      <updated>1712809374900</updated>
+    </task>
+    <task id="LOCAL-00206" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712812481419</created>
+      <option name="number" value="00206" />
+      <option name="presentableId" value="LOCAL-00206" />
+      <option name="project" value="LOCAL" />
+      <updated>1712812481419</updated>
+    </task>
+    <task id="LOCAL-00207" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712832370962</created>
+      <option name="number" value="00207" />
+      <option name="presentableId" value="LOCAL-00207" />
+      <option name="project" value="LOCAL" />
+      <updated>1712832370963</updated>
+    </task>
+    <task id="LOCAL-00208" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712834140219</created>
+      <option name="number" value="00208" />
+      <option name="presentableId" value="LOCAL-00208" />
+      <option name="project" value="LOCAL" />
+      <updated>1712834140219</updated>
+    </task>
+    <task id="LOCAL-00209" summary="WS">
+      <option name="closed" value="true" />
+      <created>1712835254563</created>
+      <option name="number" value="00209" />
+      <option name="presentableId" value="LOCAL-00209" />
+      <option name="project" value="LOCAL" />
+      <updated>1712835254563</updated>
+    </task>
+    <option name="localTasksCounter" value="210" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="生成总部端代码" />
+    <MESSAGE value="生成代码" />
+    <MESSAGE value="代码生成" />
+    <MESSAGE value="ZRJ" />
+    <MESSAGE value="WS" />
+    <option name="LAST_COMMIT_MESSAGE" value="WS" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/strosoft/sys/service/UploadFileServiceHandler.java</url>
+          <line>169</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="org.apache.commons.collections.map.ListOrderedMap$ListOrderedMapEntry" memberName="value" />
+      </pinned-members>
+    </pin-to-top-manager>
+    <watches-manager>
+      <configuration name="SpringBootApplicationConfigurationType">
+        <watch expression="project" />
+        <watch expression="filePath" language="JAVA" />
+        <watch expression="path" language="JAVA" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

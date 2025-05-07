@@ -1,0 +1,116 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.model.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.ClassHelper;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+public class GetMemberBorrowBookListServiceHandler extends ServiceHandler {
+    @Override
+    public void process(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONObject jData = getRequestData(request);
+        Integer memberId = JsonHelper.getInt(jData, "memberId");
+        Integer companyId = JsonHelper.getInt(jData, "companyId");
+        String condition = String.format("member_id = %d and company_id = %d " +
+                        " AND deliver_status_code not in ('%s','%s')",
+                memberId, companyId, DeliverStatusCodes.Delivered, DeliverStatusCodes.Storageed);
+        List<ViewBookOrderItem> lstViewBookOrderItem =
+                ViewBookOrderItemManager.getInstance().getList(condition, "create_time");
+        MemberBorrowBookInfo newMemberBorrowBookInfo = new MemberBorrowBookInfo();
+        List<ViewBook> lstViewBook = ViewBookManager.getInstance().getListByMemberId(companyId, memberId);
+        List<BookInfo> lstBookInfo = new ArrayList<>();
+        if (lstViewBook != null && lstViewBook.size() > 0) {
+            for (ViewBook viewBook : lstViewBook) {
+                BookInfo newBookInfo = (BookInfo) ClassHelper.copyObject(BookInfo.class, viewBook);
+                //获取借阅时间
+                String conditionItem = String.format(
+                        "member_id = %d and book_id = %d and book_order_type_code='%s'",
+                        memberId, viewBook.getId(), BookOrderTypeCodes.Borrow);
+                List<ViewBookOrderItem> lstViewBookOrderItemItem =
+                        ViewBookOrderItemManager.getInstance().getList(conditionItem, "create_time desc");
+                if (lstViewBookOrderItemItem != null && lstViewBookOrderItemItem.size() > 0) {
+                    String strCreateTime = DateHelper.timestampToString(
+                            lstViewBookOrderItemItem.get(0).getCreateTime(), "yyyy-MM-dd HH:mm:ss");
+                    newBookInfo.setBorrowTimeText(strCreateTime);
+                }
+                lstBookInfo.add(newBookInfo);
+            }
+            // 根据借阅时间倒序排序
+            Collections.sort(lstBookInfo, (bookInfo1, bookInfo2) -> {
+                String borrowTime1 = bookInfo1.getBorrowTimeText();
+                String borrowTime2 = bookInfo2.getBorrowTimeText();
+                // 倒序比较
+                return borrowTime2.compareTo(borrowTime1);
+            });
+        }
+        newMemberBorrowBookInfo.setBookList(lstBookInfo);
+
+        //获取会员卡
+        ViewMemberCard theViewMemberCard = ViewMemberCardManager.getInstance().getEntityByMemberId(memberId);
+
+        if (theViewMemberCard != null) {
+            //获取已借阅数量
+            Integer borrowedQuantity = ViewBookOrderItemManager.getInstance().getBorrowedQuantity(memberId);
+            //获取可借总数
+            Integer allQuantity = theViewMemberCard.getMaxBorrowableQuantity().intValue() + theViewMemberCard.getExtendQuantity().intValue();
+            newMemberBorrowBookInfo.setBorrowedQuantity(borrowedQuantity);
+
+            newMemberBorrowBookInfo.setBorrowableQuantity(allQuantity - borrowedQuantity);
+
+            /*if (theViewMemberCard.getBorrowableQuantity() != null && theViewMemberCard.getMaxBorrowableQuantity() != null) {
+                newMemberBorrowBookInfo.setBorrowableQuantity(theViewMemberCard.getBorrowableQuantity());
+                newMemberBorrowBookInfo.setBorrowedQuantity(
+                        theViewMemberCard.getMaxBorrowableQuantity() - theViewMemberCard.getBorrowableQuantity());
+            }*/
+        }
+
+        List<BookOrderItemInfo> lstBookOrderItemInfo = new ArrayList<>();
+        if (lstViewBookOrderItem != null && lstViewBookOrderItem.size() > 0) {
+            Long returnedCount = lstViewBookOrderItem.stream()
+                    .filter(item -> item.getBookOrderTypeCode().equals(BookOrderTypeCodes.Return))
+                    .count();
+            newMemberBorrowBookInfo.setReturnedQuantity(returnedCount);
+            //获取还书数量
+            for (ViewBookOrderItem viewBookOrderItem : lstViewBookOrderItem) {
+                BookOrderItemInfo newBookOrderItemInfo = (BookOrderItemInfo) ClassHelper.copyObject(BookOrderItemInfo.class, viewBookOrderItem);
+                Date addCreateTime = DateHelper.addMinutes(viewBookOrderItem.getCreateTime(), 20);
+                LocalDateTime startTime = LocalDateTime.now();
+                LocalDateTime ldtApproveTime = addCreateTime.toInstant().atZone(ZoneId.systemDefault())
+                        .toLocalDateTime();
+                long hours = ChronoUnit.HOURS.between(startTime, ldtApproveTime);
+                long minutes = ChronoUnit.MINUTES.between(startTime, ldtApproveTime) % 60;
+                long seconds = ChronoUnit.SECONDS.between(startTime, ldtApproveTime) % 60;
+                newBookOrderItemInfo.setCreateTimeText(DateHelper.format(
+                        viewBookOrderItem.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+                if (seconds >= 0) {
+                    newBookOrderItemInfo.setHours(hours);
+                    newBookOrderItemInfo.setMinutes(minutes);
+                    newBookOrderItemInfo.setSeconds(seconds);
+                    newBookOrderItemInfo.setIsCancelled(true);
+                } else {
+                    newBookOrderItemInfo.setIsCancelled(false);
+                }
+                newBookOrderItemInfo.setAddCreateTimeText(DateHelper.format(addCreateTime, "yyyy-MM-dd HH:mm:ss"));
+                lstBookOrderItemInfo.add(newBookOrderItemInfo);
+            }
+        }
+        newMemberBorrowBookInfo.setBookOrderItemInfoList(lstBookOrderItemInfo);
+        this.writeSuccessResponse(response, newMemberBorrowBookInfo);
+    }
+}

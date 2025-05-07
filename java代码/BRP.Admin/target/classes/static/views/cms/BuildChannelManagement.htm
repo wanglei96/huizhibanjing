@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>内容审核主界面</title>
+<link rel="stylesheet" type="text/css" href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/management.js"></script>
+<script type="text/javascript" src="../../js/cms/cms.promission.js"></script>
+<script type="text/javascript" src="../../js/cms/cms.build.js"></script>
+<script type="text/javascript">
+	managementContext.dataName="CmsChannel";
+	managementContext.tableName="cms_Channel";
+	managementContext.primaryKeyName="id";
+	managementContext.isCms = true;
+	managementContext.gridType = "Tree";
+	managementContext.allowPaging = false;
+	managementContext.managementPermission = "BuildChannelManagement";
+	$(function(){
+		var permissions = JSON.parse(localStorage.permissions);
+		var tableGridPermissions = $("#DivOperation [id^='btn']");
+		for(var i=0;i<tableGridPermissions.length;i++){
+			var id=tableGridPermissions[i].id;
+			var permission = managementContext.managementPermission+id.split("_")[0].substr(3);
+			if(!checkIsFunctionPermission(permissions,permission)){
+				$("#"+id).hide();
+			}
+		}
+		//实现全选按钮
+		$("#chooseAll").click(function(){
+			if($(this).is(':checked')){
+				$("#divCmschannel .tree-checkbox0").trigger("click");
+			} else {
+				$("#divCmschannel .tree-checkbox1").trigger("click");
+			}
+		})
+	})
+	/*
+	取得树的列
+	 */
+	function getTreeColumns(lstData) {
+		var treeColumns = [ [{
+			title : '栏目列表',
+			field : 'name',
+			align : 'left',
+			fixed : true,
+			width : 280
+		},{
+			field : 'cmsChannelTemplateName',
+			title : '栏目模板',
+			width : 80
+		}] ];
+		return treeColumns;
+	}
+	/*
+	取得请求参数
+	 */
+	function getParameters() {
+		var parameters = getParametersBase();
+		var cmsSiteId = $.cookie("cmsSiteId");
+		parameters.condition = "cms_site_id='" + cmsSiteId + "'";
+		parameters.cmsLanguageCode = currentCmsLanguageCode;
+		return parameters;
+	}
+	/*
+	 * 取得树数据
+	 */
+	function getGridTreeDataBase(lstData) {
+		// alert(JSON.stringify(lstData));
+		if (managementContext.primaryKeyName == "id") {
+			var treeData = getGridTreeData(lstData, 0, "id", "parentId");
+			// alert(JSON.stringify(treeData));
+			return treeData;
+		} else if (managementContext.primaryKeyName == "code") {
+			var treeData = getGridTreeData(lstData, "", "code", "parent_code");
+			// alert(JSON.stringify(treeData));
+			return treeData;
+		}
+	}
+	
+	/*
+	 * 输出树型列表
+	 */
+	function outputTreeGrid(dataList) {
+		var treeData = getGridTreeDataBase(dataList);
+		var treeColumns = getTreeColumns(dataList);
+		//alert(JSON.stringify(treeData));
+		// alert(JSON.stringify(treeColumns));
+		$('#tableGrid').treegrid({
+			idField : managementContext.primaryKeyName,
+			treeField : 'name',
+			checkOnSelect : false,
+			selectOnCheck : true,
+			checkbox : true,
+			fitColumns : true,
+			cascadeCheck : false,
+			columns : treeColumns
+		});
+		$('#tableGrid').treegrid("loadData", treeData);
+		//加载数据后展开树形列表
+		$("#divCmschannel .tree-hit").trigger("click");
+	}
+	//获取页面参数
+	function getCreateParameter(){
+		var data = new Object();
+		data.cmsChannelList = [];
+		data.cmsSiteId = $.cookie("cmsSiteId");
+		data.createdFileRange = $("#cmsBuildRange").val();
+		//设置生成页面类型
+		data.buildTaskType = "Channel";
+		data.adminRootUrl = config.adminRootUrl;
+		var cmsChannelList = $('#tableGrid').treegrid('getCheckedNodes');
+		for ( var i = 0; i < cmsChannelList.length; i++) {
+			data.cmsChannelList.push(cmsChannelList[i].id);
+		}
+		return data;
+	}
+</script>
+
+</head>
+
+<body>
+	<div id="divDetailDialog" class="easyui-layout" style="width:100%;overflow:auto;"
+	 closed="false" fit="true">
+			<div buttons="#dlg-buttons">
+				<form id="formDetail" method="post" novalidate
+					style="margin:0;padding:20px 50px">
+					<div>生成选定的栏目:</div>
+					<div style="margin-bottom:10px;width: 40%;height:630px;"class="divUlData">
+						<div style="float:left;width:100%;height:100%;border: 1px solid Gray;overflow:auto;" id="divCmschannel">
+							<table id="tableGrid" class="table table-bordered table-hover" style="height:auto;">
+							</table>
+						</div>
+						<br>
+						<div style="float:right">
+							<input  type="checkbox" value="chooseAll" id="chooseAll"/> 全选
+						</div>
+					</div>
+					<br>
+					<br>
+					<div >
+						<!-- <div style="float:left;">
+							<span style="display:block;width:255px;">生成范围:</span>
+						</div>
+						<div style="margin-bottom:20px;float:left;">
+							<select name="createdFileRange"
+								id="createdFileRange"
+								style="border-radius: 3px;width: 150px;height: 22px;">
+								<option value="AllOfChosen">所有选中的栏目</option>
+								<option value="OneMonthOfChosen">一个月内更新的栏目</option>
+								<option value="OneDayOfChosen">一天内更新的栏目</option>
+								<option value="TwoHoursOfChosen">两小时内更新的栏目</option>
+							</select>
+						</div> -->
+						<div style="float:left;display: none" class="createByCmslanguage">
+							<span style="display:block;width:80px;margin-left: 70px;">语言范围:</span>
+						</div>
+						<div style="margin-bottom:20px;float:left; display: none" class="createByCmslanguage">
+							<select name="cmsLanguageRange"
+								id="cmsLanguageRange"  class="easyui-combotree"
+								style="border-radius: 3px;width: 150px;height: 22px;">
+								
+							</select>
+							<span style="margin-left: 70px;">所有语言:</span>
+							<input type="checkbox" id="chooseAllCmsAllLanguage" />
+						</div>
+						<div style="float:left;margin-left:100px;" id="DivOperation">
+							<input type="button" value = "生成所选栏目" id="btnCmsChannelBuild" onclick="CmsBuild()"/>
+						</div>
+					</div>
+				</form>
+			</div>
+			<br>
+			<br>
+			<!-- <div style="margin:0;padding:0px 50px">
+				<div style="float:left;">
+					<span style="display:block;width:155px;">删除全部栏目页面:</span>
+				</div>
+				<div style="float:left;margin-left:20px;">
+					<input type="button" value = "删除" />
+				</div>
+			</div>	 -->
+		</div>
+</body>
+</html>

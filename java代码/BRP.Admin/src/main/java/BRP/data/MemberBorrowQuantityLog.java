@@ -1,0 +1,136 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import java.lang.Boolean;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+public class MemberBorrowQuantityLog extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer memberId;//会员id;
+    private  Integer quantity;//增加借阅本数;
+    private  Timestamp startDate;//开始日期;
+    private  Timestamp endDate;//结束日期;
+    private  String memberBorrowQuantityTypeCode;//扩展类型编码;
+    private  String activityName;//活动名称;
+    private  String remark;//增加借阅本数原因;
+    private  Boolean isReduced;//是否已减;
+    private  Boolean isDeleted;
+    private  Timestamp createTime;//创建时间;
+    private  Timestamp updateTime;//修改时间;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setMemberId(Integer memberId)    
+    {
+        this.memberId = memberId;
+    }
+    public  Integer getMemberId()    
+    {
+        return memberId;
+    }
+    public  void setQuantity(Integer quantity)    
+    {
+        this.quantity = quantity;
+    }
+    public  Integer getQuantity()    
+    {
+        return quantity;
+    }
+    public  void setStartDate(Timestamp startDate)    
+    {
+        this.startDate = startDate;
+    }
+    public  Timestamp getStartDate()    
+    {
+        return startDate;
+    }
+    public  void setEndDate(Timestamp endDate)    
+    {
+        this.endDate = endDate;
+    }
+    public  Timestamp getEndDate()    
+    {
+        return endDate;
+    }
+    public  void setMemberBorrowQuantityTypeCode(String memberBorrowQuantityTypeCode)    
+    {
+        this.memberBorrowQuantityTypeCode = memberBorrowQuantityTypeCode;
+    }
+    public  String getMemberBorrowQuantityTypeCode()    
+    {
+        return memberBorrowQuantityTypeCode;
+    }
+    public  void setActivityName(String activityName)    
+    {
+        this.activityName = activityName;
+    }
+    public  String getActivityName()    
+    {
+        return activityName;
+    }
+    public  void setRemark(String remark)    
+    {
+        this.remark = remark;
+    }
+    public  String getRemark()    
+    {
+        return remark;
+    }
+    public  void setIsReduced(Boolean isReduced)    
+    {
+        this.isReduced = isReduced;
+    }
+    public  Boolean getIsReduced()    
+    {
+        return isReduced;
+    }
+    public  void setIsDeleted(Boolean isDeleted)    
+    {
+        this.isDeleted = isDeleted;
+    }
+    public  Boolean getIsDeleted()    
+    {
+        return isDeleted;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setUpdateTime(Timestamp updateTime)    
+    {
+        this.updateTime = updateTime;
+    }
+    public  Timestamp getUpdateTime()    
+    {
+        return updateTime;
+    }
+    public  MemberBorrowQuantityLog copy()    
+    {
+        MemberBorrowQuantityLog entity = null;
+        try        
+        {
+            entity = (MemberBorrowQuantityLog) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

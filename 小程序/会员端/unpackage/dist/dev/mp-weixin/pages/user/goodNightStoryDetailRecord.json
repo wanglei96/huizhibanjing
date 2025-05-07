@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "慧至半径童书馆",
+  "navigationBarBackgroundColor": "#5EAC59",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "tw-videov": "/components/tsp-video/member-video-list/video-v"
+  }
+}

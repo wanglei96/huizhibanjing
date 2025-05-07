@@ -1,0 +1,171 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+public class ViewActivityRecommendMember extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer referrerCardId;//推荐人会员卡ID;
+    private  Integer newMemberCardId;//新会员会员卡ID;
+    private  Integer activityRecommendId;//老带新ID;
+    private  Integer displayOrder;
+    private  Timestamp newExpireDate;
+    private  Timestamp createTime;//创建时间;
+    private  Timestamp referrerExpireDate;
+    private  String referrerCardNo;
+    private  Timestamp referrerCardEffectiveDate;//生效日期;
+    private  Timestamp referrerCardExpireDate;//失效日期;
+    private  String referrerName;//名称;
+    private  String newMemberCardNo;
+    private  Timestamp newMemberCardEffectiveDate;//生效日期;
+    private  Timestamp newMemberCardExpireDate;//失效日期;
+    private  String newMemberName;//名称;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setReferrerCardId(Integer referrerCardId)    
+    {
+        this.referrerCardId = referrerCardId;
+    }
+    public  Integer getReferrerCardId()    
+    {
+        return referrerCardId;
+    }
+    public  void setNewMemberCardId(Integer newMemberCardId)    
+    {
+        this.newMemberCardId = newMemberCardId;
+    }
+    public  Integer getNewMemberCardId()    
+    {
+        return newMemberCardId;
+    }
+    public  void setActivityRecommendId(Integer activityRecommendId)    
+    {
+        this.activityRecommendId = activityRecommendId;
+    }
+    public  Integer getActivityRecommendId()    
+    {
+        return activityRecommendId;
+    }
+    public  void setDisplayOrder(Integer displayOrder)    
+    {
+        this.displayOrder = displayOrder;
+    }
+    public  Integer getDisplayOrder()    
+    {
+        return displayOrder;
+    }
+    public  void setNewExpireDate(Timestamp newExpireDate)    
+    {
+        this.newExpireDate = newExpireDate;
+    }
+    public  Timestamp getNewExpireDate()    
+    {
+        return newExpireDate;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setReferrerExpireDate(Timestamp referrerExpireDate)    
+    {
+        this.referrerExpireDate = referrerExpireDate;
+    }
+    public  Timestamp getReferrerExpireDate()    
+    {
+        return referrerExpireDate;
+    }
+    public  void setReferrerCardNo(String referrerCardNo)    
+    {
+        this.referrerCardNo = referrerCardNo;
+    }
+    public  String getReferrerCardNo()    
+    {
+        return referrerCardNo;
+    }
+    public  void setReferrerCardEffectiveDate(Timestamp referrerCardEffectiveDate)    
+    {
+        this.referrerCardEffectiveDate = referrerCardEffectiveDate;
+    }
+    public  Timestamp getReferrerCardEffectiveDate()    
+    {
+        return referrerCardEffectiveDate;
+    }
+    public  void setReferrerCardExpireDate(Timestamp referrerCardExpireDate)    
+    {
+        this.referrerCardExpireDate = referrerCardExpireDate;
+    }
+    public  Timestamp getReferrerCardExpireDate()    
+    {
+        return referrerCardExpireDate;
+    }
+    public  void setReferrerName(String referrerName)    
+    {
+        this.referrerName = referrerName;
+    }
+    public  String getReferrerName()    
+    {
+        return referrerName;
+    }
+    public  void setNewMemberCardNo(String newMemberCardNo)    
+    {
+        this.newMemberCardNo = newMemberCardNo;
+    }
+    public  String getNewMemberCardNo()    
+    {
+        return newMemberCardNo;
+    }
+    public  void setNewMemberCardEffectiveDate(Timestamp newMemberCardEffectiveDate)    
+    {
+        this.newMemberCardEffectiveDate = newMemberCardEffectiveDate;
+    }
+    public  Timestamp getNewMemberCardEffectiveDate()    
+    {
+        return newMemberCardEffectiveDate;
+    }
+    public  void setNewMemberCardExpireDate(Timestamp newMemberCardExpireDate)    
+    {
+        this.newMemberCardExpireDate = newMemberCardExpireDate;
+    }
+    public  Timestamp getNewMemberCardExpireDate()    
+    {
+        return newMemberCardExpireDate;
+    }
+    public  void setNewMemberName(String newMemberName)    
+    {
+        this.newMemberName = newMemberName;
+    }
+    public  String getNewMemberName()    
+    {
+        return newMemberName;
+    }
+    public  ViewActivityRecommendMember copy()    
+    {
+        ViewActivityRecommendMember entity = null;
+        try        
+        {
+            entity = (ViewActivityRecommendMember) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

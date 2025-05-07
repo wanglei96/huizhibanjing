@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SysSite">
+	<resultMap type="SysDataType" id="SysCiteResultMap">
+		<id column="id" property="id"/>
+		<result column="name" property="name" />
+		<result column="site_type_code" property="siteTypeCode" />
+		<result column="location" property="location" />
+		<result column="display_order" property="displayOrder" />
+		<result column="description" property="description" />
+	</resultMap>
+	<!-- 查询列表 -->
+	<select id="selectSysCite" resultMap="SysCiteResultMap">
+		select * from cms_site
+	</select>
+	<!-- 根据ID查询数据 -->
+	<select id="selectSysDataType"
+		resultMap="SysDataTypeResultMap">
+		select * from cms_site where id=#{id}
+	</select>
+	<!-- 新增 -->
+	<insert id="insertSysDataType" parameterType="SysDataType">
+		insert into cms_site
+		(name,site_type_code,description,location,display_order)
+		values
+		(#{name},#{siteTypeCode},#{description},#{location},#{displayOrder})
+	</insert>
+	<!-- 修改 -->
+	<update id="updateSysDataType">
+		update  cms_site set
+		name=#{name},site_type_code=#{siteTypeCode},location=#{location},description=#{description},display_order=#{displayOrder}
+		where id=#{id}
+	</update>
+</mapper>

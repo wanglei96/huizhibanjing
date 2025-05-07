@@ -1,0 +1,4 @@
+<ServiceHandlers>
+	<ServiceHandler Name="Translate"
+		Type="strosoft.tools.service.TranslateServiceHandler" />
+</ServiceHandlers>

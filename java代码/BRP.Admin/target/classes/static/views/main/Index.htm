@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css">
+<link rel="stylesheet" href="../../themes/custom/easyui.css?v=1"
+	type="text/css"></link>
+<link rel="stylesheet" href="../../css/index.css?v=2" type="text/css"></link>
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script>
+	$(function() {
+		//绑定数据
+		bindData();
+		//绑定活跃验证
+		bindCheckLogin();
+		//绑定退出按钮
+		$("#spanExit").click(function() {
+			$.removeCookie("loginName", {
+				path : '/'
+			});
+			$.removeCookie("sysUserId", {
+				path : '/'
+			});
+			$.removeCookie("trueName", {
+				path : '/'
+			});
+			$.removeCookie("sysOrganizationName", {
+				path : '/'
+			});
+			$.removeCookie("token", {
+				path : '/'
+			});
+			window.location.href = "../login.htm";
+		});
+	});
+
+	/*
+	 *绑定活动验证
+	 */
+	function bindCheckLogin() {
+		var interval = setInterval(function() {
+			var data = new Object();
+			data.notLoad = true;
+			call("CheckLogin", data, function(result) {
+				if (result.data == false) {
+					clearInterval(interval);
+					window.location.href = "../login.htm";
+				}
+				if(result.success == true && result.data == 'NoCheck'){
+					clearInterval(interval);
+				}
+			},function(result){
+					window.location.href = "../login.htm";
+			});
+		}, 30 * 1000);
+	}
+
+	/*
+	绑定数据
+	 */
+	function bindData() {
+		//绑定菜单
+		bindMenu();
+		//绑定操作信息
+		bindPermissions();
+		//绑定用户登陆信息
+		bindUserInfo();
+		//绑定站点
+		bindSite();
+		//延时200ms
+		setTimeout( function(){
+			//绑定cms多语言;
+			bindCmsLanguage();
+		}, 200 );
+		changeCmsLanguage();
+		//设置title
+		document.title = config.systemName;
+		$("#divSystemName").html(config.systemName);
+	}
+	function bindUserInfo() {
+		$("#spanTrueName").html($.cookie("trueName"));
+		$("#spanSysOrganizationName").html($.cookie("sysOrganizationName"));
+	}
+	/*
+	绑定菜单
+	 */
+	function bindMenu() {
+		var data = new Object();
+		data.sysUserId = $.cookie("sysUserId");
+		//alert(JSON.stringify(data));
+		call("GetAdminMenuList", data, function(result) {
+			//alert(JSON.stringify(result));
+			var lstRootMenu = getRootMenuList(result.data);
+			for ( var i = 0; i < lstRootMenu.length; i++) {
+				var rootMenuInfo = lstRootMenu[i];
+				outputMenu(rootMenuInfo, result.data);
+			}
+			$("#divMenuPanel").accordion();
+			//展开第一个主菜单
+			if (lstRootMenu.length > 0) {
+				$("#divMenuPanel").accordion("select", 0);
+			}
+		});
+	}
+	/*
+	*取得操作权限
+	*/
+	function bindPermissions(){
+		var sysUserId = $.cookie("sysUserId");
+		var data = new Object();
+		data.tableName = "sys_role_permission";
+		data.condition = "sys_role_id in (SELECT sys_role_id FROM sys_user_role WHERE sys_user_id ="+sysUserId+")";
+		call("GetTable", data, function(result) {
+			var resultData = result.data;
+			var permissions = [];
+			for(var i=0;i<resultData.length;i++){
+				var permission = resultData[i].permission;
+				permissions.push(permission);
+			}
+			//把权限存入localStorage
+			localStorage.permissions =  JSON.stringify(permissions);
+		});
+	}
+	/*
+	取得根菜单列表
+	 */
+	function getRootMenuList(menuList) {
+		var lstRootMenu = new Array();
+		for ( var i = 0; i < menuList.length; i++) {
+			var menuInfo = menuList[i];
+			if (menuInfo.parentId == null || menuInfo.parentId == 0) {
+				lstRootMenu.push(menuInfo);
+			}
+		}
+		return lstRootMenu;
+	}
+	/*
+	输出菜单
+	 */
+	function outputMenu(rootMenuInfo, lstMenu) {
+		var menuContent = getMenuContent(rootMenuInfo.id);
+		$('#divMenuPanel').accordion('add', {
+			title : rootMenuInfo.name,
+			content : menuContent,
+			selected : false
+		});
+		//加载子菜单
+		loadSubMenu(rootMenuInfo.id, lstMenu);
+	}
+
+	function loadSubMenu(rootMenuId, lstMenu) {
+		var subMenuContainerId = getSubMenuContainerId(rootMenuId);
+		var subTreeData = getSubTreeData(rootMenuId, lstMenu);
+		//alert(JSON.stringify(subTreeData));
+		$("#" + subMenuContainerId).tree({
+			data : subTreeData,
+			onClick : function(node) {
+				//alert(JSON.stringify(node));
+				openTab(node, rootMenuId);
+			}
+		});
+	}
+	/*
+	打开Tab
+	 */
+	function openTab(node, rootMenuId) {
+		//alert(JSON.stringify(node));
+		if (node.attributes.url == null || node.attributes.url == "") {
+			//如果没有页面地址，则切换下级菜单展开状态
+			var subMenuContainerId = getSubMenuContainerId(rootMenuId);
+			$("#" + subMenuContainerId).tree("toggle", node.target);
+			return;
+		}
+		var existsTab = $("#divTabs").tabs("exists", node.text);
+
+		//如果存在，则选中
+		if (existsTab) {
+			$("#divTabs").tabs("select", node.text);
+			return;
+		}
+		//添加Tab		
+		var tabContent = getTabContent(node);
+		$("#divTabs").tabs("add", {
+			title : node.text,
+			content : tabContent,
+			closable : true
+		});
+	}
+	/*
+	取得Tab页内容
+	 */
+	function getTabContent(node) {
+		//alert(JSON.stringify(node));
+		var url = config.adminRootUrl + encodeURI(node.attributes.url);
+		if (url.indexOf('?') < 0) {
+			url += "?r=" + Math.random();
+		} else {
+			url += "&r=" + Math.random();
+		}
+		var tabContent = "";
+		tabContent += "<iframe id='ifrmMain' name='ifrmMain' frameborder='0' marginheight='0' marginwidth='0' width='100%' height='98%' border='0' src='";
+		tabContent += url;
+		tabContent += "'></iframe>";
+		return tabContent;
+	}
+
+	function getSubMenuContainerId(rootMenuId) {
+		return "ulSubMenu" + rootMenuId;
+	}
+	/*
+	取得子菜单数据
+	 */
+	function getSubTreeData(menuId, lstMenu) {
+		var treeData = new Array();
+		var lstSubMenu = getSubMenuList(menuId, lstMenu);
+		for ( var i = 0; i < lstSubMenu.length; i++) {
+			var menuInfo = lstSubMenu[i];
+			var treeNode = new Object();
+			treeNode.id = menuInfo.id;
+			treeNode.text = menuInfo.name;
+			treeNode.attributes = menuInfo;
+			treeData.push(treeNode);
+			var childrenTreeData = getSubTreeData(menuInfo.id, lstMenu);
+			if (childrenTreeData.length > 0) {
+				treeNode.children = new Array();
+				for ( var j = 0; j < childrenTreeData.length; j++) {
+					treeNode.children.push(childrenTreeData[j]);
+				}
+				treeNode.state = "closed";
+			}
+		}
+		return treeData;
+	}
+	/*
+	取得子菜单列表
+	 */
+	function getSubMenuList(parentId, lstMenu) {
+		var lstSubMenu = new Array();
+		for ( var i = 0; i < lstMenu.length; i++) {
+			var menuInfo = lstMenu[i];
+			if (menuInfo.parentId == parentId) {
+				lstSubMenu.push(menuInfo);
+			}
+		}
+		return lstSubMenu;
+	}
+
+	/*
+	取得菜单内容
+	 */
+	function getMenuContent(rootMenuId) {
+		var subMenuContainerId = getSubMenuContainerId(rootMenuId);
+		var menuContent = "<ul id='" + subMenuContainerId + "' class='easyui-tree'></ul>";
+		return menuContent;
+	}
+
+	/*
+	 绑定站点
+	 */
+	function bindSite() {
+		var data = new Object();
+		data.tableName = "cms_site";
+		data.fields = "id,name";//可选
+		data.async = false;
+		call("GetTable", data, function(result) {
+			//alert(JSON.stringify(result));
+			//设置第一个站点为当前站点			
+			var currentCmsSiteId = getCookie("cmsSiteId");
+			//如果cookie中的没有缓存站点或站点id在数据库中不存在，默认选择第一个站点
+			if (currentCmsSiteId == null || !cmsSiteExistence(result.data,currentCmsSiteId)) {
+				if (result.data.length > 0) {
+					var firstSite = result.data[0];
+					setCurrentSite(firstSite.id);
+				}
+			}
+			outputSiteList(result.data);
+		});
+	}
+	/*
+	 绑定CMS多语言
+	 */
+	function bindCmsLanguage(){
+		var data = new Object();
+		data.cmsSiteId = $.cookie("cmsSiteId");
+		call("GetCmsLanguageListCustom",data,function(result){
+			if(!result.data.isOnCmslaunguage){
+				//如果没有开启多语言
+				$(".divCmsLanguage").remove();
+				$.cookie("cmsLanguage","Default", {
+					expires : 9999,
+					path : '/'
+				});
+				return;
+			}
+			var html = "";
+			var cmsLanguageCode = getCmsLanguageCode(result.data); 
+			$.cookie("cmsLanguage",cmsLanguageCode, {
+				expires : 9999,
+				path : '/'
+			});
+			for(var i=0;i<result.data.cmsLanguages.length;i++){
+				var item = result.data.cmsLanguages[i];
+				if(item.code == cmsLanguageCode){
+					html += "<option value='"+item.code+"' selected=selected>"+item.name+"</option>";
+				}else{
+					html += "<option value='"+item.code+"'>"+item.name+"</option>";
+				}
+			}
+			$("#selectCmsLanguage").append(html);
+		})
+	}
+	
+	//获取CMS默认语言Code
+	function getCmsLanguageCode(data){
+		var cmsLanguage = getCookie("cmsLanguage");
+		if(typeof(cmsLanguage) != "undefined"){
+			var flag = false;
+			for(var i=0;i<data.cmsLanguages.length;i++){
+				var code = data.cmsLanguages[i].code;
+				if(code == cmsLanguage){
+					flag = true;
+					return cmsLanguage;
+				}
+			}
+		}
+		return data.defaultCode;
+	}
+	
+	//CMS语言切换事件
+	function changeCmsLanguage(){
+		$("#selectCmsLanguage").on("change",function(){
+			var value = $(this).val();
+			$.cookie("cmsLanguage",value, {
+				expires : 9999,
+				path : '/'
+			});
+		})
+	}
+	/*
+	 判断站点是否在结果中
+	 */
+	function cmsSiteExistence(data,cmsSiteId){
+		var flag = false;
+		for(var i=0;i<data.length;i++){
+			if(data[i].id == cmsSiteId){
+				flag = true;
+				break;
+			}
+		}
+		return flag;
+	}
+	/*
+	输出站点
+	 */
+	function outputSiteList(lstSite) {
+		var cmsSiteId = getCookie("cmsSiteId");
+		if(lstSite.length<2){
+			return ;
+		}
+		$.each(lstSite, function(index, value) {
+			var htmlSite = "";
+			htmlSite += "<a href='javascript:void(0)' onclick='setCurrentSite("
+					+ value.id + ");refreshPage();'>";
+			if (cmsSiteId == value.id) {
+				htmlSite += "<span class='b'>";
+			}
+			htmlSite += value.name;
+			if (cmsSiteId == value.id) {
+				htmlSite += "</span>";
+			}
+			htmlSite += "</a>";
+			$("#divSites").append(htmlSite);
+		});
+	}
+	/*
+	设置当前站点
+	 */
+	function setCurrentSite(cmsSiteId) {
+		setCookie("cmsSiteId", cmsSiteId);
+	}
+</script>
+</head>
+<body class="easyui-layout">
+	<!-- 上 -->
+	<div data-options="region:'north',border:false" class="panel-body"
+		style="height: 40px;padding: 0 10px 10px;overflow: hidden;">
+		<div class="system_name" id="divSystemName">Strosoft CMS</div>
+		<div class="header_site" id="divSites"></div>
+		<a id="spanExit" class="main_button_exit">退出</a>
+		<div class="divCmsLanguage">
+			<span>CMS语言：</span>
+			<select class="cms_language" id="selectCmsLanguage"></select>
+		</div>
+	</div>
+
+	<!-- 左-->
+	<div data-options="region:'west',split:true,title:'功能菜单'"
+		style="width:200px;height:100%;overflow: hidden;">
+		<div id="divMenuPanel" class="easyui-accordion" style="width:100%"
+			data-options="multiple:false"></div>
+	</div>
+
+	<!-- 中 -->
+	<div data-options="region:'center',title:''">
+		<div id="divTabs" class="easyui-tabs" style="width:100%;height:100%">
+			<div title="首页">
+				<iframe id="ifrmMain" runat="server" name="ifrmMain" frameborder="0"
+					marginheight="0" marginwidth="0" width="100%" height="98%"
+					border="0" src="../common/Desktop.htm"></iframe>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

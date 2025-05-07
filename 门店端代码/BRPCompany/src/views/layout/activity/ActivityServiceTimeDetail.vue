@@ -1,0 +1,359 @@
+<script setup>
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import detail from '@/js/detail'
+import config from '@/js/config'
+import common from '@/js/common'
+import DatabaseSelect from '@/components/extension/DatabaseSelect.vue'
+import dayjs from 'dayjs'
+import { ElMessage } from 'element-plus'
+
+//详情页组件引用
+const refSearchForm = ref()
+const refForm = ref()
+const isLoading = ref(false)
+
+const router = useRouter()
+
+//批量曾加会员卡时长信息
+const activityServiceTime = ref({})
+//会员卡信息列表
+const memberCardArr = ref([])
+//会员卡信息异常列表
+const exceptionMemberCardList = ref([])
+//文件列表
+const fileList = ref([])
+//门店id
+const companyId = ref()
+companyId.value = localStorage.getItem('companyId')
+
+//定义事件发射器
+const emit = defineEmits(['reload-data'])
+//详情页开关
+const detailFormVisible = ref(false)
+//表单引用
+const refDataEntityForm = ref()
+
+let page = reactive({})
+const init = (options) => {
+  detailFormVisible.value = true
+  page = detail({
+    tableName: 'activity',
+    addServiceName: 'BatchAddActivityServiceTime',
+    getServiceName: 'GetViewActivityServiceTime',
+    mode: options.mode,
+    primaryKeyValue: options.primaryKeyValue,
+    detailFormVisible,
+    refDataEntityForm,
+    emit,
+    getDataEntity(dataEntity) {
+      let memberCardIdArr = memberCardArr.value.map(item => {
+        return {
+          memberCardId: item.id, memberId: item.memberId, expireDate: item.expireDate
+        };
+      });
+
+      dataEntity.value.memberCardIdArr = memberCardIdArr
+    },
+    onDetailHide() {
+      activityServiceTime.value = {}
+      memberCardArr.value = []
+      fileList.value = []
+      exceptionMemberCardList.value = []
+    }
+  })
+}
+
+//暴露
+defineExpose({
+  init
+})
+
+//文件列表移除文件时的钩子
+const handleRemove = (file, uploadFiles) => {
+  console.log(file, uploadFiles)
+}
+//上传成功的钩子
+const attachmentFileSuccess = (response, uploadFile, uploadFiles) => {
+  common.call('GetMemberCardListByExcel', { uploadId: response.data.id, companyId: companyId.value }, (res) => {
+    memberCardArr.value = res.data.memberCardListByExcel
+    exceptionMemberCardList.value = res.data.exceptionMemberCardList
+  })
+}
+
+//监听文件列表长度
+watch(
+  () => fileList.value.length,
+  (newValue, oldValue) => {
+    if (newValue === 0) {
+      memberCardArr.value = []
+    }
+  }
+)
+
+//上传失败的钩子
+const attachmentFileError = (error, uploadFile, uploadFiles) => {
+  console.log(error)
+  ElMessage.error('上传失败')
+}
+
+//文件数量超出限制时的钩子
+const handleExceed = (files, uploadFiles) => {
+  ElMessage.warning(`只能上传一份文件`)
+}
+
+//上传前的钩子
+const beforeAvatarUpload = (rawFile) => {
+  if (rawFile.type !== 'video/mp4') {
+    ElMessage.error('请上传大小在200M以内的mp4格式视频文件')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 200) {
+    ElMessage.error('请上传大小在200M以内的mp4格式视频文件')
+  }
+  return true
+}
+
+const timeTypeArr = reactive([])
+const getTimeTypeArr = function () {
+  timeTypeArr.push({ label: '时长', value: 'duration' })
+}
+getTimeTypeArr()
+
+function floatValidator(rule, value, callback) {
+  if (!/^[1-9]\d*$/.test(value)) {
+    // 校验不通过
+    return callback(new Error('请输入正整数'))
+  } else {
+    // 校验通过
+    callback()
+  }
+}
+
+const rules = reactive({
+  days: [
+    { required: true, message: '请输入天数', trigger: 'blur' },
+    { validator: floatValidator, trigger: 'blur' }
+  ],
+  // activityId: [{required: true, message: '请选择活动', trigger: 'change'}],
+  activityFreeTypeCode: [{ required: true, message: '请选择赠送类型', trigger: 'change' }]
+})
+
+//是否显示校验错误信息
+const showMessage = ref(true)
+
+//提交表单
+function submitForm() {
+  if (memberCardArr.value.length === 0) {
+    ElMessage({ type: 'error', message: '未查询到会员' })
+    return
+  }
+  page.submitForm()
+}
+</script>
+<template>
+  <div class="ActivityServiceTimeDetail-box">
+    <el-dialog destroy-on-close :close-on-click-modal="false" v-model="detailFormVisible"
+      :title="page.title ? page.title.value : ''" width="800" draggable>
+      <div class="basic-list">
+        <el-card shadow="never" class="operate-card">
+          <template #header>
+            <div class="card-header">
+              <span>操作栏</span>
+            </div>
+          </template>
+          <el-form :model="page.dataEntity.value" :rules="rules" ref="refDataEntityForm" :label-position="'right'"
+            :disabled="page.mode === 'view'" label-width="100px">
+            <el-row>
+              <el-col :xs="12" :sm="12" :md="12" :lg="12">
+                <el-form-item label="天数" prop="days">
+                  <el-input v-model.number="page.dataEntity.value.days" class="form-item-width" placeholder="请输入天数"
+                    style="flex-grow: 1"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="12" :sm="12" :md="12" :lg="12">
+                <el-form-item label="活动" prop="activityId">
+                  <database-select table-name="activity" style="flex-grow: 1" v-model="page.dataEntity.value.activityId"
+                    valueFieldName="id"
+                    :condition="'is_deleted is not true and company_id=' + companyId"></database-select>
+                </el-form-item>
+              </el-col>
+              <el-col :xs="12" :sm="12" :md="12" :lg="12">
+                <el-form-item label="赠送类型" prop="activityFreeTypeCode">
+                  <database-select table-name="activity_free_type" style="flex-grow: 1"
+                    :condition="'is_deleted is not true'"
+                    v-model="page.dataEntity.value.activityFreeTypeCode"></database-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :xs="24" :sm="24" :md="24" :lg="24">
+                <el-form-item label="备注" prop="remark">
+                  <el-input v-model="page.dataEntity.value.remark" class="form-item-width" type="textarea" rows="5"
+                    placeholder="请输入备注"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-card>
+        <el-card shadow="never" class="result-card">
+          <template #header>
+            <div class="card-header">
+              <span>结果栏</span>
+            </div>
+          </template>
+          <el-row type="flex">
+            <el-col :xs="24" :sm="24" :md="24" :lg="24" style="margin-bottom: 10px">
+              <span style="font-size: 16px; color: #f00000">任意创建一个excel表格，把需要查询的的会员卡号放在第一列</span>
+              <el-form-item label="选择要导入的Excel" prop="name">
+                <el-upload v-model:file-list="fileList" class="upload-demo"
+                  :action="config.adminRootUrl + '/api/Service?serviceName=UploadFile'" :on-remove="handleRemove"
+                  :on-success="attachmentFileSuccess" :on-error="attachmentFileError" :limit="1"
+                  :on-exceed="handleExceed"
+                  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                  <el-button type="primary" size="small">选择文件</el-button>
+                </el-upload>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-card shadow="never" class="result-card-list-card">
+            <template #header>
+              <div class="card-header">
+                <span>会员卡信息</span>
+              </div>
+            </template>
+            <el-alert :title="`共 ${memberCardArr.length} 项`" v-show="memberCardArr.length >= 0" type="warning" show-icon
+              style="margin-bottom: 10px" />
+            <el-table ref="multipleTableRef" :data="memberCardArr" style="width: 100%" border>
+              <el-table-column property="memberName" label="会员姓名" />
+              <el-table-column property="cardNo" label="会员卡号" />
+              <el-table-column label="会员卡生效时间">
+                <template #default="scope">
+                  {{ dayjs(scope.row.effectiveDate.time).format('YYYY-MM-DD HH:mm:ss') }}
+                </template>
+              </el-table-column>
+              <el-table-column label="会员卡失效时间">
+                <template #default="scope">
+                  {{ dayjs(scope.row.expireDate.time).format('YYYY-MM-DD HH:mm:ss') }}
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+          <el-card shadow="never" class="result-card-list-card" style="margin-top: 15px">
+            <template #header>
+              <div class="card-header">
+                <span>会员卡信息异常列表</span>
+              </div>
+            </template>
+            <el-alert :title="`共 ${exceptionMemberCardList.length} 项`" v-show="exceptionMemberCardList.length >= 0"
+              type="warning" show-icon style="margin-bottom: 10px" />
+            <el-table ref="multipleTableRef" :data="exceptionMemberCardList" style="width: 100%" border>
+              <el-table-column property="cardNo" label="会员卡号" />
+            </el-table>
+          </el-card>
+        </el-card>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" :loading="isLoading" @click="submitForm()">
+            批量增加时长
+          </el-button>
+          <el-button @click="detailFormVisible = false">取消</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.head-card {
+  margin-bottom: 15px;
+
+  .card-header {
+    height: 20px;
+  }
+
+  .el-form-item {
+    margin-bottom: 0px;
+  }
+}
+
+.image-slot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-secondary);
+  font-size: 30px;
+}
+
+.el-input {
+  width: 200px;
+}
+
+.el-table {
+  mix-height: 300px;
+  overflow-y: auto;
+}
+
+.upload-demo {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+</style>
+<style>
+.ActivityServiceTimeDetail-box {
+
+  .result-card {
+    .el-card__header {
+      background-color: #f89898;
+    }
+  }
+
+  .result-card-list-card {
+    .el-card__header {
+      background-color: #ffffff;
+      color: #303133;
+    }
+  }
+
+  .operate-card {
+    margin-bottom: 15px;
+
+    .el-card__header {
+      background-color: #95d475;
+    }
+  }
+
+  .el-card__header {
+    padding: 12px;
+    color: #ffffff;
+    font-size: 1.05rem;
+  }
+
+  .operate-card-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .el-upload-list__item {
+    margin: 0;
+  }
+
+  .result-card .el-form-item__label {
+    font-size: 16px;
+  }
+
+  .el-form-item__content {
+    flex-grow: 2;
+  }
+
+  .el-upload-list {
+    margin: 0;
+    width: 300px;
+    height: 34px;
+  }
+}
+</style>

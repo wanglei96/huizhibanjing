@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Elements>
+	<!-- Element Name="stl:include" Type="strosoft.cms.model.CmsTemplateTagIncludeHandler"> 
+		</Element> -->
+	<!-- <Element Name="stl:a" Type="strosoft.cms.model.CmsTemplateTagAHandler"> 
+		</Element> -->
+	<Element Name="stl:contents"
+		Type="strosoft.cms.model.CmsTemplateTagContentsHandler">
+	</Element>
+	<Element Name="stl:content" Type="strosoft.cms.model.CmsTemplateTagContentHandler">
+	</Element>
+	<Element Name="stl:channels"
+		Type="strosoft.cms.model.CmsTemplateTagChannelsHandler">
+	</Element>
+	<Element Name="stl:channel" Type="strosoft.cms.model.CmsTemplateTagChannelHandler">
+	</Element>
+	<Element Name="stl:image" Type="strosoft.cms.model.CmsTemplateTagImageHandler">
+	</Element>
+
+	<Element Name="stl:video" Type="strosoft.cms.model.CmsTemplateTagVideoHandler">
+	</Element>
+
+	<Element Name="stl:audio" Type="strosoft.cms.model.CmsTemplateTagAudioHandler">
+	</Element>
+
+	<Element Name="stl:a" Type="strosoft.cms.model.CmsTemplateTagAHandler">
+	</Element>
+
+	<Element Name="stl:location"
+		Type="strosoft.cms.model.CmsTemplateTagLocaTionHandler">
+	</Element>
+
+	<Element Name="stl:include" Type="strosoft.cms.model.CmsTemplateTagIncludeHandler">
+	</Element>
+	<Element Name="stl:pageItems"
+		Type="strosoft.cms.model.CmsTemplateTagPageItemsHandler">
+	</Element>
+	<Element Name="stl:pageItem"
+		Type="strosoft.cms.model.CmsTemplateTagPageItemHandler">
+	</Element>
+	<Element Name="stl:sqlContents"
+		Type="strosoft.cms.model.CmsTemplateTagSqlContentsHandler">
+	</Element>
+	<Element Name="stl:sqlContent"
+		Type="strosoft.cms.model.CmsTemplateTagSqlContentHandler">
+	</Element>
+	<Element Name="stl:queryString"
+		Type="strosoft.cms.model.CmsTemplateTagQueryStringHandler">
+	</Element>
+	<Element Name="stl:itemTemplate"
+		Type="strosoft.cms.model.CmsTemplateTagItemTemplateHandler">
+	</Element>
+	<Element Name="stl:alternatingItemTemplate"
+		Type="strosoft.cms.model.CmsTemplateTagAlternatingItemTemplateHandler">
+	</Element>
+	<Element Name="stl:headerTemplate"
+		Type="strosoft.cms.model.CmsTemplateTagHeaderTemplateHandler">
+	</Element>
+	<Element Name="stl:footerTemplate"
+		Type="strosoft.cms.model.CmsTemplateTagFooterTemplateHandler">
+	</Element>
+	<Element Name="#cdata-section" Type="strosoft.cms.model.CdataSectionHandler">
+	</Element>
+	<Element Name="stl:meta" Type="strosoft.cms.model.CmsTemplateTagMetaHandler">
+	</Element>
+	<Element Name="stl:file" Type="strosoft.cms.model.CmsTemplateTagFileHandler">
+	</Element>
+
+</Elements>

@@ -1,0 +1,11 @@
+{
+  "state": 1,
+  "message": "success",
+  "content": {
+    "isUpdatedPassword": true,
+    "authorityList": ["sys_login", "sys_user_add", "sys_user_delete"],
+    "userName": "管理员",
+    "portrait": "https://img0.baidu.com/it/u=4060187940,3351722992&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"
+  },
+  "success": true
+}

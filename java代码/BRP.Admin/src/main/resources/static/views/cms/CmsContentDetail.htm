@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>栏目管理的编辑界面</title>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.uploader.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/cms/cms.promission.js"></script>
+<link rel="stylesheet" href="../../css/CmsChannelDetial.css"
+	type="text/css"></link>
+<script type="text/javascript" src="../../js/detail.js"></script>
+<!-- 配置文件 -->
+<script type="text/javascript" src="../../js/ueditor/ueditor.config.js"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="../../js/ueditor/ueditor.all.js"></script>
+<script type="text/javascript">
+	detailContext.dataName = "CmsContent";
+	detailContext.tableName = "cms_content";
+	var ue;
+	var dataInfo;
+	/*
+	绑定控件
+	 */
+	function bindControls() {
+		if (isAddMode()) {
+			var dataItem = new Object();
+			//绑定所属栏目
+			var selectedCmsChannelId = $.query.get("selectedCmsChannelId");
+			if (selectedCmsChannelId === true) {
+				selectedCmsChannelId = 0;
+			}
+			bindCmsComboTreeWithValueAndPermission("ctCmsChannelId",
+					"GetCmsChannelList", 0, "id", "name", "parentId", null,
+					"cms_site_id=" + $.cookie("cmsSiteId"),
+					selectedCmsChannelId);
+			//实例化编辑器
+			ue = new UE.ui.Editor();
+			ue.render('txtContainer');
+			//默认选中已审核
+			dataItem.cmsContentStatusCode = "Approved";
+			//绑定内容状态
+			bindCmsContentStatus(dataItem);
+		}
+	}
+
+	/*
+	 * 绑定数据实体
+	 */
+	function bindEntity(primaryKey) {
+		var data = new Object();
+		data.id = primaryKey;
+		data.cmsSiteId = $.cookie("cmsSiteId");
+		data.cmsLanguageCode = currentCmsLanguageCode;
+		call("GetViewCmsContentInfoContentIdCustom", data, function(result) {
+			dataInfo = result.data;
+			outputEntityByCmsLanguageCode();
+		});
+	}
+	//根据语言编码展示信息
+	function outputEntityByCmsLanguageCode() {
+		var viewCmsContentLanguage = dataInfo.dataList[currentCmsLanguageCode];
+		outputEntity(viewCmsContentLanguage);
+	}
+
+	/*
+	 动态加载内容状态
+	 */
+	function bindCmsContentStatus(dataItem) {
+		var data = new Object();
+		var cmsSiteId = $.cookie("cmsSiteId");
+		data.tableName = "cms_content_status";
+		call(
+				"GetTable",
+				data,
+				function(result) {
+					$
+							.each(
+									result.data,
+									function(index, value) {
+										$("#divCmsContentStatusCode")
+												.append(
+														"<input id='cbCmsContentStatusCode' class='cmsContentStatus' type='radio' name='tj' value='"+value.code+"'>"
+																+ value.name
+																+ "");
+										$(
+												"#divCmsContentStatusCode input[value='"
+														+ dataItem.cmsContentStatusCode
+														+ "']").prop("checked",
+												true);
+									});
+					if (isViewMode()) {
+						$(".cmsContentStatus").attr("disabled", "disabled");
+					}
+				});
+	}
+	/*
+	 * 绑定图片、视频、附件地址
+	 */
+	function bindImageFileId(dataItem) {
+		getFilePathByFileId(dataItem.attachmentFileId, "attachmentFilePath");
+		getImgPathByFileId(dataItem.thumbFileId, "thumbFilePath");
+		getFilePathByFileId(dataItem.videoFileId, "videoFilePath");
+	}
+	/*
+	 * 获取图片、视频、附件地址
+	 */
+	function getFilePathByFileId(fileId, pathInputId) {
+		if (typeof (fileId) == "undefined" || fileId == null) {
+			fileId = "";
+		}
+		if (fileId != "") {
+			var data = new Object();
+			data.tableName = "sys_upload_file";
+			data.condition = "id =" + fileId;
+			data.condition += ""
+			call("GetTable", data, function(result) {
+				$.each(result.data, function(index, value) {
+					$("#" + pathInputId).val(value.path);
+				});
+				if (isViewMode()) {
+					$("#" + pathInputId).attr("disabled", "disabled");
+					//$(".inputFilePath").css("margin-top","16px");
+					//$(".photo").hide();
+				}
+			});
+		}
+	}
+	/*
+	 * 获取图片、视频、附件地址
+	 */
+	function getImgPathByFileId(fileId, pathInputId) {
+		if (typeof (fileId) == "undefined" || fileId == null) {
+			fileId = "";
+		}
+		if (fileId != "") {
+			var data = new Object();
+			data.tableName = "sys_upload_file";
+			data.condition = "id =" + fileId;
+			data.condition += ""
+			call("GetTable", data, function(result) {
+				$.each(result.data, function(index, value) {
+					$("#" + pathInputId).val(value.path);
+					$("#thumbAutoUpload").attr("src",
+							config.adminRootUrl + value.path);
+				});
+				if (isViewMode()) {
+					$("#" + pathInputId).attr("disabled", "disabled");
+					//$(".inputFilePath").css("margin-top","16px");
+					//$(".photo").hide();
+				}
+			});
+		}
+	}
+	/*
+	 * 取得实体$('input:radio:checked').val()
+	 */
+	function getEntity() {
+		var newEntity = getEntityBase();
+		var text = UE.getEditor('txtContainer').getContent();
+		$(".cmsContentProperty").each(function() {
+			var controlId = $(this).attr("id");
+			var propertyName = controlId;
+			newEntity[propertyName] = $(this).val();
+		});
+		//获取内容的状态
+		var cmsContentStatusCode = $(
+				"#divCmsContentStatusCode input:radio:checked").val();
+		var cmsSiteId = $.cookie("cmsSiteId");
+		newEntity.cmsContentStatusCode = cmsContentStatusCode;
+		newEntity.text = text;
+		newEntity.cmsSiteId = cmsSiteId;
+		//验证必填项
+		checkRequiredField(newEntity);
+		//alert(JSON.stringify(newEntity));
+		return newEntity;
+	}
+	/*
+	 * 输出实体信息
+	 */
+	function outputEntity(dataItem) {
+		//alert(JSON.stringify(dataItem));
+		var primaryKey = $.query.get(detailContext.primaryKeyName);
+		outputEntityBase(dataItem);
+		//模板内容
+		//实例化编辑器
+		if (isViewMode()) {
+			ue = new UE.ui.Editor({
+				readonly : true,
+			});
+			ue.render('txtContainer');
+			//隐藏选择按钮
+			$(".input-file").hide();
+			//隐藏保存并添加按钮
+			$("#btnSaveAndAdd").hide();
+		} else {
+			divCmsChannelTree
+			$("#divCmsChannelTree").hide();
+			var ue = new UE.ui.Editor();
+			ue.render('txtContainer');
+		}
+		ue.ready(function() {
+			ue.setContent(dataItem.text);
+
+		});
+		//绑定文件、视频、图片
+		bindImageFileId(dataItem);
+		//绑定内容状态
+		bindCmsContentStatus(dataItem);
+		//绑定内容属性
+		bindCmsContentProperty(dataItem);
+		//绑定所属栏目
+		/* bindCmsIdNameComboTreeWithValue("ctCmsChannelId", "cms_channel", null,
+				dataItem.cmsChannelId); */
+		bindCmsComboTreeWithValueAndPermission("ctCmsChannelId",
+				"GetCmsChannelList", 0, "id", "name", "parentId", null,
+				"cms_site_id=" + $.cookie("cmsSiteId"), dataItem.cmsChannelId);
+
+	}
+
+	//验证必填项
+	function checkRequiredField(newEntity) {
+		if (newEntity.cmsChannelId == 0) {
+			newEntity.cmsChannelId == "";
+		}
+	}
+	//绑定内容属性
+	function bindCmsContentProperty(dataItem) {
+		$(".cmsContentProperty").each(function() {
+			var controlId = $(this).attr("id");
+			if (eval("dataItem." + controlId) == "1") {
+				$(this).trigger("click");
+			}
+			if (isViewMode()) {
+				$(this).attr("disabled", "disabled");
+			}
+		})
+	}
+
+	$(function() {
+		//cmsContentProperty内容属性多选框状态改变设置值
+		$(".cmsContentProperty").click(function() {
+			var value = $(this).attr("value");
+			if (value == 0 || value == "") {
+				$(this).attr("value", "1");
+			} else {
+				$(this).attr("value", "0");
+			}
+		})
+	})
+	/*
+	 * 保存/保存并继续添加
+	 */
+	function save(key) {
+		var data = getEntity();
+		data.cmsLanguageCode = currentCmsLanguageCode;
+		if (data.cmsChannelId != null && isPermitted(data.cmsChannelId)) {
+			if (isEditMode()) {
+				//设置多语言栏目ID
+				data.cmsContentLanguageId = dataInfo.dataList[currentCmsLanguageCode].cmsContentLanguageId;
+				call(detailContext.updateServiceName, data, function(result) {
+					closeDetailDialog();
+					//bindData();
+				});
+			} else {
+				call(detailContext.addServiceName, data, function(result) {
+					if (key == 1) {
+						window.location.reload();
+					} else {
+						closeDetailDialog();
+						//bindData();
+					}
+				});
+			}
+		} else {
+			alert("所属栏目没有权限");
+		}
+	}
+</script>
+
+</head>
+
+<body>
+	<div id="editContent" class="easyui-layout"
+		style="width:100%;overflow:auto;" fit="true">
+		<div buttons="#dlg-buttons">
+			<form id="formDetail" method="post" enctype="multipart/form-data"
+				class="detail_form">
+				<div class="form_item" style="display:none;margin-bottom: 3px;">
+					<input id="txtDisplayOrder" name="displayOrder"
+						class="easyui-textbox" label="显示顺序:" labelPosition="left"
+						style="width:400px;height:100%;">
+				</div>
+				<div class="form_item" style="margin-bottom: 3px;">
+					<input id="txtTitle" name="title" class="easyui-textbox"
+						label="标题:" labelPosition="left" style="width:400px;height:100%;">
+					<span class="copy_item" id="copy_item_title" title="标题"> <a
+						href="#" class="easyui-linkbutton" iconCls="icon-search"
+						plain="true"></a> </span>
+				</div>
+				<div class="form_item" style="margin-bottom: 3px;">
+					<input id="txtSubTitle" name="subTitle" class="easyui-textbox"
+						label="副标题:" labelPosition="left" style="width:400px;height:100%;">
+					<span class="copy_item" id="copy_item_subTitle" title="副标题">
+						<a href="#" class="easyui-linkbutton" iconCls="icon-search"
+						plain="true"></a> </span>
+				</div>
+				<div class="form_item" id="divCmsChannelTree"
+					style="margin-bottom: 3px;">
+					<input id="ctCmsChannelId" class="easyui-combotree" label="所属栏目:"
+						labelPosition="left" style="width:400px;height:100%;">
+				</div>
+				<div class="form_item" style="margin-bottom: 3px;">
+					<input id="txtUrl" class="easyui-textbox" label="外部链接:"
+						labelPosition="left" style="width:400px;height:100%;"> <span
+						class="copy_item" id="copy_item_url" title="外部链接"> <a
+						href="#" class="easyui-linkbutton" iconCls="icon-search"
+						plain="true"></a> </span>
+				</div>
+				<div class="form_item" style="height:50px;">
+					<span style="float:left;width:148px;line-height:50px;">图片:</span> <input
+						type="hidden" class="easyui-textbox" id="hfThumbFileId" /> <input
+						class="inputFilePath" id="thumbFilePath" /> <input type="file"
+						id="thumbAutoUploadFileUpload" style="display: none" /> <img
+						src="../../img/uploadPic.png" class="photo" id="thumbAutoUpload" />
+				</div>
+				<div class="form_item" style="height:50px;">
+					<span style="float:left;width:148px;line-height:50px;">视频:</span> <input
+						type="hidden" class="easyui-textbox" id="hfVideoFileId" /> <input
+						class="inputFilePath" id="videoFilePath" /> <input type="file"
+						id="videoAutoUploadFileUpload" style="display: none" /> <img
+						src="../../img/uploadVideo.png" class="photo" id="videoAutoUpload" />
+				</div>
+				<div class="form_item" style="height:50px;">
+					<span style="float:left;width:148px;line-height:50px;">附件:</span> <input
+						type="hidden" class="easyui-textbox" id="hfAttachmentFileId" /> <input
+						class="inputFilePath" id="attachmentFilePath" /> <input
+						type="file" id="fileAutoUploadFileUpload" style="display: none" />
+					<img src="../../img/uploadFile.png" class="photo"
+						id="fileAutoUpload" />
+				</div>
+				<div id="divProgressBar" style="display: none;">
+					<img src="../../img/progressbar.jpg"
+						style="width:300px;height:30px;" />
+				</div>
+				<div style="margin-bottom:10px;float: left;">
+					<div style="float:left;line-height:250px;">
+						<span>内容:</span>
+					</div>
+					<div
+						style="margin-bottom:10px;margin-left:105px;position:relative;">
+						<script id="txtContainer" name="content" type="text/plain"
+							style="width:1400px;height:500px;">			
+						</script>
+						<span class="copy_item" id="copy_item_text" title="内容"
+							style="float: right;position: absolute;top: 21px;right:-23px;">
+							<a href="#" class="easyui-linkbutton" iconCls="icon-search"
+							plain="true"></a> </span>
+					</div>
+				</div>
+
+				<div class="form_item_full" style="margin-bottom:10px;">
+					<input id="txtSummary" class="easyui-textbox" label="内容摘要:"
+						multiline="true" labelPosition="left"
+						style="width:1000px;height:120px;" /> <span class="copy_item"
+						id="copy_item_summary" title="内容摘要"> <a href="#"
+						class="easyui-linkbutton" iconCls="icon-search" plain="true"></a>
+					</span>
+				</div>
+				<div class="form_item_full" style="margin-bottom:10px;">
+					<input id="txtDescription" class="easyui-textbox" label="描述:"
+						multiline="true" labelPosition="left"
+						style="width:1000px;height:120px;" /> <span class="copy_item"
+						id="copy_item_description" title="描述"> <a href="#"
+						class="easyui-linkbutton" iconCls="icon-search" plain="true"></a>
+					</span>
+				</div>
+				<div class="form_item_full" style="margin-bottom:10px;">
+					<input id="txtKeywords" class="easyui-textbox" label="关键字:"
+						multiline="true" labelPosition="left"
+						style="width:1000px;height:120px;" /> <span class="copy_item"
+						id="copy_item_keywords" title="关键字"> <a href="#"
+						class="easyui-linkbutton" iconCls="icon-search" plain="true"></a>
+					</span>
+				</div>
+
+				<div class="form_item">
+					<input id="txtAuthor" name="author" class="easyui-textbox"
+						label="作者:" labelPosition="left" style="width:400px;height:100%;">
+					<span class="copy_item" id="copy_item_author" title="作者"> <a
+						href="#" class="easyui-linkbutton" iconCls="icon-search"
+						plain="true"></a> </span>
+				</div>
+
+				<div class="form_item">
+					<input id="txtSource" name="source" class="easyui-textbox"
+						label="来源:" labelPosition="left" style="width:400px;height:100%;">
+					<span class="copy_item" id="copy_item_source" title="来源"> <a
+						href="#" class="easyui-linkbutton" iconCls="icon-search"
+						plain="true"></a> </span>
+				</div>
+				<div style="margin-top:10px;float: left;width: 90%;">
+					<div style="float:left;width:83px">
+						<span>内容属性:</span>
+					</div>
+					<div id="divCmsContentProperty">
+						<input id='isRecommend' class='cmsContentProperty' type='checkbox'
+							value="0" /> 推荐 <input id='isTop' class='cmsContentProperty'
+							type='checkbox' value="0" /> 顶置 <input id='isHot'
+							class='cmsContentProperty' type='checkbox' value="0" /> 热点 <input
+							id='isHighlight' class='cmsContentProperty' type='checkbox'
+							value="0" /> 醒目
+					</div>
+				</div>
+				</br>
+				<div style="margin-top:10px;float: left;width:90%; display: none"
+					id="divCmsContentStatus">
+					<div style="float:left;width:83px">
+						<span>内容状态:</span>
+					</div>
+					<div id="divCmsContentStatusCode"></div>
+				</div>
+			</form>
+
+		</div>
+		<div id="divDetailCommandBar" class="detail_commandbar"
+			style="text-align: center;width: 90%;float: left;height:40px;margin-top: 10px">
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+				iconCls="icon-ok" onclick="save(0)" style="width:90px" id="btnSave">保存</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+				iconCls="icon-ok" onclick="save(1)" style="width:120px"
+				id="btnSaveAndAdd">保存并继续添加</a> <a href="javascript:void(0)"
+				class="easyui-linkbutton" iconCls="icon-cancel"
+				onclick="javascript:closeDetailDialog();" style="width:90px">返回</a>
+		</div>
+		<div class="copyItemDiv" id="copyItemDiv"></div>
+	</div>
+	<!-- 上传图片 -->
+	<script>
+		$(function() {
+			$("#thumbAutoUpload").uploadify({
+				isImage : true,
+				fileUploadID : "imgAutoUploadFileUpload",
+				uploading : function() {
+					showProgressBar();
+				},
+				success : function(result) {
+					hideProgressBar();
+					//alert(JSON.stringify(result));
+					$("#hfThumbFileId").val(result.data.id);
+					$("#thumbFilePath").val(result.data.path);
+				},
+				fail : function(result) {
+					hideProgressBar();
+				}
+			});
+			$("#videoAutoUpload").uploadify({
+				fileUploadID : "imgAutoUploadFileUpload",
+				uploading : function() {
+					showProgressBar();
+				},
+				success : function(result) {
+					hideProgressBar();
+					//alert(JSON.stringify(result));
+					$("#hfVideoFileId").val(result.data.id);
+					$("#videoFilePath").val(result.data.path);
+				},
+				fail : function(result) {
+					hideProgressBar();
+				}
+			});
+			$("#fileAutoUpload").uploadify({
+				fileUploadID : "imgAutoUploadFileUpload",
+				uploading : function() {
+					showProgressBar();
+				},
+				success : function(result) {
+					hideProgressBar();
+					//alert(JSON.stringify(result));
+					$("#hfAttachmentFileId").val(result.data.id);
+					$("#attachmentFilePath").val(result.data.path);
+				},
+				fail : function(result) {
+					hideProgressBar();
+				}
+			});
+		});
+		function showProgressBar() {
+			$("#divProgressBar").show();
+		}
+		function hideProgressBar() {
+			$("#divProgressBar").hide();
+		}
+	</script>
+</body>
+</html>

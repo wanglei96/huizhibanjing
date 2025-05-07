@@ -1,0 +1,206 @@
+package BRP.service;
+
+import BRP.data.BookSkuContext;
+import BRP.model.BookSkuManager;
+import net.sf.json.JSONObject;
+import org.w3c.dom.Node;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.common.MySqlConditionBuilder;
+import strosoft.app.model.ListInfo;
+import strosoft.app.service.GetListServiceHandler;
+import strosoft.app.service.ServiceHandlerHelper;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+import strosoft.app.util.XmlDocumentHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.time.ZoneId;
+import java.util.*;
+
+public class GetViewBookSkuInfoListServiceHandler extends GetListServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        Integer companyId = JsonHelper.getInt(jData, "companyId");
+        String ISBN = JsonHelper.getString(jData, "ISBN");
+        String bookName = JsonHelper.getString(jData, "bookName");
+        String author = JsonHelper.getString(jData, "author");
+        Integer bookSeriesId = JsonHelper.getInt(jData, "bookSeriesId");
+        String condition = JsonHelper.getString(jData, "condition");
+        String isOnlineQuery = JsonHelper.getString(jData, "isOnlineQuery");
+        Integer bookTagSelectValue = JsonHelper.getInt(jData, "bookTagSelectValue");
+        Integer ageGroupSelectValue = JsonHelper.getInt(jData, "ageGroupSelectValue");
+        String searchContent = JsonHelper.getString(jData, "searchContent");
+        Integer collectMemberId = JsonHelper.getInt(jData, "collectMemberId");
+        Integer borrowMemberId = JsonHelper.getInt(jData, "borrowMemberId");
+        String available = JsonHelper.getString(jData, "available");
+        Integer pageIndex = JsonHelper.getInt(jData, "pageIndex");
+        Integer pageSize = JsonHelper.getInt(jData, "pageSize");
+        String orderBy = JsonHelper.getString(jData, "orderBy");
+
+        MySqlConditionBuilder conditionBuilder = new MySqlConditionBuilder();
+        conditionBuilder.add(condition);
+        if(companyId==null){
+            conditionBuilder.add("book_sku.company_id=(SELECT id FROM company where is_default is true)");
+        }else{
+            conditionBuilder.addEqualCondition("book_sku.company_id", companyId);
+        }
+
+        conditionBuilder.addEqualCondition("book_sku.book_series_id", bookSeriesId);
+        conditionBuilder.addLikeCondition("book_sku.book_name", bookName);
+        conditionBuilder.addLikeCondition("book_sku.author", author);
+        conditionBuilder.addLikeCondition("book_sku.ISBN", ISBN);
+        conditionBuilder.add(isOnlineQuery);
+        if (bookTagSelectValue != null) {
+            conditionBuilder.add(String.format(
+                    "book_sku.id in (SELECT book_sku_id FROM book_sku_book_tag WHERE book_tag_id =%s)", bookTagSelectValue));
+        }
+        if (ageGroupSelectValue != null) {
+            conditionBuilder.add(String.format(
+                    "book_sku.id in (SELECT book_sku_id FROM book_sku_age_group WHERE age_group_id =%s)", ageGroupSelectValue));
+        }
+        if (!StringHelper.isNullOrEmpty(searchContent)) {
+            conditionBuilder.add(String.format(
+                    "(book_sku.book_name LIKE '%%%s%%' OR book_sku.ISBN LIKE '%%%s%%' OR book_sku.author LIKE '%%%s%%' OR book_series.name LIKE '%%%s%%')",
+                    searchContent, searchContent, searchContent, searchContent));
+        }
+        if (collectMemberId != null) {
+            conditionBuilder.add(String.format(
+                    "book_sku.id in (SELECT book_sku_id from member_bookmark where member_id =%s)", collectMemberId));
+        }
+        if (borrowMemberId != null) {
+            conditionBuilder.add(String.format(
+                    "book_sku.id in (SELECT book_sku_id from member_book_subscription where member_id =%s)", borrowMemberId));
+        }
+        if (!StringHelper.isNullOrEmpty(available)) {
+            conditionBuilder.add(String.format(
+                    "( SELECT COUNT(*) FROM book WHERE book.book_sku_id = book_sku.id AND book.is_available = 1  AND book.book_status_code='On') %s 0", available));
+        }
+        String sqlCondition = conditionBuilder.toString();
+
+        String sqlWhere = "";
+        if (sqlCondition != null && !sqlCondition.equals("")) {
+            sqlWhere = " where " + sqlCondition;
+        }
+        ArrayList<LinkedHashMap<String, Object>> alData =
+                BookSkuManager.getInstance().getViewBookSkuInfoList(pageIndex, pageSize, sqlWhere, orderBy);
+
+
+
+
+
+
+        MySqlConditionBuilder conditionCountBuilder = new MySqlConditionBuilder();
+        conditionCountBuilder.add(condition);
+
+        if(companyId==null){
+            conditionCountBuilder.add("company_id=(SELECT id FROM company where is_default is true)");
+        }else{
+            conditionCountBuilder.addEqualCondition("company_id", companyId);
+        }
+
+        conditionCountBuilder.addEqualCondition("book_series_id", bookSeriesId);
+        conditionCountBuilder.addLikeCondition("book_name", bookName);
+        conditionCountBuilder.addLikeCondition("author", author);
+        conditionCountBuilder.addLikeCondition("ISBN", ISBN);
+        conditionCountBuilder.add(isOnlineQuery);
+        if (bookTagSelectValue != null) {
+            conditionCountBuilder.add(String.format(
+                    "id in (SELECT book_sku_id FROM book_sku_book_tag WHERE book_tag_id =%s)", bookTagSelectValue));
+        }
+        if (ageGroupSelectValue != null) {
+            conditionCountBuilder.add(String.format(
+                    "id in (SELECT book_sku_id FROM book_sku_age_group WHERE age_group_id =%s)", ageGroupSelectValue));
+        }
+        if (!StringHelper.isNullOrEmpty(searchContent)) {
+            conditionCountBuilder.add(String.format(
+                    "(book_name LIKE '%%%s%%' OR ISBN LIKE '%%%s%%' OR author LIKE '%%%s%%' OR book_series_name LIKE '%%%s%%')",
+                    searchContent, searchContent, searchContent, searchContent));
+        }
+        if (collectMemberId != null) {
+            conditionCountBuilder.add(String.format(
+                    "id in (SELECT book_sku_id from member_bookmark where member_id =%s)", collectMemberId));
+        }
+        if (borrowMemberId != null) {
+            conditionCountBuilder.add(String.format(
+                    "id in (SELECT book_sku_id from member_book_subscription where member_id =%s)", borrowMemberId));
+        }
+        if (!StringHelper.isNullOrEmpty(available)) {
+            conditionCountBuilder.add(String.format(
+                    "( SELECT COUNT(*) FROM book WHERE book.book_sku_id = book_sku.id AND book.is_available = 1  AND book.book_status_code='On') %s 0", available));
+        }
+        String sqlCountCondition = conditionCountBuilder.toString();
+
+        String sqlCountWhere = "";
+        if (sqlCountCondition != null && !sqlCountCondition.equals("")) {
+            sqlCountWhere = " where " + sqlCountCondition;
+        }
+        //List<BookSkuInfo> lstBookSkuInfo =  JsonHelper.toJavaList(BookSkuInfo.class, alData);
+        String sqlCount = "SELECT COUNT(*) AS count FROM view_book_sku " + sqlCountWhere;
+        Integer recordCount = MyBatisManager.getInstance().executeInt(sqlCount);
+        ListInfo listInfo = this.createListInfo();
+        listInfo.setDataList(alData);
+        // 当前页
+        listInfo.setPageIndex(pageIndex);
+        // 分页大小
+        listInfo.setPageSize(pageSize);
+        // 记录数
+        listInfo.setRecordCount(recordCount);
+        // 页数
+        int pageCount = ServiceHandlerHelper.getPageCount(recordCount, pageSize);
+        listInfo.setPageCount(pageCount);
+        this.newProcessListInfo(listInfo);
+        this.writeSuccessResponse(response, listInfo);
+    }
+
+    protected void newProcessListInfo(ListInfo listInfo) throws Exception {
+        ArrayList<LinkedHashMap<String, Object>> alData = (ArrayList<LinkedHashMap<String, Object>>) listInfo
+                .getDataList();
+        Node configNode = this.getConfigNode();
+        String encryptFields = XmlDocumentHelper.getAttribute(configNode, "EncryptFields");
+        for (LinkedHashMap<String, Object> currentDataItem : alData) {
+            LinkedHashMap<String, Object> lhmTemp = new LinkedHashMap<String, Object>();
+            Iterator<Map.Entry<String, Object>> iterator = currentDataItem.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, Object> currentEntry = iterator.next();
+                String key = currentEntry.getKey();
+                Object objValue = currentEntry.getValue();
+                if (objValue == null) {
+                    continue;
+                }
+                if (objValue instanceof java.sql.Timestamp) {
+                    java.sql.Timestamp tsValue = (java.sql.Timestamp) objValue;
+                    String strValue = DateHelper.format(tsValue, "yyyy-MM-dd HH:mm:ss");
+                    currentDataItem.put(key, tsValue);
+                    // 保存要添加的建值对到临时Map中
+                    lhmTemp.put(key + "_text", strValue);
+                } else if (objValue instanceof java.time.LocalDateTime) {
+                    java.time.LocalDateTime ldtValue = (java.time.LocalDateTime) objValue;
+                    ZoneId zoneId = ZoneId.systemDefault();
+                    Date date = Date.from(ldtValue.atZone(zoneId).toInstant());
+                    String strValue = DateHelper.format(date, "yyyy-MM-dd HH:mm:ss");
+                    currentDataItem.put(key, ldtValue);
+                    // 保存要添加的建值对到临时Map中
+                    lhmTemp.put(key + "_text", strValue);
+                } else if (objValue instanceof java.sql.Time) {
+                    java.sql.Time timeValue = (java.sql.Time) objValue;
+                    String strValue = timeValue.toString();
+                    currentDataItem.put(key, strValue);
+                }
+                if (("," + encryptFields + ",").contains("," + key + ",")) {
+                    currentDataItem.put(key, "");
+                }
+            }
+            // 添加新键值对
+            for (String key : lhmTemp.keySet()) {
+                Object objValue = lhmTemp.get(key);
+                currentDataItem.put(key, objValue);
+            }
+        }
+        com.alibaba.fastjson2.JSONArray jarrData = JsonHelper.toFastJSONArray(alData,
+                "All");
+        listInfo.setDataList(jarrData);
+    }
+
+}

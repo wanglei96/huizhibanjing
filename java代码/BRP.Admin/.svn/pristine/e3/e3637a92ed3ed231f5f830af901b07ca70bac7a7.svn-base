@@ -1,0 +1,114 @@
+package BRP.service;
+
+import BRP.data.Member;
+import BRP.data.MemberCard;
+import BRP.data.MemberCardDisableLog;
+import BRP.model.MemberCardDisableLogManager;
+import BRP.model.MemberCardManager;
+import BRP.model.MemberManager;
+import BRP.model.MessageManager;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.UpdateServiceHandler;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+/**
+ * 会员卡停卡接口
+ */
+public class UpdateMemberCardStopServiceHandler extends UpdateServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+            JSONObject jData = this.getRequestData(request);
+            Integer memberId = JsonHelper.getInt(jData, "memberId");
+            Integer memberCardId = JsonHelper.getInt(jData, "memberCardId");
+            String stopDate = JsonHelper.getString(jData, "stopDate");
+            Integer days = JsonHelper.getInt(jData, "days");
+            Integer stopCardNum = JsonHelper.getInt(jData, "stopCardNum");
+            String remark = JsonHelper.getString(jData, "remark");
+            String source = JsonHelper.getString(jData, "source");
+            String status = JsonHelper.getString(jData, "status");
+            String expireDate = JsonHelper.getString(jData, "stopDate");
+            String stopEndDate = JsonHelper.getString(jData, "stopEndDate");
+            String type = JsonHelper.getString(jData, "type");
+
+            MemberCardDisableLog memberCardDisableLog = new MemberCardDisableLog();
+            memberCardDisableLog.setMemberId(memberId);
+            memberCardDisableLog.setMemberCardId(memberCardId);
+            if (type.equals("decrease")) {
+                Timestamp tsStopDate = Timestamp.valueOf(stopDate);
+                memberCardDisableLog.setStopDate(tsStopDate);
+                memberCardDisableLog.setDays(days);
+
+                LocalDateTime localDateTime = tsStopDate.toLocalDateTime();
+                LocalDateTime newLocalDateTime = localDateTime.plus(days, ChronoUnit.DAYS);
+                Timestamp tsStopEndDate = Timestamp.valueOf(newLocalDateTime);
+                memberCardDisableLog.setStopEndDate(tsStopEndDate);
+            }
+            memberCardDisableLog.setSource(source);
+            memberCardDisableLog.setStatus(status);
+            memberCardDisableLog.setRemark(remark);
+            memberCardDisableLog.setApplyTime(new Timestamp(System.currentTimeMillis()));
+            memberCardDisableLog.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            memberCardDisableLog.setType(type);
+            memberCardDisableLog.setStopCardNum(stopCardNum);
+            memberCardDisableLog.setIsRelieve(false);
+            MemberCardDisableLogManager.getInstance().add(sqlSession, memberCardDisableLog);
+
+            MemberCard memberCard = MemberCardManager.getInstance().getEntity(sqlSession, memberCardId);
+            // 避免空指针，如果为null = 0
+            if (memberCard.getStoppableCardQuantity() == null) {
+                memberCard.setStoppableCardQuantity(0);
+            }
+            Integer stoppableCardQuantity = 0;
+            if (type.equals("augment")) {
+                stoppableCardQuantity = memberCard.getStoppableCardQuantity() + stopCardNum;
+            }
+            if (type.equals("decrease")) {
+                if (memberCard.getStoppableCardQuantity() - stopCardNum < 0) {
+                    this.writeErrorResponse(response, "停卡次数不足，请联系管理员");
+                    return;
+                } else if (memberCard.getDisabled() == true) {
+                    this.writeErrorResponse(response, "该会员卡不可用");
+                    return;
+                }
+                stoppableCardQuantity = memberCard.getStoppableCardQuantity() - stopCardNum;
+                memberCard.setIsStopCard(true);
+                //memberCard.setExpireDate(Timestamp.valueOf(expireDate));
+            }
+            memberCard.setStoppableCardQuantity(stoppableCardQuantity);
+            MemberCardManager.getInstance().update(sqlSession, memberCard);
+            Member theMember = MemberManager.getInstance().getEntity(sqlSession, memberId);
+            // 如果订单的微信 OpenID 不为空，则发送模板消息
+           /* if (!StringHelper.isNullOrEmpty(theMember.getWxOpenId())) {
+                // 将发送模板消息的操作放入一个新的线程中执行
+                new Thread(() -> {
+                    try {
+                        MessageManager.getInstance().sendWxStopCardMessage(stopDate, stopEndDate, theMember.getWxOpenId());
+                    } catch (Exception e) {
+                        // 处理发送消息失败的情况
+                        e.printStackTrace();
+                    }
+                }).start();
+            }*/
+
+            sqlSession.commit();
+            this.writeSuccessResponse(response);
+        } catch (Exception e) {
+            sqlSession.rollback();
+            e.printStackTrace();
+        } finally {
+            sqlSession.close();
+        }
+    }
+}

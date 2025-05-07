@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SysMenuCustom">
+    <resultMap type="SysMenu" id="SysMenuResultMap">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="value" jdbcType="VARCHAR" property="value"/>
+        <result column="parent_id" jdbcType="INTEGER"
+                property="parentId"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="sys_menu_type_code" jdbcType="VARCHAR"
+                property="sysMenuTypeCode"/>
+        <result column="picture_id" jdbcType="INTEGER"
+                property="pictureId"/>
+        <result column="activation_picture_id" jdbcType="INTEGER"
+                property="activationPictureId"/>
+        <result column="display_order" jdbcType="INTEGER"
+                property="displayOrder"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
+        <result column="icon" jdbcType="VARCHAR" property="icon"/>
+    </resultMap>
+    <!-- 取得用户菜单列表 -->
+    <select id="selectSysMenuBySysUserId" parameterType="int"
+            resultMap="SysMenuResultMap">
+        select *
+        from sys_menu
+        where value in (select permission
+                        from sys_role_permission
+                        where sys_role_id in (select sys_role_id
+                                              from sys_user_role
+                                              where sys_user_id = #{id}))
+        order by display_order;
+    </select>
+    <!-- 取得用户后台菜单列表 -->
+    <select id="selectAdminSysMenuBySysUserId" parameterType="int"
+            resultMap="SysMenuResultMap">
+        select *
+        from sys_menu
+        where sys_menu_type_code = 'Admin'
+          and value in (select permission
+                        from sys_role_permission
+                        where sys_role_id in (select sys_role_id
+                                              from sys_user_role
+                                              where sys_user_id
+                                                        = #{id}))
+        order by display_order;
+    </select>
+    <!-- 取得用户前台菜单列表 -->
+    <select id="selectFrontSysMenuBySysUserId" parameterType="int"
+            resultMap="SysMenuResultMap">
+        select *
+        from sys_menu
+        where sys_menu_type_code = 'Front'
+          and value in (select permission
+                        from sys_role_permission
+                        where sys_role_id in (select sys_role_id
+                                              from sys_user_role
+                                              where sys_user_id
+                                                        = #{id}))
+        order by display_order;
+    </select>
+
+    <!-- 取得菜单列表 -->
+    <select id="selectSysMenuBySysUserIdAndSysMenuTypeCode"
+            parameterType="Map" resultMap="SysMenuResultMap">
+        select *
+        from sys_menu
+        where sys_menu_type_code = #{menuTypeCode}
+          and value in (select permission
+                        from sys_role_permission
+                        where sys_role_id in (select sys_role_id
+                                              from sys_user_role
+                                              where (sys_user_id
+                                                  = #{sysUserId})
+                                                 or #{sysUserId} = 0))
+        order by display_order;
+    </select>
+
+    <!-- 取得商户中心菜单列表 -->
+    <select id="selectSysMenuByCompanyUserIdAndSysMenuTypeCode"
+            parameterType="Map" resultMap="SysMenuResultMap">
+        select *
+        from sys_menu
+        where sys_menu_type_code = #{menuTypeCode}
+          and value in (select permission
+                        from company_role_permission
+                        where company_role_id in (select company_role_id
+                                                  from company_user_role
+                                                  where company_user_id
+                                                            = #{companyUserId}))
+        order by display_order;
+    </select>
+
+    <!-- 取得商户用户菜单列表 -->
+    <select id="selectSysMenuByCompanyUserId"
+            parameterType="Map" resultMap="SysMenuResultMap">
+        select *
+        from sys_menu
+        where sys_menu_type_code = 'Company'
+          and value in (select permission
+                        from company_role_permission
+                        where company_role_id in (select company_role_id
+                                                  from company_user_role
+                                                  where company_user_id
+                                                            = #{companyUserId}))
+        order by display_order;
+    </select>
+</mapper>

@@ -1,0 +1,1 @@
+<view><view class="container center"><view class="h200"></view><image style="width:400rpx;height:400rpx;" src="{{imageRootUrl+'image/common/serviceQRCode.png'}}"></image></view></view>

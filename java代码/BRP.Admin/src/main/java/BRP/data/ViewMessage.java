@@ -1,0 +1,144 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+public class ViewMessage extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer memberId;//会员ID;
+    private  Timestamp pushTime;//推送时间;
+    private  String messageTypeCode;//消息类型;
+    private  String content;//内容;
+    private  Integer companyId;//商户ID;
+    private  String msg;//消息信息;
+    private  Timestamp createTime;//创建时间;
+    private  Timestamp updateTime;//更新时间;
+    private  String companyName;//门店名称;
+    private  String companyNo;//门店编号;
+    private  String memberName;//名称;
+    private  String messageTypeName;//消息类型名称;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setMemberId(Integer memberId)    
+    {
+        this.memberId = memberId;
+    }
+    public  Integer getMemberId()    
+    {
+        return memberId;
+    }
+    public  void setPushTime(Timestamp pushTime)    
+    {
+        this.pushTime = pushTime;
+    }
+    public  Timestamp getPushTime()    
+    {
+        return pushTime;
+    }
+    public  void setMessageTypeCode(String messageTypeCode)    
+    {
+        this.messageTypeCode = messageTypeCode;
+    }
+    public  String getMessageTypeCode()    
+    {
+        return messageTypeCode;
+    }
+    public  void setContent(String content)    
+    {
+        this.content = content;
+    }
+    public  String getContent()    
+    {
+        return content;
+    }
+    public  void setCompanyId(Integer companyId)    
+    {
+        this.companyId = companyId;
+    }
+    public  Integer getCompanyId()    
+    {
+        return companyId;
+    }
+    public  void setMsg(String msg)    
+    {
+        this.msg = msg;
+    }
+    public  String getMsg()    
+    {
+        return msg;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setUpdateTime(Timestamp updateTime)    
+    {
+        this.updateTime = updateTime;
+    }
+    public  Timestamp getUpdateTime()    
+    {
+        return updateTime;
+    }
+    public  void setCompanyName(String companyName)    
+    {
+        this.companyName = companyName;
+    }
+    public  String getCompanyName()    
+    {
+        return companyName;
+    }
+    public  void setCompanyNo(String companyNo)    
+    {
+        this.companyNo = companyNo;
+    }
+    public  String getCompanyNo()    
+    {
+        return companyNo;
+    }
+    public  void setMemberName(String memberName)    
+    {
+        this.memberName = memberName;
+    }
+    public  String getMemberName()    
+    {
+        return memberName;
+    }
+    public  void setMessageTypeName(String messageTypeName)    
+    {
+        this.messageTypeName = messageTypeName;
+    }
+    public  String getMessageTypeName()    
+    {
+        return messageTypeName;
+    }
+    public  ViewMessage copy()    
+    {
+        ViewMessage entity = null;
+        try        
+        {
+            entity = (ViewMessage) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

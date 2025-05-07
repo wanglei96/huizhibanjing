@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery-migrate-1.4.1.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.uploader.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/management.js"></script>
+<link rel="stylesheet" href="../../js/ztree/zTreeStyle/zTreeStyle.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/ztree/jquery.ztree.all-3.5.min.js"></script>
+<script>
+	managementContext.title = "登录管理";
+	//设置权限参数
+	function setPermissionContext(){
+		managementContext.managementPermission= "ApplicationLoginManagement";
+		var managementPermission = $.query.get("managementPermission");
+		if(managementPermission != ""){
+			managementContext.managementPermission= managementPermission;
+		}
+	}
+	/*
+	 * 绑定数据
+	 */
+	function bindData() {
+		getLoginList();
+	}
+	function getLoginList(){
+		var data = new Object();
+		data.applicationId = $.query.get("applicationId");
+		call("GetApplicationsLoginList", data, function(
+				result) {
+			console.log(result)
+			if(result.data != null){
+				bindZTree(result.data);
+			};
+			
+		});
+	}
+	function bindZTree(data){
+		var zNodes = [];
+		for(var applicationId in data){
+			var currentApplication = data[applicationId];
+			var applicationNode = new Object();
+			var userSessionOverTime = currentApplication.userSessionOverTime;
+			var duplicateLogin = currentApplication.duplicateLogin==true?'是':'否';
+			applicationNode.id = applicationId;
+			applicationNode.type="application";
+			applicationNode.title = currentApplication.applicationId+'(非活跃用户失效时长:'+userSessionOverTime+'s;同一帐号是否可以同时登录：'+duplicateLogin+')';
+			applicationNode.icon = '../../img/icon/application.png';
+			zNodes.push(applicationNode);
+			var activeUsers = currentApplication.activeUsers;
+			for(var accountId in activeUsers){
+				var currentAccount = activeUsers[accountId];
+				var account = new Object();
+				account.id = applicationId+":"+accountId;
+				account.type="account";
+				account.title = accountId;
+				account.icon = '../../img/icon/user.png';
+				account.parentId = applicationId;
+				zNodes.push(account);
+				for(var i=0;i<currentAccount.length;i++){
+					var currentSession = currentAccount[i];
+					var activeUserSession = new Object();
+					var ipAddress = currentSession.IPAddress;
+						var loginTime = new Date(currentSession.loginTime.time).Format("yyyy-MM-dd hh:mm:ss.S");
+						var activeTime = new Date(currentSession.activeTime.time).Format("yyyy-MM-dd hh:mm:ss.S");
+						activeUserSession.id = currentSession.activeUserSessionID;
+						account.title = currentSession.accountName;
+						activeUserSession.parentId = account.id;
+						activeUserSession.type = "session";
+						activeUserSession.accountId = accountId;
+						activeUserSession.applicationId = applicationId;
+						activeUserSession.title = "IP地址:"+ipAddress+"  登录时间:"+loginTime+"  最后活跃时间:"+activeTime;
+						zNodes.push(activeUserSession);
+				}
+			}
+		}
+		
+		var setting = {
+						 check : {
+				            enable : true,
+				            chkStyle : "checkbox",    //复选框
+				            chkboxType : {
+				                "Y" : "s",
+				                "N" : "ps"
+				            }
+				        }, 
+					    data: {
+					        key : {
+					            title : "title", //鼠标悬停显示的信息
+					            name : "title" //网页上显示出节点的名称
+					        },
+					        simpleData: {
+					            enable: true,
+					            idKey: "id", //修改默认的ID为自己的ID
+					            pIdKey: "parentId",//修改默认父级ID为自己数据的父级ID
+					            rootPId: 000     //根节点的ID
+					        }
+					    }
+					}; 
+		$.fn.zTree.init($("#tableGrid"), setting, zNodes);
+		//展开二级节点
+        var treeObj = $.fn.zTree.getZTreeObj("tableGrid");
+        var nodes = treeObj.getNodes();
+        for (var i = 0; i < nodes.length; i++) { //设置节点展开
+            treeObj.expandNode(nodes[i], true, false, true);
+        }
+	}
+	
+	function kickOutUser(){
+		var treeObj = $.fn.zTree.getZTreeObj("tableGrid");
+		var nodes = treeObj.getCheckedNodes(true);
+		var data = new Object();
+		data.userSessionList = [];
+		for(var i=0;i<nodes.length;i++){
+			if(nodes[i].type != "session"){
+				continue;
+			}
+			var item = new Object();
+			item.accountId = nodes[i].accountId;
+			item.applicationId = nodes[i].applicationId;
+			item.token = nodes[i].id;
+			data.userSessionList.push(item);
+		}
+		call("SysKickOutActiveUser",data,function(result){
+			bindData();
+		})
+	}
+</script>
+</head>
+
+<body>
+	<div class="page">
+		<div class="toolbar_panel" id="divToolbar"> <a href="#"
+				class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+				onclick="kickOutUser()">踢出</a> <a id="lnkRefreshPage" href="#"
+				class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+				onclick="refreshPage()">刷新</a>
+		</div>
+		<div>
+			<div><!-- 
+				<div id="divSearchPanel" class="search_panel easyui-panel">
+					<div class="search_item">
+						<span class="search_item_caption">名称:</span> <input
+							id="txtSearchName" class="search_item_textbox easyui-textbox">
+					</div>
+					<div class="search_item_command">
+						<a href="#" class="easyui-linkbutton" plain="true"
+							iconCls="icon-search" onclick="query()">查询</a>
+					</div>
+				</div> -->
+				<div class="data_panel">
+					<ul id="tableGrid" class="ztree"
+						style="height:auto;">
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

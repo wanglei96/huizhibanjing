@@ -1,0 +1,163 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+public class MemberCardServiceTimeLog extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer memberId;//会员ID;
+    private  Integer days;//增加/减少时长;
+    private  Integer giftDays;
+    private  String memberCardServiceTimeTypeCode;//类型编码;
+    private  BigDecimal cost;//费用;
+    private  String paymentMethodCode;
+    private  String remark;//备注;
+    private  Timestamp addTime;//添加时间;
+    private  Timestamp effectiveTime;
+    private  Timestamp expiryTime;//到期时间;
+    private  String memberCardServiceTimeGiftTypeCode;
+    private  Integer activityId;
+    private  Timestamp createTime;//创建时间;
+    private  Timestamp updateTime;//更新时间;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setMemberId(Integer memberId)    
+    {
+        this.memberId = memberId;
+    }
+    public  Integer getMemberId()    
+    {
+        return memberId;
+    }
+    public  void setDays(Integer days)    
+    {
+        this.days = days;
+    }
+    public  Integer getDays()    
+    {
+        return days;
+    }
+    public  void setGiftDays(Integer giftDays)    
+    {
+        this.giftDays = giftDays;
+    }
+    public  Integer getGiftDays()    
+    {
+        return giftDays;
+    }
+    public  void setMemberCardServiceTimeTypeCode(String memberCardServiceTimeTypeCode)    
+    {
+        this.memberCardServiceTimeTypeCode = memberCardServiceTimeTypeCode;
+    }
+    public  String getMemberCardServiceTimeTypeCode()    
+    {
+        return memberCardServiceTimeTypeCode;
+    }
+    public  void setCost(BigDecimal cost)    
+    {
+        this.cost = cost;
+    }
+    public  BigDecimal getCost()    
+    {
+        return cost;
+    }
+    public  void setPaymentMethodCode(String paymentMethodCode)    
+    {
+        this.paymentMethodCode = paymentMethodCode;
+    }
+    public  String getPaymentMethodCode()    
+    {
+        return paymentMethodCode;
+    }
+    public  void setRemark(String remark)    
+    {
+        this.remark = remark;
+    }
+    public  String getRemark()    
+    {
+        return remark;
+    }
+    public  void setAddTime(Timestamp addTime)    
+    {
+        this.addTime = addTime;
+    }
+    public  Timestamp getAddTime()    
+    {
+        return addTime;
+    }
+    public  void setEffectiveTime(Timestamp effectiveTime)    
+    {
+        this.effectiveTime = effectiveTime;
+    }
+    public  Timestamp getEffectiveTime()    
+    {
+        return effectiveTime;
+    }
+    public  void setExpiryTime(Timestamp expiryTime)    
+    {
+        this.expiryTime = expiryTime;
+    }
+    public  Timestamp getExpiryTime()    
+    {
+        return expiryTime;
+    }
+    public  void setMemberCardServiceTimeGiftTypeCode(String memberCardServiceTimeGiftTypeCode)    
+    {
+        this.memberCardServiceTimeGiftTypeCode = memberCardServiceTimeGiftTypeCode;
+    }
+    public  String getMemberCardServiceTimeGiftTypeCode()    
+    {
+        return memberCardServiceTimeGiftTypeCode;
+    }
+    public  void setActivityId(Integer activityId)    
+    {
+        this.activityId = activityId;
+    }
+    public  Integer getActivityId()    
+    {
+        return activityId;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setUpdateTime(Timestamp updateTime)    
+    {
+        this.updateTime = updateTime;
+    }
+    public  Timestamp getUpdateTime()    
+    {
+        return updateTime;
+    }
+    public  MemberCardServiceTimeLog copy()    
+    {
+        MemberCardServiceTimeLog entity = null;
+        try        
+        {
+            entity = (MemberCardServiceTimeLog) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

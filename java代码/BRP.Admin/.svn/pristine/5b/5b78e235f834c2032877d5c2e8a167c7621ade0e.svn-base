@@ -1,0 +1,180 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.model.CompanySettingManager;
+import BRP.model.ViewBookOrderManager;
+import net.sf.json.JSONObject;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.common.MySqlConditionBuilder;
+import strosoft.app.model.ListInfo;
+import strosoft.app.service.GetListServiceHandler;
+import strosoft.app.service.ServiceHandlerHelper;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * 获取配送单列表
+ */
+public class GetDeliveryOrderInfoListServiceHandler extends GetListServiceHandler {
+
+    public void process(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        Integer companyId = JsonHelper.getInt(jData, "companyId");
+        Integer deliverAreaId = JsonHelper.getInt(jData, "deliverAreaId");
+        Integer deliverLineId = JsonHelper.getInt(jData, "deliverLineId");
+        Integer deliverPlaceId = JsonHelper.getInt(jData, "deliverPlaceId");
+        Integer delivererId = JsonHelper.getInt(jData, "delivererId");
+        Integer bookpickerId = JsonHelper.getInt(jData, "bookpickerId");
+        String deliverTimeBegin = JsonHelper.getString(jData, "deliverTimeBegin");
+        String deliverTimeEnd = JsonHelper.getString(jData, "deliverTimeEnd");
+        String memberName = JsonHelper.getString(jData, "memberName");
+        String condition = JsonHelper.getString(jData, "condition");
+        Integer pageIndex = JsonHelper.getInt(jData, "pageIndex");
+        Integer pageSize = JsonHelper.getInt(jData, "pageSize");
+        String orderBy = JsonHelper.getString(jData, "orderBy");
+        MySqlConditionBuilder conditionBuilder = new MySqlConditionBuilder();
+        conditionBuilder.add(condition);
+        conditionBuilder.add("is_offline=0");
+        conditionBuilder.addEqualCondition("company_id", companyId);
+        conditionBuilder.addEqualCondition("deliver_area_id", deliverAreaId);
+        conditionBuilder.addEqualCondition("deliver_line_id", deliverLineId);
+        conditionBuilder.addEqualCondition("deliver_place_id", deliverPlaceId);
+        conditionBuilder.addEqualCondition("deliverer_id", delivererId);
+        conditionBuilder.addEqualCondition("bookpicker_id", bookpickerId);
+        conditionBuilder.addLikeCondition("member_name", memberName);
+        conditionBuilder.addTimeSpanCondition(deliverTimeBegin, deliverTimeEnd, "deliver_time");
+        String returnButNotBorrowed = CompanySettingManager.getInstance().getCompanySettingValueByCode(companyId, "ReturnButNotBorrowed");
+        if (!StringHelper.isNullOrEmpty(returnButNotBorrowed) && returnButNotBorrowed.equals("false")) {
+            conditionBuilder.add("EXISTS (SELECT 1 FROM book_order_item i WHERE i.book_order_id = view_book_order.id AND book_order_type_code = 'Borrow')");
+        }
+        String sqlCondition = conditionBuilder.toString();
+
+        List<DeliveryOrderInfo> lstDeliveryOrderInfo = this.getList(sqlCondition, orderBy, pageIndex, pageSize);
+
+        //List<ViewBookOrder> lstViewBookOrder = ViewBookOrderManager.getInstance().getList(sqlCondition, orderBy, pageIndex, pageSize);
+        String idString = lstDeliveryOrderInfo.stream()
+                .map(DeliveryOrderInfo::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        List<ViewBookOrderItem> lstViewBookOrderItem = this.getChildrenList(idString);
+        List<DeliveryOrderInfo> newDeliveryOrderInfoList = new ArrayList<>();
+        for (DeliveryOrderInfo deliveryOrderInfo : lstDeliveryOrderInfo) {
+            Integer bookOrderId = deliveryOrderInfo.getId();
+            deliveryOrderInfo.setBookOrderId(bookOrderId);
+            List<ViewBookOrderItem> children =
+                    lstViewBookOrderItem.stream().filter
+                            (viewBookOrderItem -> viewBookOrderItem.getBookOrderId()
+                                    .equals(bookOrderId)).collect(Collectors.toList());
+            String deliverAreaName = deliveryOrderInfo.getDeliverAreaName();
+            Integer deliverAreaNumber = deliveryOrderInfo.getDeliverAreaNumber();
+            if (deliverAreaNumber != null) {
+                deliveryOrderInfo.setDeliverAreaName(deliverAreaName + deliverAreaNumber + "号");
+            } else {
+                deliveryOrderInfo.setDeliverAreaName(deliverAreaName);
+            }
+            if (deliveryOrderInfo.getDeliverTime() != null) {
+                String deliverTimeText = DateHelper.timestampToString(deliveryOrderInfo.getDeliverTime(), "yyyy-MM-dd");
+                deliveryOrderInfo.setDeliverTimeText(deliverTimeText);
+            } else {
+                deliveryOrderInfo.setDeliverTimeText("");
+            }
+            //获取送书数量
+            long sendCount = children.stream()
+                    .filter(item -> BookOrderTypeCodes.Borrow.equals(item.getBookOrderTypeCode())).count();
+            deliveryOrderInfo.setSendCount(sendCount);
+            //获取送书数量
+            long fetchCount = children.stream()
+                    .filter(item -> BookOrderTypeCodes.Return.equals(item.getBookOrderTypeCode())).count();
+            deliveryOrderInfo.setFetchCount(fetchCount);
+            deliveryOrderInfo.setChildren(children);
+            newDeliveryOrderInfoList.add(deliveryOrderInfo);
+        }
+        Integer recordCount = ViewBookOrderManager.getInstance().getCount(sqlCondition);
+        ListInfo listInfo = this.createListInfo();
+        listInfo.setDataList(newDeliveryOrderInfoList);
+        // 当前页
+        listInfo.setPageIndex(pageIndex);
+        // 分页大小
+        listInfo.setPageSize(pageSize);
+        // 记录数
+        listInfo.setRecordCount(recordCount);
+        // 页数
+        int pageCount = ServiceHandlerHelper.getPageCount(recordCount, pageSize);
+        listInfo.setPageCount(pageCount);
+        this.writeSuccessResponse(response, listInfo);
+    }
+
+    private List<DeliveryOrderInfo> getList(String sqlCondition, String orderBy, Integer pageIndex, Integer pageSize) throws Exception {
+        String sqlWhere = "";
+        if (sqlCondition != null && !sqlCondition.equals("")) {
+            sqlWhere = " where " + sqlCondition;
+        }
+        String sqlLimit = "";
+        if (pageSize > 0) {
+            sqlLimit = " limit " + String.valueOf(pageIndex * pageSize) + "," + pageSize;
+        }
+        String sqlOrderBy = "";
+        if (orderBy != null && !orderBy.equals("")) {
+            sqlOrderBy = " order by  " + orderBy;
+        }
+        String sql = String.format("select * from view_book_order %s %s %s", sqlWhere, sqlOrderBy, sqlLimit);
+        return JsonHelper.toJavaList(DeliveryOrderInfo.class, MyBatisManager.getInstance().executeHashMapList(sql));
+    }
+
+
+    /**
+     * 获取订单下所有子表
+     *
+     * @param idString
+     */
+    private List<ViewBookOrderItem> getChildrenList(String idString) throws Exception {
+        if (StringHelper.isNullOrEmpty(idString)) {
+            return null;
+        }
+        String sql = String.format("select book_order_item.id AS id,\n" +
+                "\t\t\t book_order_item.book_order_id AS bookOrderId,\n" +
+                "\t     book_order_item.book_id AS bookId,\n" +
+                "\t\t\t\tbook_order_item.is_damage AS isDamage,\n" +
+                "\t\t\t\tbook_order_item.book_order_type_code AS bookOrderTypeCode,\n" +
+                "\t\t\t\tbook_order_item.deliver_status_code AS deliverStatusCode,\n" +
+                "\t\t\t\tbook_order_item.is_returned AS isReturned,\n" +
+                "\t\t\t\tbook_order_item.book_return_time AS bookReturnTime,\n" +
+                "\t\t\t\tbook_order_item.book_in_stocks_time AS bookInStocksTime,\n" +
+                "\t\t\t\tbook_order_item.create_time AS createTime,\n" +
+                "\t\t\t\tbook_order_item.update_time AS updateTime,\n" +
+                "\t     book.sn AS bookSn,\n" +
+                "\t     book.book_sku_id AS bookSkuId,\n" +
+                "\t\t\t book.borrow_status_code AS borrowStatusCode,\n" +
+                "\t\t\t book.bookcase_id AS bookcaseId,\n" +
+                "\t\t\t book_sku.book_name AS bookName,\n" +
+                "\t\t\t book_sku.book_series_id AS bookSeriesId,\n" +
+                "\t\t\t book_sku.binding_type_code AS bindingTypeCode,\n" +
+                "\t\t\t book_sku.price AS bookSkuPrice,\n" +
+                "\t\t\t bookcase.name AS bookcaseName,\n" +
+                "\t\t\t book_series.name AS bookSeriesName,\n" +
+                "\t\t\t binding_type.name AS bindingTypeName,\n" +
+                "\t\t\t deliver_status.name AS deliverStatusName,\n" +
+                "\t\t\t book_order_type.name AS bookOrderTypeName\n" +
+                "FROM\n" +
+                "(select * from book_order_item where book_order_id in (%s)) as book_order_item\n" +
+                "LEFT JOIN book ON book.id = book_order_item.book_id\n" +
+                "LEFT JOIN book_order_type ON book_order_item.book_order_type_code = book_order_type.code \n" +
+                "LEFT JOIN deliver_status ON book_order_item.deliver_status_code = deliver_status.code \n" +
+                "LEFT JOIN book_sku ON book.book_sku_id = book_sku.id \n" +
+                "LEFT JOIN sys_upload_file image_file ON book_sku.image_file_id = image_file.id \n" +
+                "LEFT JOIN bookcase ON book.bookcase_id = bookcase.id\n" +
+                "LEFT JOIN book_series ON book_sku.book_series_id = book_series.id \n" +
+                "LEFT JOIN binding_type ON book_sku.binding_type_code = binding_type.code\n" +
+                "ORDER BY book_order_type_code,book_order_item.create_time desc\n", idString);
+        ArrayList<LinkedHashMap<String, Object>> lData = MyBatisManager.getInstance().executeHashMapList(sql);
+        return JsonHelper.toJavaList(ViewBookOrderItem.class, lData);
+    }
+}

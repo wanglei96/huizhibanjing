@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>包含管理的编辑界面</title>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.uploader.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/detail.js"></script>
+
+<link rel="stylesheet" href="../../js/CodeMirror/css/codemirror.css"
+	type="text/css"></link>
+<script type="text/javascript" src="../../js/CodeMirror/codemirror.js"></script>
+<script type="text/javascript" src="../../js/CodeMirror/xml/xml.js"></script>
+<script type="text/javascript" src="../../js/CodeMirror/css/css.js"></script>
+
+<style type="text/css">
+.CodeMirror-line-numbers {
+	width: 22px;
+	color: #aaa;
+	background-color: #eee;
+	text-align: right;
+	padding-right: .3em;
+	font-size: 10pt;
+	font-family: monospace;
+	padding-top: .4em;
+	line-height: 16px;
+}
+</style>
+
+<script type="text/javascript">
+	detailContext.dataName = "CmsInclude";
+	detailContext.tableName = "cms_clude";
+	detailContext.primaryKeyName = "id";
+	var editor = null;
+	/*
+	 * 设置新增时的默认选项
+	 */
+	$(function(){
+		if(isAddMode()){
+			$(" select option[value='.html']").attr("selected",true);
+			$(" select option[value='utf-8']").attr("selected",true);
+		}
+	})
+	function bindControls() {
+
+	}
+
+	/*
+	 * 输出实体信息
+	 */
+	function outputEntity(dataItem) {
+		outputEntityBase(dataItem);
+		editor.setValue(dataItem.cmsIncludeContent);
+		//设置编码
+		$("#ddlEncode option[value='"+dataItem.encode+"']").attr("selected","selected")
+	}
+	/*
+	 * 取得实体
+	 */
+	function getEntity() {
+		var newEntity = getEntityBase();
+		newEntity.cmsIncludeContent = editor.getValue();
+		newEntity.createdFileExtName = $("#cmbCreatedFileExtNameDropDownList").val();
+		newEntity.encode = $("#ddlEncode").val();
+		newEntity.cmsSiteId = $.cookie("cmsSiteId");
+		return newEntity;
+	}
+	
+	/*
+	 * 设置只读
+	 */
+	function setReadonly() {
+		$("#formDetail input[id*=txt]").each(function() {
+			$(this).textbox("readonly", true);
+		});
+	
+		$("#formDetail textarea[id*=txt]").each(function() {
+			$(this).textbox("readonly", true);
+		});
+		$("#formDetail input[id*=cmb]").each(function() {
+			$(this).combobox("readonly", true);
+		});
+		//alert("#formDetail input[id*=ct]:" + $("#formDetail input[id*=ct]").size());
+		$("#formDetail input[id*=ct]").each(function() {
+			$(this).combotree("readonly", true);
+		});
+		$("#formDetail input[id*=chk]").each(function() {
+			$(this).attr("disabled", "disabled");
+		});
+		$("#encode").attr("disabled", "disabled");
+		$("#createdFileExtNameDropDownList").attr("disabled", "disabled");
+		editor.setOption("readOnly", true);
+	}
+</script>
+
+</head>
+
+<body>
+	<div id="editContent" class="easyui-layout"
+		style="width:100%;overflow:auto;" fit="true">
+		<div buttons="#dlg-buttons">
+			<form id="formDetail" method="post" novalidate
+				style="margin:0;padding:20px 50px">
+
+				<div style="margin-bottom:20px">
+					<input id="txtName" name="txtName" class="easyui-textbox"
+						label="包含文件名称:" style="width:265px">
+				</div>
+				<div style="margin-bottom:20px">
+					<div style="float:left;">
+						<span style="display:block;width:105px;">文件扩展名:</span>
+					</div>
+					<div style="margin-bottom:20px;">
+						<select name="cmbCreatedFileExtNameDropDownList"
+							id="cmbCreatedFileExtNameDropDownList"
+							style="border-radius: 3px;width: 10%;height: 22px;"  >
+							<option value=".html">.html</option>
+						</select>
+					</div>
+				</div>
+				<div style="margin-bottom:20px">
+					<div style="float:left;">
+						<span style="display:block;width:105px;">网页编码:</span>
+					</div>
+					<div style="margin-bottom:20px;">
+						<select name="ddlEncode" id="ddlEncode">
+							<option value="utf-8">Unicode
+								(UTF-8)</option>
+							<option value="gb2312">简体中文 (GB2312)</option>
+							<option value="big5">繁体中文 (Big5)</option>
+							<option value="iso-8859-1">西欧 (iso-8859-1)</option>
+							<option value="euc-kr">韩文 (euc-kr)</option>
+							<option value="euc-jp">日文 (euc-jp)</option>
+							<option value="iso-8859-6">阿拉伯文 (iso-8859-6)</option>
+							<option value="windows-874">泰文 (windows-874)</option>
+							<option value="iso-8859-9">土耳其文 (iso-8859-9)</option>
+							<option value="iso-8859-5">西里尔文 (iso-8859-5)</option>
+							<option value="iso-8859-8">希伯来文 (iso-8859-8)</option>
+							<option value="iso-8859-7">希腊文 (iso-8859-7)</option>
+							<option value="windows-1258">越南文 (windows-1258)</option>
+							<option value="iso-8859-2">中欧 (iso-8859-2)</option>
+						</select>
+					</div>
+				</div>
+				<div style="border: 1px solid #CCC; width:100%">
+					<textarea name="Content" rows="2" cols="20" wrap="off" id="Content"
+						style="height: 500px; width: 100%; display: none;"></textarea>
+				</div>
+				<script type="text/javascript">
+					editor = CodeMirror.fromTextArea(document
+							.getElementById("Content"), {
+						lineNumbers : true,
+						extraKeys : {
+							"Ctrl-Space" : "autocomplete"
+						},
+						mode : "xml"
+					})
+					editor.setSize("1020px", "540px");
+					editor.getValue();//保存到textarea
+				</script>
+			</form>
+		</div>
+		<div id="dlg-buttons" style="text-align:center;">
+			<a href="javascript:void(0)" class="easyui-linkbutton c6"
+				iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+				iconCls="icon-cancel" onclick="javascript:closeDetailDialog();"
+				style="width:90px">返回</a>
+		</div>
+
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>用户管理</title>
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css?v=2"></link>
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css"></link>
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js?v=2"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/management.js"></script>
+
+<link rel="stylesheet" href="../../css/common.css" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script>
+	managementContext.dataName = "SysUser";
+	managementContext.tableName = "sys_user";
+	managementContext.operationColumnWidth = 250;
+	managementContext.customTableColumns = [ {
+		field : 'employee_no',
+		title : '员工编号',
+		fixed : true,
+		width : 150,
+		align : 'left'
+	}, {
+		field : 'login_name',
+		title : '登陆账号',
+		fixed : true,
+		width : 150,
+		align : 'left'
+	}, {
+		field : 'true_name',
+		title : '真实姓名',
+		fixed : true,
+		width : 80,
+		align : 'center'
+	}, {
+		field : 'sys_organization_name',
+		title : '所属部门',
+		fixed : true,
+		width : 80,
+		align : 'center'
+	}, {
+		field : 'description',
+		title : '描述',
+		width : 100,
+		align : 'left'
+	} ];
+	/*
+	绑定控件
+	 */
+	function bindControls() {
+		//绑定组织机构
+		bindIdNameTree("ulSysOrganization", "sys_organization", "组织机构", false,
+				function(node) {
+					//alert(JSON.stringify(node));
+					bindData();
+				});
+		//绑定角色
+		bindIdNameTree("ulSysRole", "sys_role", "角色", true, function(node) {
+			bindData();
+		});
+		//绑定所属部门
+		bindIdNameComboTree("ctSysOrganizationId", "sys_organization");
+	}
+
+	/*
+	  取得请求参数
+	 */
+	function getParameters() {
+		var parameters = getParametersBase();
+		parameters.condition = "login_name != 'admin'";
+		parameters.sysOrganizationId = getSelectedSysOrganizationId();
+		return parameters;
+	}
+
+	/*
+		取得组织机构节点Id
+	 */
+	function getSelectedSysOrganizationId() {
+		var node = $("#ulSysOrganization").tree("getSelected");
+		if (node == null) {
+			var parentId = 0;
+			return parentId;
+		}
+		return node.id;
+	}
+
+	/*
+	取得操作按钮列表
+	 */
+	function getOperationButtonHtmlArray(dataItem) {
+		var arrOpeartionButtonHtml = getOperationButtonHtmlArrayBase(dataItem);
+		var lnkRoleHtml = getGridRoleButtonHtml(dataItem);
+		var lnkEnableHtml = getGridEnableButtonHtml(dataItem);
+		arrOpeartionButtonHtml.push(lnkRoleHtml);
+		arrOpeartionButtonHtml.push(lnkEnableHtml);
+		return arrOpeartionButtonHtml;
+	}
+
+	/*
+	 * 取得设置角色按钮Html
+	 */
+	function getGridRoleButtonHtml(dataItem) {
+		var primaryKey = getPrimaryKey(dataItem);
+		var buttonId = "btnSetPermission_"+primaryKey;
+		return "<a id='"+buttonId+"' class='easyui-linkbutton grid_button' href='#' onclick=\"return openRoleDialog('"
+				+ primaryKey + "')\">设置角色</a>";
+	}
+	/*
+	 * 取得设置角色按钮Html
+	 */
+	function getGridEnableButtonHtml(dataItem) {
+		var primaryKey = getPrimaryKey(dataItem);
+		if((null != dataItem.enabled) && dataItem.enabled){
+			return "<a id='"+"btnSetDisabled_"+primaryKey+"' class='easyui-linkbutton grid_button' href='#' onclick=\"setDisabled('"
+				+ primaryKey + "')\">禁用</a>";
+		}
+		return "<a id='"+"btnSetEnabled_"+primaryKey+"' class='easyui-linkbutton grid_button' href='#' onclick=\"setEnabled('"
+				+ primaryKey + "')\">启用</a>";
+	}
+	/*
+	输出实体
+	 */
+	function outputEntity(dataItem) {
+		outputEntityBase(dataItem);
+		$("#txtPassword").textbox("setValue", "");
+	}
+
+	/*
+		打开设置角色Dialog
+	 */
+	function openRoleDialog(primaryKey) {
+		$("#hfSysUserId").attr("value", primaryKey);
+		var data = new Object();
+		data.tableName = "sys_user_role";
+		data.sysUserId = primaryKey;
+		call("GetSysUserRoleList", data, function(result) {
+			//alert(JSON.stringify(result));
+			checkTree("ulSysRole", result.data.dataList, "sys_role_id", "id")
+		});
+		openDialog("divRoleDialog", "设置角色");
+	}
+	/*
+	 * 关闭明细对话框
+	 */
+	function closeRoleDialog() {
+		$('#divRoleDialog').dialog('close');
+	}
+	/*
+	 *保存用户角色信息
+	 */
+	function saveSysUserRoles() {
+		var data = new Object();
+		data.sysUserId = $('#hfSysUserId').val();
+		data.sysRoleIds = getTreeCheckedValues("ulSysRole", "id");
+		call("SaveSysUserRoles", data, function(result) {
+			closeRoleDialog();
+		});
+	}
+	/*
+	 *禁用用户
+	 */
+	function setDisabled(primaryKey){
+		var data = new Object();
+		data.primaryKey = primaryKey;
+		data.enabled = false;
+		call("SetSysUserEnabled", data, function(result) {
+			bindData();
+		});
+	}
+	/*
+	 *启用用户
+	 */
+	function setEnabled(primaryKey){
+		var data = new Object();
+		data.primaryKey = primaryKey;
+		data.enabled = true;
+		call("SetSysUserEnabled", data, function(result) {
+			bindData();
+		});
+	}
+</script>
+</head>
+
+<body>
+	<div class="easyui-layout" style="width:100%;" fit="true">
+		<div region="west" split="true" title="" style="width:150px;"
+			id="divMenuPanel">
+			<p style="padding:5px;margin:0;"></p>
+			<ul id="ulSysOrganization" class="easyui-tree">
+			</ul>
+		</div>
+		<div id="content" region="center" style="padding:1px;">
+			<div class="toolbar_panel" id="divToolbar">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add"
+					plain="true" onclick="openAddDialog()" id="btnAdd">新增</a> <a
+					href="#" class="easyui-linkbutton" iconCls="icon-remove"
+					plain="true" onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a
+					id="lnkRefreshPage" href="#" class="easyui-linkbutton"
+					iconCls="icon-reload" plain="true" onclick="refreshPage()">刷新</a>
+			</div>
+			<div id="divSearchPanel" class="search_panel easyui-panel">
+				<div class="search_item">
+					<span class="search_item_caption">员工编号:</span> <input
+						id="txtSearchEmployeeNo"
+						class="search_item_textbox easyui-textbox" />
+				</div>
+				<div class="search_item">
+					<span class="search_item_caption">登陆账号:</span> <input
+						id="txtSearchLoginName" class="search_item_textbox easyui-textbox" />
+				</div>
+				<div class="search_item">
+					<span class="search_item_caption">真实姓名:</span> <input
+						id="txtSearchTrueName" class="search_item_textbox easyui-textbox" />
+				</div>
+				<div class="search_item_command">
+					<a href="#" class="easyui-linkbutton" plain="true"
+						iconCls="icon-search" onclick="query()">查询</a>
+				</div>
+			</div>
+			<table id="tableGrid">
+			</table>
+			<div id="divDetailDialog" class="easyui-dialog"
+				style="width:700px;min-height:500px;" closed="true"
+				buttons="#dlg-buttons">
+				<input type="hidden" id="hid" value="" />
+				<form id="formDetail" method="post" novalidate class="formDetail">
+					<div class="form_item">
+						<div class="form_item_caption">
+							<span>员工编号:</span>
+						</div>
+						<div class="form_item_value">
+							<input id="txtEmployeeNo" name="txtEmployeeNo"
+								class="easyui-textbox" style="width:100%" />
+						</div>
+					</div>
+					<div class="form_item">
+						<div class="form_item_caption">
+							<span>登陆账号:</span>
+						</div>
+						<div class="form_item_value">
+							<input id="txtLoginName" name="txtLoginName"
+								class="easyui-textbox" style="width:100%" />
+						</div>
+					</div>
+					<div class="form_item">
+						<div class="form_item_caption">
+							<span>登陆密码:</span>
+						</div>
+						<div class="form_item_value">
+							<input id="txtPassword" name="txtPassword" class="easyui-textbox"
+								type="password" style="width:100%" />
+						</div>
+					</div>
+					<div class="form_item">
+						<div class="form_item_caption">
+							<span>真实姓名:</span>
+						</div>
+						<div class="form_item_value">
+							<input id="txtTrueName" name="txtTrueName" class="easyui-textbox"
+								style="width:100%" />
+						</div>
+					</div>
+					<div class="form_item">
+						<div class="form_item_caption">
+							<span>手机号码:</span>
+						</div>
+						<div class="form_item_value">
+							<input id="txtMobilePhone" name="txtMobilePhone"
+								class="easyui-textbox" style="width:100%" />
+						</div>
+					</div>
+					<div class="form_item">
+						<div class="form_item_caption">
+							<span>所属部门:</span>
+						</div>
+						<div class="form_item_value">
+							<input id="ctSysOrganizationId" name="ctSysOrganizationId"
+								class="easyui-combotree" style="width:100%" />
+						</div>
+					</div>
+					<div class="form_item_full">
+						<div class="form_item_full_caption">
+							<span>描述:</span>
+						</div>
+						<div class="form_item_full_value">
+							<input id="txtDescription" name="txtDescription"
+								class="easyui-textbox" multiline="true" labelPosition="left"
+								style="width:100%;height:120px;" />
+						</div>
+					</div>
+				</form>
+				<div id="dlg-buttons">
+					<a href="javascript:void(0)" class="easyui-linkbutton c6"
+						iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+					<a href="javascript:void(0)" class="easyui-linkbutton"
+						iconCls="icon-cancel" onclick="javascript:closeDetailDialog();"
+						style="width:90px">取消</a>
+				</div>
+			</div>
+			<!-- 角色设置 -->
+			<input type="hidden" id="hfSysUserId" value="" />
+			<div id="divRoleDialog" class="easyui-dialog"
+				style="width:400px;height:300px;" closed="true"
+				buttons="#dlg-role-buttons">
+				<form id="formDetaild" method="post" novalidate
+					style="margin:0;padding:20px 50px">
+					<ul id="ulSysRole" class="easyui-tree">
+					</ul>
+				</form>
+				<div id="dlg-role-buttons">
+					<a href="javascript:void(0)" class="easyui-linkbutton"
+						iconCls="icon-ok" onclick="saveSysUserRoles()" style="width:90px"
+						id="btnSaveSysUserRoles">保存</a> <a href="javascript:void(0)"
+						class="easyui-linkbutton" iconCls="icon-cancel"
+						onclick="javascript:closeRoleDialog();" style="width:90px">取消</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.model.*;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * 配送员小程序 送达点我
+ */
+public class DeliverBookOrderReceivedServiceHandler extends ServiceHandler {
+
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        // 获取配送单id
+        Integer bookOrderId = JsonHelper.getInt(jData, "bookOrderId");
+
+        SqlSession session = MyBatisManager.getInstance().openSession();
+        try {
+            // 查询配送单data
+            BookOrder bookOrder = BookOrderManager.getInstance().getEntity(session, bookOrderId);
+            // 将配送的书籍绑定到该会员下
+            List<BookOrderItem> bookOrderItemList = BookOrderItemManager.getInstance().
+                    getListByBookOrderId(session, bookOrder.getId());
+            bookOrder.setDeliveredTime(DateHelper.getCurrentTimestamp());
+            bookOrder.setBookOrderBorrowStatusCode(BookOrderBorrowStatusCodes.Received);
+            boolean hasReturnItem = bookOrderItemList.stream()
+                    .anyMatch(item -> "Return".equals(item.getBookOrderTypeCode()));
+            if (!hasReturnItem) {
+                bookOrder.setBookOrderReturnStatusCode(null);
+            }
+            for (BookOrderItem bookOrderItem : bookOrderItemList) {
+                Book book = BookManager.getInstance().getEntity(session, bookOrderItem.getBookId());
+                if (bookOrderItem.getBookOrderTypeCode().equals("Borrow")) {
+                    // 修改配送单状态编码为 已送达
+                    bookOrderItem.setDeliverStatusCode("Delivered");
+                    book.setMemberId(bookOrder.getMemberId());
+                    book.setBorrowStatusCode(BorrowStatusCodes.Out);
+                }
+                if (bookOrderItem.getBookOrderTypeCode().equals("Return")) {
+                    /*if(!bookOrderItem.getDeliverStatusCode().equals("Storageing")){
+                        bookOrderItem.setDeliverStatusCode("Storageing");
+                    }*/
+                    bookOrderItem.setIsReturned(true);
+                    //修改配送单还书状态为待消毒
+                    bookOrder.setBookOrderReturnStatusCode(BookOrderReturnStatusCodes.Sterilizing);
+                    //book.setBorrowStatusCode(BorrowStatusCodes.InCloud);
+
+                    //修改这本书的借书单明细
+                    String condition = String.format(
+                            "book_id = %d and member_id = %d and is_returned is not true and book_order_type_code='%s'",
+                            bookOrderItem.getBookId(), bookOrder.getMemberId(), BookOrderTypeCodes.Borrow);
+                    List<ViewBookOrderItem> borrowBookOrderItemList = ViewBookOrderItemManager.
+                            getInstance().getList(session, condition, "create_time desc");
+                    if (borrowBookOrderItemList.size() > 0) {
+                        String idString = borrowBookOrderItemList.stream()
+                                .map(item -> String.valueOf(item.getId()))
+                                .collect(Collectors.joining(","));
+                        String strBookReturnTime = DateHelper.getDateTimeString();
+                        String sql = String.format("update book_order_item set is_returned = 1,  " +
+                                "book_return_time = '%s' \n" +
+                                "where id in (%s)", strBookReturnTime, idString);
+                        MyBatisManager.getInstance().executeUpdate(session, sql);
+                    }
+
+                }
+                BookOrderItemManager.getInstance().update(session, bookOrderItem);
+                BookManager.getInstance().update(session, book);
+            }
+            ViewBookOrder theViewBookOrder = ViewBookOrderManager.getInstance().getEntityById(session, bookOrder.getId());
+
+            // 如果订单的微信 OpenID 不为空，则发送模板消息
+            if (!StringHelper.isNullOrEmpty(theViewBookOrder.getWxaOpenId())) {
+                String condition = String.format("book_order_id='%s' and book_order_type_code='%s'",
+                        theViewBookOrder.getId(), BookOrderTypeCodes.Borrow);
+                List<ViewBookOrderItem> lstViewBookOrderItem =
+                        ViewBookOrderItemManager.getInstance().getList(session, condition);
+
+                String bookNames;
+                if (lstViewBookOrderItem.size() > 0) {
+                    bookNames = lstViewBookOrderItem.stream()
+                            .map(ViewBookOrderItem::getBookName)
+                            .map(bookName -> "《" + bookName + "》")
+                            .collect(Collectors.joining(", "));
+                } else {
+                    bookNames = "";
+                }
+
+                //添加消息记录
+                Message newMessage = new Message();
+                newMessage.setMemberId(theViewBookOrder.getMemberId());
+                newMessage.setCompanyId(theViewBookOrder.getCompanyId());
+                newMessage.setMessageTypeCode(MessageTypeCodes.BookDelivered);
+                newMessage.setPushTime(DateHelper.getCurrentTimestamp());
+                newMessage.setContent("您借阅的图书" + bookNames + ",已经送达快去书箱领取新书吧！");
+                MessageManager.getInstance().add(session, newMessage);
+                new Thread(() -> {
+                    try {
+                        //MessageManager.getInstance().sendWxTemplateMessage(theViewBookOrder);
+                        MessageManager.getInstance().sendDeliveryMessage(theViewBookOrder, lstViewBookOrderItem, bookNames);
+                    } catch (Exception e) {
+                        // 处理发送消息失败的情况
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+
+
+            BookOrderManager.getInstance().update(session, bookOrder);
+            MyBatisManager.getInstance().commitSession(session);
+        } catch (Exception ex) {
+            MyBatisManager.getInstance().rollbackSession(session);
+            throw ex;
+        } finally {
+            MyBatisManager.getInstance().closeSession(session);
+        }
+        this.writeSuccessResponse(response, "已送达");
+    }
+}

@@ -1,0 +1,64 @@
+package strosoft.wx.service;
+
+import java.net.URLEncoder;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+
+
+import net.sf.json.JSONObject;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+import strosoft.wx.common.WxAccessToken;
+import strosoft.wx.common.WxClient;
+import strosoft.wx.common.WxConfig;
+import strosoft.wx.common.WxTemplateMessage;
+
+/**
+ * 发送模板消息
+ * @author Administrator
+ *
+ */
+public class SendWxTemplateMessageServiceHandler extends ServiceHandler{
+	@Override
+	public void process(HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String data = request.getParameter("data");
+		JSONObject jData = JSONObject.fromObject(data);
+		String openId = JsonHelper.getString(jData, "openID");
+
+		WxClient theWXClient = new WxClient(WxConfig.getWxAppId(), WxConfig.getWxAppSecret());
+		System.out.println(WxConfig.getWxAppId()+":"+ WxConfig.getWxAppSecret());
+        WxAccessToken theWXAccessToken = theWXClient.GetAccessToken();
+        WxTemplateMessage newWXTemplateMessage = new WxTemplateMessage();
+        newWXTemplateMessage.setToUser("oxGTw6lujcZZQ4RZCMngR241hhP0");
+		newWXTemplateMessage.setTemplateID("tj7ESRxdeJmom1rhDXR1ZEAhKmcLZSQKRs52cqs5Dyk");
+        newWXTemplateMessage.setUrl("http://www.strosoft.com?templateID=" + newWXTemplateMessage.TemplateID);
+        
+        HashMap<String, JSONObject> requestData = new HashMap<String, JSONObject>();
+        
+		JSONObject jFirst1 = new JSONObject();
+		jFirst1.put("value", "2222");
+		jFirst1.put("color", "green");
+		requestData.put("character_string2", jFirst1);
+		
+		JSONObject jFirst2 = new JSONObject();
+		jFirst2.put("value", "线索主题。");
+		jFirst2.put("color", "green");
+		requestData.put("thing4", jFirst2);
+
+		
+	
+        
+        newWXTemplateMessage.setData(requestData);
+       
+        String messageID = theWXClient.SendTempateMessage(theWXAccessToken.getAccessToken(), newWXTemplateMessage);
+        this.writeSuccessResponse(response, messageID);
+       
+	}
+	
+	
+}

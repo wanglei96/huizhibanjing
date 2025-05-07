@@ -1,0 +1,69 @@
+package BRP.service;
+
+import BRP.data.*;
+import BRP.model.BookManager;
+import BRP.model.MemberCardManager;
+import BRP.model.PayOrderManager;
+import BRP.model.SalesOrderItemManager;
+import net.sf.json.JSONObject;
+import strosoft.app.data.DataEntity;
+import strosoft.app.service.AddServiceHandler;
+import strosoft.app.service.ServiceContext;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+public class AddBookDamageServiceHandler extends AddServiceHandler {
+
+    protected DataEntity processDataEntity(ServiceContext newAddServiceContext, DataEntity newDataEntity)
+            throws Exception {
+        HttpServletRequest request = newAddServiceContext.getRequest();
+        JSONObject jData = this.getRequestData(request);
+        String memberCardNo = JsonHelper.getString(jData, "memberCardNo");
+        Integer companyId = JsonHelper.getInt(jData, "companyId");
+        BookDamage newBookDamage = (BookDamage) newDataEntity;
+        newBookDamage.setDamageTime(DateHelper.getCurrentTimestamp());
+        if (!StringHelper.isNullOrEmpty(memberCardNo)) {
+            MemberCard memberCard = MemberCardManager.getInstance().getEntityByMemberCardNo(
+                    newAddServiceContext.session, companyId, memberCardNo);
+            if (memberCard == null) {
+                throw new Exception("会员卡不存在");
+            }
+            newBookDamage.setMemberId(memberCard.getMemberId());
+        }
+        Book theBook = BookManager.getInstance().getEntity(newAddServiceContext.session, newBookDamage.getBookId());
+        if (newBookDamage.getIsOff() != null && newBookDamage.getIsOff()) {
+            theBook.setBookStatusCode(BookStatusCodes.Off);
+        }
+        if (newBookDamage.getIsCompensation() != null && newBookDamage.getIsCompensation()) {
+            newBookDamage.setPaymentTime(DateHelper.getCurrentTimestamp());
+            //添加pay_order账单
+            PayOrder newPayOrder = new PayOrder();
+            newPayOrder.setCompanyId(companyId);
+            newPayOrder.setAmount(newBookDamage.getAmount());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            newPayOrder.setMemberId(newBookDamage.getMemberId());
+            Date now = new Date();
+            String payOrderNo = sdf.format(now);
+            newPayOrder.setPayOrderNo(payOrderNo);
+            newPayOrder.setBusinessDate(DateHelper.getCurrentTimestamp());
+            newPayOrder.setPaymentItemCode("BookDamageCompensate");
+            newPayOrder.setPayTime(DateHelper.getCurrentTimestamp());
+            newPayOrder.setOperatorId(newBookDamage.getCompanyUserId());
+            newPayOrder.setBookId(newBookDamage.getBookId());
+            newPayOrder.setPaymentMethodCode(newBookDamage.getPaymentMethodCode());
+            newPayOrder.setIsFinished(true);
+            newPayOrder.setIsPaid(true);
+            PayOrderManager.getInstance().add(newAddServiceContext.session, newPayOrder);
+        }
+        theBook.setIsDamaged(true);
+        theBook.setIsAvailable(false);
+        BookManager.getInstance().update(newAddServiceContext.session, theBook);
+        return newBookDamage;
+    }
+}

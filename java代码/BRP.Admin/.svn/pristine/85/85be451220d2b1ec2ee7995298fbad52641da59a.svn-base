@@ -1,0 +1,393 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>自定义基础表管理</title>
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<link rel="stylesheet" href="../../css/common.css" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/customtable.js"></script>
+<script type="text/javascript" src="../../js/management.js"></script>
+<script>
+	managementContext.dataName = "CustomTable";
+	managementContext.customTableColumns = [];
+	managementContext.isBasicTable = true;
+	managementContext.operationColumnWidth = 200;
+	//列表是否可排序
+	var isDisplayOrder = false;
+	//时间格式化列表
+	var formatterAndParser = [];
+	//引用列表
+	var referencedList = [];
+	//上传文件字段列表
+	var uploadFieldList = [];
+	//加载自定义组件
+	function bindCustomControls(){
+		//从基础表字段表中获取表中所有字段
+		var data = new Object();
+		data.tableName = "sys_basic_table_field";
+		data.condition = "table_name='"+$.query.get("tableName")+"'";
+		data.orderBy = "display_order";
+		data.pageSize = 1000;
+		data.async = false;
+		call("GetList",data,function(result){
+			//根据字段构建页面
+			createHtml(result.data.dataList);
+			//重新解析页面
+			$.parser.parse();
+		})
+	}
+	// 绑定控件
+	function bindControls(){
+		for(var i=0;i<referencedList.length;i++){
+			var fieldName = referencedList[i].field_name;
+			var referencedFieldName = referencedList[i].datasource_value_field;
+			var referencedTableName = referencedList[i].datasource_table_name;
+			var sysUiControlCode = referencedList[i].sys_ui_control_code;
+			var orderBy = referencedList[i].datasource_order_by;
+			var dataName = fieldNameToDataName(fieldName);
+			var idSuffix = dataName.substring(0,1).toUpperCase()+dataName.substring(1);
+			//判断是否为ID
+			if(referencedFieldName.toUpperCase() == "ID"){
+				//树形列表
+				if(sysUiControlCode == "ComboTree"){
+					//绑定搜索
+					!($("#ctSearch"+idSuffix).length==1)?null:bindIdNameComboTree("ctSearch"+idSuffix,referencedTableName);
+					//绑定表单详情
+					!($("#ct"+idSuffix).length==1)?null:bindIdNameComboTree("ct"+idSuffix,referencedTableName);
+				}
+				//不是树形列表
+				if(sysUiControlCode == "ComboBox"){
+					//绑定搜索
+					!($("#cmbSearch"+idSuffix).length==1)?null:bindComboBox("cmbSearch"+idSuffix,referencedTableName,"id","name", orderBy, "　","");
+					//绑定表单详情
+					!($("#cmb"+idSuffix).length==1)?null:bindComboBox("cmb"+idSuffix,referencedTableName,"id","name", orderBy, "　","");
+				}
+			}
+			//判断是否为CODE
+			if(referencedFieldName.toUpperCase() == "CODE"){
+				//树形列表
+				if(sysUiControlCode == "ComboTree"){
+					//绑定搜索
+					!($("#ctSearch"+idSuffix).length==1)?null:bindCodeNameComboTree("ctSearch"+idSuffix,referencedTableName);
+					//绑定表单详情
+					!($("#ct"+idSuffix).length==1)?null:bindCodeNameComboTree("ct"+idSuffix,referencedTableName);
+				}
+				//不是树形列表
+				if(sysUiControlCode == "ComboBox"){
+					//绑定搜索
+					!($("#cmbSearch"+idSuffix).length==1)?null:bindComboBox("cmbSearch"+idSuffix,referencedTableName,"code","name", orderBy, "　","");
+					//绑定表单详情
+					!($("#cmb"+idSuffix).length==1)?null:bindComboBox("cmb"+idSuffix,referencedTableName,"code","name", orderBy, "　","");
+				}
+			}
+			
+		}
+	};
+	/*
+	 *取得操作按钮列表
+	 */
+	function getOperationButtonHtmlArray(dataItem) {
+		var arrOpeartionButtonHtml = getOperationButtonHtmlArrayBase(dataItem);
+		return arrOpeartionButtonHtml;
+	}
+	//构建页面
+	function createHtml(dataList){
+		var queryHtml = "";
+		var formHtml = "";
+		for(var i=0;i<dataList.length;i++){
+			var dataItem = dataList[i];
+			//设置主键
+			if(dataItem.is_primary_key != null && dataItem.is_primary_key == 1){
+				managementContext.primaryKeyName = dataItem.field_name;
+			}
+			//判断是否为引用字段
+			if(dataItem.datasource_value_field != null){
+				referencedList.push(dataItem);
+			}
+			//是否为上传文件控件
+			if(dataItem.sys_ui_control_code != null && dataItem.sys_ui_control_code == "UploadFile"){
+				uploadFieldList.push(dataItem);
+			}
+			//根据时间格式创建时间格式化、解析
+			addFormatterAndParserItem(dataItem);
+			if(dataItem.show_in_grid != null && dataItem.show_in_grid == 1){
+			//添加数据列表显示字段
+				addShowInGridItem(dataItem);
+			}
+			if(dataItem.show_in_query != null && dataItem.show_in_query == 1){
+			//添加查询字段
+				queryHtml += getQueryItemHtml(dataItem);
+			}
+			if(dataItem.show_in_form != null && dataItem.show_in_form == 1){
+			//添加详情字段
+				formHtml += getFormItemHtml(dataItem);
+			}
+			if(dataItem.field_name == 'display_order'){
+			//若字段名为display_order,记录可排序
+				isDisplayOrder = true;
+			}
+		}
+		//添加查询html
+		$("#divSearchPanel").prepend(queryHtml);
+		//添加表单详情html
+		$("#formDetail").prepend(formHtml);
+		//设置时间控件格式
+		setDatetimeboxFormatter();
+	}
+	//根据时间格式创建时间格式化、解析,添加到列表
+	function addFormatterAndParserItem(dataItem){
+		if(dataItem.sys_ui_control_code == "DateTimeBox"){
+			var formatterAndParserItem = {
+				fieldName:dataItem.field_name,
+				formatString:dataItem.format_string,
+				formatter:function(date){
+					return date.Format(dataItem.format_string);
+				}
+			}
+			formatterAndParser.push(formatterAndParserItem);
+		}
+	}
+	//添加数据列表显示字段
+	function addShowInGridItem(dataItem){
+		var gridItem = {
+			field : dataItem.field_name,
+			title : dataItem.caption,
+			fixed : true,
+			width : dataItem.list_item_width==null?150:dataItem.list_item_width,
+			align : dataItem.sys_align_code
+		}
+		if(dataItem.sys_field_data_type_code == "timestamp"){
+			//格式化时间
+			gridItem.formatter = 
+								function(value, row, index){
+									if(value == null || value.time == null){
+										return value;
+									}
+									return (new Date(value.time)).Format(dataItem.format_string);
+								}
+		}
+		managementContext.customTableColumns.push(gridItem);
+	}
+	//获取查询字段项html
+	function getQueryItemHtml(dataItem){
+		var caption = dataItem.caption;
+		var dataName = fieldNameToDataName(dataItem.field_name);
+		var id = "txtSearch"+(dataName.substring(0,1).toUpperCase()+dataName.substring(1));
+		var className = "search_item_textbox easyui-textbox";
+		var dataOptions = "";
+		if (dataItem.sys_ui_control_code == "DateTimeBox"){
+			//时间类型
+			className = "search_item_textbox easyui-datetimebox";
+		}
+		if(dataItem.sys_ui_control_code == "ComboBox"){
+			//下拉选
+			id = "cmbSearch"+(dataName.substring(0,1).toUpperCase()+dataName.substring(1));
+			className = "search_item_textbox easyui-combobox";
+		}
+		if(dataItem.sys_ui_control_code == "ComboTree"){
+			//树形下拉选
+			id = "ctSearch"+(dataName.substring(0,1).toUpperCase()+dataName.substring(1));
+			className = "search_item_textbox easyui-combotree";
+		}
+		var html =	"<div class='search_item'>"+
+						"<span class='search_item_caption'>"+caption+":</span> "+
+						"<input id='"+id+"' class='"+className+"' "+dataOptions+">"+
+					"</div>";
+		return html;
+	}
+	//获取表单详情字段项html
+	function getFormItemHtml(dataItem){
+		var caption = dataItem.caption;
+		var dataName = fieldNameToDataName(dataItem.field_name);
+		var idSuffix = dataName.substring(0,1).toUpperCase()+dataName.substring(1);
+		var id = "txt"+idSuffix;
+		var name = id;
+		var className = "easyui-textbox";
+		var height = dataItem.form_item_height==null?30:dataItem.form_item_height+"px";
+		var width = dataItem.form_item_width==null?"100%":dataItem.form_item_width+"px";
+		var hidden = dataItem.hidden==null||dataItem.hidden==0?"":";display:none";
+		var itemStyle = "height:"+height+hidden;
+		var style = "width:"+width+";height:"+height;
+		var dataOptions = "";
+		var itemClass = "form_item";
+		if (dataItem.sys_ui_control_code == "DateTimeBox"){
+			//时间类型
+			className = "easyui-datetimebox";
+			dataOptions = "";
+		}
+		if (dataItem.sys_ui_control_code == "NumericBox"){
+			//数字类型
+			className = "easyui-numberbox";
+			var min = dataItem.min_value;
+			var max = dataItem.max_value;
+			var precision = dataItem.field_scale;
+			dataOptions = "data-options='min:"+min+",max:"+max+",precision:"+precision+"'";
+		}
+		if(dataItem.sys_ui_control_code == "ComboBox"){
+			//下拉选
+			id = "cmb"+idSuffix;
+			name = id;
+			className = "search_item_textbox easyui-combobox";
+		}
+		if(dataItem.sys_ui_control_code == "ComboTree"){
+			//树形下拉选
+			id = "ct"+idSuffix;
+			name = id;
+			className = "search_item_textbox easyui-combotree";
+		}
+		//占用列数
+		if(dataItem.column_span > 1){
+			itemClass = "form_item_full";
+		}
+		var itemHtml = "<div class=\""+itemClass+"\" style = \""+itemStyle+"\">\n" +
+						"	<div class=\""+itemClass+"_caption\">\n" +
+						"								<span>"+caption+"：</span>\n" +
+						"						</div>\n" +
+						"	<div class=\""+itemClass+"_value\">\n";
+		if (dataItem.sys_ui_control_code == "TextArea"){
+			//多行文本类型
+			itemHtml += "		<input id='"+id+"' name='"+name+"' class='"+className+"' multiline='true' labelPosition='top' style='"+style+"'/>";
+
+		}else if(dataItem.sys_ui_control_code == "UploadFile"){
+			itemHtml += "		<input type=\"hidden\" class=\"easyui-textbox\" id=\"hf"+idSuffix+"\" />\n" +
+						"		<input class=\"inputFilePath\"  id=\""+idSuffix+"Path\" />\n" +
+						"		<input type=\"file\" id=\""+idSuffix+"AutoUploadFileUpload\" style=\"display: none\" />\n" +
+						"		<img src=\"../../img/blank.jpg\" class=\"photo\" id=\""+idSuffix+"AutoUpload\" />";
+		}else{
+			itemHtml += "		<input id='"+id+"' class='"+className+"' labelPosition='left' style='"+style+"' "+dataOptions+" />";
+		}	
+		itemHtml+=		"	</div>\n" +
+						"</div>";
+		return itemHtml;
+	}
+	//datetimebox时间格式化
+	function setDatetimeboxFormatter(){
+		for(var i=0;i<formatterAndParser.length;i++){
+			var item = formatterAndParser[i];
+			var dataName = fieldNameToDataName(item.fieldName);
+			//设置查询字段时间格式
+			var searchId = "txtSearch"+(dataName.substring(0,1).toUpperCase()+dataName.substring(1));
+			$("#"+searchId).datetimebox({
+                formatter: item.formatter
+            });
+			//设置详情字段时间格式
+			var formId = "txt"+(dataName.substring(0,1).toUpperCase()+dataName.substring(1));
+			$("#"+formId).datetimebox({
+                formatter: item.formatter
+            });
+		}
+	}
+	/*
+	 * 取得请求参数，如果有排序，按照排序顺序查询
+	 */
+	function getParameters() {
+		var parameters = getParametersBase();
+		if(isDisplayOrder){
+			parameters.orderBy = "display_order";
+		}
+		return parameters;
+	}
+	/*
+	 * 取得操作按钮列表，默认为查看，修改，删除三个按钮；若有排序字段，添加上移、下移操作
+	 */
+	function getOperationButtonHtmlArrayBase(dataItem) {
+		var arrOpeartionButtonHtml = new Array();
+		var lnkViewHtml = getGridViewButtonHtml(dataItem);
+		var lnkEditHtml = getGridEditButtonHtml(dataItem);
+		var lnkDeleteHtml = getGridDeleteButtonHtml(dataItem);
+		arrOpeartionButtonHtml.push(lnkViewHtml);
+		arrOpeartionButtonHtml.push(lnkEditHtml);
+		arrOpeartionButtonHtml.push(lnkDeleteHtml);
+		if(isDisplayOrder){
+			var likMoveUpHtml = getGridMoveUpButtonHtml(dataItem);
+			var likMoveDownHtml = getGridMoveDownButtonHtml(dataItem);
+			arrOpeartionButtonHtml.push(likMoveUpHtml);
+			arrOpeartionButtonHtml.push(likMoveDownHtml);
+		}
+		return arrOpeartionButtonHtml;
+	}
+	/*
+	 * 输出实体信息
+	 */
+	function outputEntity(dataItem) {
+		//时间格式，转化为格式化的字符串
+		for(var i=0;i<formatterAndParser.length;i++){
+			var item = formatterAndParser[i];
+			var dataName = fieldNameToDataName(item.fieldName);
+			if(null != dataItem[dataName] || null != dataItem[dataName].time){
+				dataItem[dataName] = new Date(dataItem[dataName].time).Format(item.formatString);
+			}
+		}
+		outputEntityBase(dataItem);
+	}
+	//表名转换为实体类名
+	function tableNameToDataName(tableName){
+		var charList = tableName.split("_");
+		var dataName = "";
+		for(var i=0;i<charList.length;i++){
+			var charItem = charList[i];
+			dataName += charItem.substring(0,1).toUpperCase()+charItem.substring(1);
+		}
+		return dataName;
+	}
+	//字段名转换为属性名
+	function fieldNameToDataName(fieldName){
+		var charList = fieldName.split("_");
+		var dataName = charList[0];
+		for(var i=1;i<charList.length;i++){
+			var charItem = charList[i];
+			dataName += charItem.substring(0,1).toUpperCase()+charItem.substring(1);
+		}
+		return dataName;
+	}
+</script>
+</head>
+
+<body>
+	<div class="page">
+		<div class="toolbar_panel">
+			<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+				onclick="openAddDialog()">新增</a> <a href="#"
+				class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+				onclick="deleteDataItems()">删除</a><a id="lnkRefreshPage" href="#"
+				class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+				onclick="refreshPage()">刷新</a>
+		</div>
+		<div id="divSearchPanel" class="search_panel easyui-panel">
+			<div class="search_item_command">
+				<a href="#" class="easyui-linkbutton" plain="true"
+					iconCls="icon-search" onclick="query()">查询</a>
+			</div>
+		</div>
+		<div class="data_panel">
+			<table id="tableGrid" class="easyui-datagrid">
+			</table>
+		</div>
+		<div id="divDetailDialog" class="easyui-dialog" style="width:880px;top:150px;min-height:550px;"
+			closed="true" buttons="#divDetailCommandBar">
+			<form id="formDetail" method="post" novalidate class="formDetail">
+			</form>
+		</div>
+		<div id="divDetailCommandBar" class="detail_commandbar">
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+				iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+				iconCls="icon-cancel"
+				onclick="javascript:$('#divDetailDialog').dialog('close')"
+				style="width:90px">取消</a>
+		</div>
+	</div>
+</body>
+</html>

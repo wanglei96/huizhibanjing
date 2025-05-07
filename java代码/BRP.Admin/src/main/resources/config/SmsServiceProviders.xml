@@ -1,0 +1,13 @@
+<SmsServiceProviders Default="HX">
+	<SmsServiceProvider Name="None"
+		Type="strosoft.tools.sms.NoneSmsServiceProvider" />
+	<SmsServiceProvider Name="HX"
+		Type="strosoft.tools.sms.HxSmsServiceProvider" Account="strosoft"
+		Password="588188" />
+	<SmsServiceProvider Name="HUYI"
+		Type="strosoft.tools.sms.HuyiSmsServiceProvider" Account="xxx"
+		Password="xxx" />
+	<SmsServiceProvider Name="Aliyun"
+		Type="strosoft.tools.sms.AliyunSmsServiceProvider" AccessKeyId="LTAIwAIvKcasueuh"
+		AccessKeySecret="tc8VsDOr9rfaNFZ1OUlBMzNQlEQQFO" />
+</SmsServiceProviders>

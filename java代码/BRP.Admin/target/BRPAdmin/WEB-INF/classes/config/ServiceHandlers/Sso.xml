@@ -1,0 +1,17 @@
+<ServiceHandlers>
+	<ServiceHandler Name="AddActiveUser"
+		Type="strosoft.sso.service.AddActiveUserServiceHandler">     
+	</ServiceHandler>
+	<ServiceHandler Name="IsActiveUser"
+		Type="strosoft.sso.service.IsActiveUserServiceHandler">     
+	</ServiceHandler>
+	<ServiceHandler Name="UpdateActiveTime"
+		Type="strosoft.sso.service.UpdateActiveTimeServiceHandler">     
+	</ServiceHandler>
+	<ServiceHandler Name="KickOutActiveUser"
+		Type="strosoft.sso.service.KickOutActiveUserServiceHandler" />
+	<ServiceHandler Name="AddApplication"
+		Type="strosoft.sso.service.AddApplicationServiceHandler" />
+	<ServiceHandler Name="GetApplicationsUserList"
+		Type="strosoft.sso.service.GetApplicationsUserListServiceHandler" />
+</ServiceHandlers>

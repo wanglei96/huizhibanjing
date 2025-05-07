@@ -1,0 +1,21 @@
+package BRP.service;
+
+import BRP.model.BookManager;
+import net.sf.json.JSONObject;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class AddBookByBookSkuIdServiceHandler extends ServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        Integer count = JsonHelper.getInt(jData, "count");
+        Integer companyId = jData.getInt("companyId");
+        Integer bookSkuId = jData.getInt("bookSkuId");
+        BookManager.getInstance().addBookByBookSkuId(companyId, bookSkuId, count);
+        this.writeSuccessResponse(response);
+    }
+}

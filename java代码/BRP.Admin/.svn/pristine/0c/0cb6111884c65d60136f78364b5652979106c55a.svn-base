@@ -1,0 +1,102 @@
+<ServiceHandlers>
+	<ServiceHandler Name="GetCgProjectList"
+		Type="strosoft.cg.service.GetCgProjectListServiceHandler">
+	</ServiceHandler>
+	<!-- 获取数据库 -->
+	<ServiceHandler Name="GetDatabasesList"
+		Type="strosoft.cg.service.GetDatabasesListServiceHandler">
+	</ServiceHandler>
+	<!-- 获取项目配置数据 -->
+	<ServiceHandler Name="GetCgProject"
+		Type="strosoft.cg.service.GetCgProjectServiceHandler">
+	</ServiceHandler>
+	<!-- 获取字段配置数据 -->
+	<ServiceHandler Name="GetColumConfig"
+		Type="strosoft.cg.service.GetColumConfigServiceHandler">
+	</ServiceHandler>
+	<!-- 新增项目 -->
+	<ServiceHandler Name="AddCgProject"
+		Type="strosoft.cg.service.AddProjectServiceHandler"
+		DataEntityType="strosoft.cg.data.CgProjectInfo">
+		<RequredFields>
+			<RequiredField DataName="projectName" Caption="项目名称"></RequiredField>
+			<RequiredField DataName="outputDirectory"
+				Caption="输出目录"></RequiredField>
+			<RequiredField DataName="dataSource" Caption="数据库"></RequiredField>
+		</RequredFields>
+	</ServiceHandler>
+	<!-- 新增项目 -->
+	<ServiceHandler Name="UpdateCgProject"
+		Type="strosoft.cg.service.UpdateProjectServiceHandler"
+		DataEntityType="strosoft.cg.data.CgProjectInfo">
+		<RequredFields>
+			<RequiredField DataName="projectId" Caption="项目ID"></RequiredField>
+			<RequiredField DataName="projectName" Caption="项目名称"></RequiredField>
+			<RequiredField DataName="outputDirectory"
+				Caption="输出目录"></RequiredField>
+			<RequiredField DataName="dataSource" Caption="数据库"></RequiredField>
+		</RequredFields>
+	</ServiceHandler>
+	<!-- 新增模块 -->
+	<ServiceHandler Name="AddCgModule"
+		Type="strosoft.cg.service.AddModuleServiceHandler"
+		DataEntityType="strosoft.cg.data.CgModule">
+		<RequredFields>
+			<RequiredField DataName="projectId" Caption="项目名称"></RequiredField>
+			<RequiredField DataName="moduleName" Caption="模块名称"></RequiredField>
+			<RequiredField DataName="moduleDocument" Caption="输出目录"></RequiredField>
+		</RequredFields>
+	</ServiceHandler>
+	<!-- 修改模块 -->
+	<ServiceHandler Name="UpdateCgModule"
+		Type="strosoft.cg.service.UpdateModuleServiceHandler"
+		DataEntityType="strosoft.cg.data.CgModule">
+		<RequredFields>
+			<RequiredField DataName="projectId" Caption="项目名称"></RequiredField>
+			<RequiredField DataName="moduleName" Caption="模块名称"></RequiredField>
+			<RequiredField DataName="moduleDocument" Caption="输出目录"></RequiredField>
+			<RequiredField DataName="originaltModuleName"
+				Caption="原模块目录"></RequiredField>
+		</RequredFields>
+	</ServiceHandler>
+	<!-- 新增表 -->
+	<ServiceHandler Name="AddCgTable"
+		Type="strosoft.cg.service.AddGcTableServiceHandler"
+		DataEntityType="strosoft.cg.data.CgModule">
+		<RequredFields>
+			<RequiredField DataName="projectId" Caption="项目名称"></RequiredField>
+			<RequiredField DataName="moduleName" Caption="模块"></RequiredField>
+		</RequredFields>
+	</ServiceHandler>
+	<!-- 新增字段 -->
+	<ServiceHandler Name="SaveCgField"
+		Type="strosoft.cg.service.SaveCgFieldServiceHandler"
+		DataEntityType="strosoft.cg.data.CgModule">
+		<RequredFields>
+			<RequiredField DataName="projectId" Caption="项目名称"></RequiredField>
+			<RequiredField DataName="moduleName" Caption="模块"></RequiredField>
+			<RequiredField DataName="tableName" Caption="表名"></RequiredField>
+		</RequredFields>
+	</ServiceHandler>
+	<!-- 移除Table -->
+	<ServiceHandler Name="BatchDeleteCgTable"
+		Type="strosoft.cg.service.BatchDeleteCgTableServiceHandler"
+		DataEntityType="strosoft.cg.data.CgModule">
+	</ServiceHandler>
+	<!-- 移除Module -->
+	<ServiceHandler Name="DeleteCgModule"
+		Type="strosoft.cg.service.DeleteCgModuleServiceHandler"
+		DataEntityType="strosoft.cg.data.CgModule">
+	</ServiceHandler>
+	<!-- 移除项目 -->
+	<ServiceHandler Name="DeleteCgProject"
+		Type="strosoft.cg.service.DeleteCgProjectServiceHandler">
+	</ServiceHandler>
+	<!-- 移除项目 -->
+	<ServiceHandler Name="ProjectCodeGenerate"
+		Type="strosoft.cg.service.ProjectCodeGenerateServiceHandler">
+		<RequredFields>
+			<RequiredField DataName="projectId" Caption="项目名称"></RequiredField>
+		</RequredFields>
+	</ServiceHandler>
+</ServiceHandlers>

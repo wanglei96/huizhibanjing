@@ -1,0 +1,281 @@
+<ServiceHandlers>
+	<!-- 框架公共服务 -->
+	<ServiceHandler Name="NoneServiceHandler"
+		Type="strosoft.sys.service.NoneServiceHandler" />
+	<ServiceHandler Name="GetTable"
+		Type="strosoft.app.service.GetTableServiceHandler" />
+	<ServiceHandler Name="Delete"
+		Type="strosoft.app.service.DeleteServiceHandler" />
+	<ServiceHandler Name="Move"
+		Type="strosoft.app.service.MoveServiceHandler" />
+	<ServiceHandler Name="ExecuteCommand"
+		Type="strosoft.app.service.ExecuteCommandServiceHandler" />
+	<ServiceHandler Name="GetCount"
+		Type="strosoft.app.service.GetCountServiceHandler" />
+	<ServiceHandler Name="GetList"
+		Type="strosoft.app.service.GetListServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="GetAllTables"
+		Type="strosoft.app.service.GetAllTablesServiceHandler" />
+	<ServiceHandler Name="GetAllColumns"
+		Type="strosoft.app.service.GetAllColumnsServiceHandler" />
+
+	<!-- IdNameTable -->
+	<ServiceHandler Name="GetIdNameTableList"
+		Type="strosoft.app.service.GetListServiceHandler"
+		OrderBy="display_order">
+		<SearchItems>
+			<SearchItem FieldName="name" Operation="like"
+				ParameterName="name" />
+			<SearchItem FieldName="description" Operation="like"
+				ParameterName="description" />
+		</SearchItems>
+	</ServiceHandler>
+	<ServiceHandler Name="GetIdNameTable"
+		Type="strosoft.app.service.GetServiceHandler"
+		DataManagerType="strosoft.app.model.IdNameTableManager" />
+	<ServiceHandler Name="AddIdNameTable"
+		Type="strosoft.app.service.AddIdNameTableServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="UpdateIdNameTable"
+		Type="strosoft.app.service.UpdateIdNameTableServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="DeleteIdNameTable"
+		Type="strosoft.app.service.DeleteServiceHandler"
+		DataManagerType="strosoft.app.model.IdNameTableManager" />
+	<ServiceHandler Name="BatchDeleteIdNameTable"
+		Type="strosoft.app.service.BatchDeleteServiceHandler"
+		DataManagerType="strosoft.app.model.IdNameTableManager" />
+
+	<!-- CodeNameTable -->
+	<ServiceHandler Name="GetCodeNameTableList"
+		Type="strosoft.app.service.GetListServiceHandler"
+		OrderBy="display_order">
+		<SearchItems>
+			<SearchItem FieldName="code" Operation="like"
+				ParameterName="code" />
+			<SearchItem FieldName="name" Operation="like"
+				ParameterName="name" />
+			<SearchItem FieldName="description" Operation="like"
+				ParameterName="description" />
+		</SearchItems>
+	</ServiceHandler>
+	<ServiceHandler Name="GetCodeNameTable"
+		Type="strosoft.app.service.GetServiceHandler"
+		DataManagerType="strosoft.app.model.CodeNameTableManager" />
+	<ServiceHandler Name="AddCodeNameTable"
+		Type="strosoft.app.service.AddCodeNameTableServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="UpdateCodeNameTable"
+		Type="strosoft.app.service.UpdateCodeNameTableServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="DeleteCodeNameTable"
+		Type="strosoft.app.service.DeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CodeNameTableManager" />
+	<ServiceHandler Name="BatchDeleteCodeNameTable"
+		Type="strosoft.app.service.BatchDeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CodeNameTableManager" />
+
+	<!-- IdNameTree -->
+	<ServiceHandler Name="GetIdNameTreeList"
+		Type="strosoft.app.service.GetListServiceHandler"
+		OrderBy="display_order">
+		<SearchItems>
+			<SearchItem FieldName="name" Operation="like"
+				ParameterName="name" />
+			<SearchItem FieldName="description" Operation="like"
+				ParameterName="description" />
+		</SearchItems>
+	</ServiceHandler>
+	<ServiceHandler Name="GetIdNameTree"
+		Type="strosoft.app.service.GetServiceHandler"
+		DataManagerType="strosoft.app.model.IdNameTreeManager" />
+	<ServiceHandler Name="AddIdNameTree"
+		Type="strosoft.app.service.AddIdNameTreeServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="UpdateIdNameTree"
+		Type="strosoft.app.service.UpdateIdNameTreeServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="DeleteIdNameTree"
+		Type="strosoft.app.service.DeleteServiceHandler"
+		DataManagerType="strosoft.app.model.IdNameTreeManager" />
+	<ServiceHandler Name="BatchDeleteIdNameTree"
+		Type="strosoft.app.service.BatchDeleteServiceHandler"
+		DataManagerType="strosoft.app.model.IdNameTreeManager" />
+
+	<!-- CodeNameTree -->
+	<ServiceHandler Name="GetCodeNameTreeList"
+		Type="strosoft.app.service.GetListServiceHandler"
+		OrderBy="display_order">
+		<SearchItems>
+			<SearchItem FieldName="code" Operation="like"
+				ParameterName="code" />
+			<SearchItem FieldName="name" Operation="like"
+				ParameterName="name" />
+			<SearchItem FieldName="description" Operation="like"
+				ParameterName="description" />
+		</SearchItems>
+	</ServiceHandler>
+	<ServiceHandler Name="GetCodeNameTree"
+		Type="strosoft.app.service.GetServiceHandler"
+		DataManagerType="strosoft.app.model.CodeNameTreeManager" />
+	<ServiceHandler Name="AddCodeNameTree"
+		Type="strosoft.app.service.AddCodeNameTreeServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="UpdateCodeNameTree"
+		Type="strosoft.app.service.UpdateCodeNameTreeServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="DeleteCodeNameTree"
+		Type="strosoft.app.service.DeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CodeNameTreeManager" />
+	<ServiceHandler Name="BatchDeleteCodeNameTree"
+		Type="strosoft.app.service.BatchDeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CodeNameTreeManager" />
+
+	<!-- CmsIdNameTable -->
+	<ServiceHandler Name="GetCmsIdNameTableList"
+		Type="strosoft.app.service.GetListServiceHandler"
+		OrderBy="display_order">
+		<SearchItems>
+			<SearchItem FieldName="cms_site_id" Operation="like"
+				ParameterName="cmsSiteId" />
+			<SearchItem FieldName="name" Operation="like"
+				ParameterName="name" />
+			<SearchItem FieldName="description" Operation="like"
+				ParameterName="description" />
+		</SearchItems>
+	</ServiceHandler>
+	<ServiceHandler Name="GetCmsIdNameTable"
+		Type="strosoft.app.service.GetServiceHandler"
+		DataManagerType="strosoft.app.model.CmsIdNameTableManager" />
+	<ServiceHandler Name="AddCmsIdNameTable"
+		Type="strosoft.app.service.AddCmsIdNameTableServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="UpdateCmsIdNameTable"
+		Type="strosoft.app.service.UpdateCmsIdNameTableServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="DeleteCmsIdNameTable"
+		Type="strosoft.app.service.DeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CmsIdNameTableManager" />
+	<ServiceHandler Name="BatchDeleteCmsIdNameTable"
+		Type="strosoft.app.service.BatchDeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CmsIdNameTableManager" />
+
+
+	<!-- CmsCodeNameTable -->
+	<ServiceHandler Name="GetCmsCodeNameTableList"
+		Type="strosoft.app.service.GetListServiceHandler"
+		OrderBy="display_order">
+		<SearchItems>
+			<SearchItem FieldName="cms_site_id" Operation="like"
+				ParameterName="cmsSiteId" />
+			<SearchItem FieldName="code" Operation="like"
+				ParameterName="code" />
+			<SearchItem FieldName="name" Operation="like"
+				ParameterName="name" />
+			<SearchItem FieldName="description" Operation="like"
+				ParameterName="description" />
+		</SearchItems>
+	</ServiceHandler>
+	<ServiceHandler Name="GetCmsCodeNameTable"
+		Type="strosoft.app.service.GetServiceHandler"
+		DataManagerType="strosoft.app.model.CmsCodeNameTableManager" />
+	<ServiceHandler Name="AddCmsCodeNameTable"
+		Type="strosoft.app.service.AddCmsCodeNameTableServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="UpdateCmsCodeNameTable"
+		Type="strosoft.app.service.UpdateCmsCodeNameTableServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="DeleteCmsCodeNameTable"
+		Type="strosoft.app.service.DeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CmsCodeNameTableManager" />
+	<ServiceHandler Name="BatchDeleteCmsCodeNameTable"
+		Type="strosoft.app.service.BatchDeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CmsCodeNameTableManager" />
+
+	<!-- CmsIdNameTree -->
+	<ServiceHandler Name="GetCmsIdNameTreeList"
+		Type="strosoft.app.service.GetListServiceHandler"
+		OrderBy="display_order">
+		<SearchItems>
+			<SearchItem FieldName="cms_site_id" Operation="like"
+				ParameterName="cmsSiteId" />
+			<SearchItem FieldName="name" Operation="like"
+				ParameterName="name" />
+			<SearchItem FieldName="description" Operation="like"
+				ParameterName="description" />
+		</SearchItems>
+	</ServiceHandler>
+	<ServiceHandler Name="GetCmsIdNameTree"
+		Type="strosoft.app.service.GetServiceHandler"
+		DataManagerType="strosoft.app.model.CmsIdNameTreeManager" />
+	<ServiceHandler Name="AddCmsIdNameTree"
+		Type="strosoft.app.service.AddCmsIdNameTreeServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="UpdateCmsIdNameTree"
+		Type="strosoft.app.service.UpdateCmsIdNameTreeServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="DeleteCmsIdNameTree"
+		Type="strosoft.app.service.DeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CmsIdNameTreeManager" />
+	<ServiceHandler Name="BatchDeleteCmsIdNameTree"
+		Type="strosoft.app.service.BatchDeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CmsIdNameTreeManager" />
+
+	<!-- CmsCodeNameTree -->
+	<ServiceHandler Name="GetCmsCodeNameTreeList"
+		Type="strosoft.app.service.GetListServiceHandler"
+		OrderBy="display_order">
+		<SearchItems>
+			<SearchItem FieldName="cms_site_id" Operation="like"
+				ParameterName="cmsSiteId" />
+			<SearchItem FieldName="code" Operation="like"
+				ParameterName="code" />
+			<SearchItem FieldName="name" Operation="like"
+				ParameterName="name" />
+			<SearchItem FieldName="description" Operation="like"
+				ParameterName="description" />
+		</SearchItems>
+	</ServiceHandler>
+	<ServiceHandler Name="GetCmsCodeNameTree"
+		Type="strosoft.app.service.GetServiceHandler"
+		DataManagerType="strosoft.app.model.CmsCodeNameTreeManager" />
+	<ServiceHandler Name="AddCmsCodeNameTree"
+		Type="strosoft.app.service.AddCmsCodeNameTreeServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="UpdateCmsCodeNameTree"
+		Type="strosoft.app.service.UpdateCmsCodeNameTreeServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="DeleteCmsCodeNameTree"
+		Type="strosoft.app.service.DeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CmsCodeNameTreeManager" />
+	<ServiceHandler Name="BatchDeleteCmsCodeNameTree"
+		Type="strosoft.app.service.BatchDeleteServiceHandler"
+		DataManagerType="strosoft.app.model.CmsCodeNameTreeManager" />
+	<!-- CustomTable -->
+	<ServiceHandler Name="GetCustomTableList"
+		Type="strosoft.app.service.GetCustomTableListServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="GetCustomTable"
+		Type="strosoft.app.service.GetCustomTableServiceHandler" />
+	<ServiceHandler Name="AddCustomTable"
+		Type="strosoft.app.service.AddCustomTableServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="UpdateCustomTable"
+		Type="strosoft.app.service.UpdateCustomTableServiceHandler">
+	</ServiceHandler>
+	<ServiceHandler Name="DeleteCustomTable"
+		Type="strosoft.app.service.DeleteCustomTableServiceHandler"
+		DataManagerType="strosoft.app.model.CustomTableManager" />
+	<ServiceHandler Name="BatchDeleteCustomTable"
+		Type="strosoft.app.service.BatchDeleteCustomTableServiceHandler"
+		DataManagerType="strosoft.app.model.CustomTableManager" />
+	<ServiceHandler Name="RemoteCall"
+		Type="strosoft.app.service.RemoteCallServiceHandler" />
+	<!-- 取得服务状态列表 -->
+	<ServiceHandler Name="GetServiceStatusList"
+		Type="strosoft.app.service.GetServiceStatusListServiceHandler" />
+	<!-- 清空服务状态 -->
+	<ServiceHandler Name="ClearServiceStatus"
+		Type="strosoft.app.service.ClearServiceStatusServiceHandler" />
+</ServiceHandlers>

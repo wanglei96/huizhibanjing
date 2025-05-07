@@ -1,0 +1,116 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<title>评论管理</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+<link rel="stylesheet" type="text/css" href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<link href="../../css/commentInput/style.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/management.js?v=12"></script>
+
+
+<script type="text/javascript">
+		managementContext.dataName="CmsComment";
+		managementContext.tableName="cms_comment";
+			var cmsContentId=$.cookie("cmsContentId");
+			var cmsChannelId=$.cookie("cmsChannelId");
+			var cmsSiteId=$.cookie("cmsSiteId");
+
+		
+		
+	   /*
+ 		* 绑定数据
+		*/
+		function bindData() {
+			
+			var requestParameters = getParameters();
+			requestParameters.condition="cms_content_id='"+cmsContentId+"' and cms_channel_id='"+cmsChannelId+"' and cms_site_id='"+cmsSiteId+"'";
+			//alert(JSON.stringify(requestParameters));
+			call(managementContext.getListServiceName, requestParameters, function(
+					result) {
+				$.each(result.data.dataList,function(index,value){
+					$("#comment_list").append("<div class='b_txt'><div class='comment_item'><div class='comment_item_cont clearfix'><div class='t_face'><img src='../../img/default_avatar.png'></div><div class='t_content'><div><div class='t_info'><span class='t_username'></span></div></div><div class='comment_content clearfix'><div class='t_txt'>"+value.content+"</div><div class='reply'><span class='datetime'>"+value.create_time+"</span></div></div></div></div></div></div>");
+				
+				});
+				
+			});
+		}
+		
+		
+		function bindAddData(value){
+			$("#comment_list").append("<div class='b_txt'><div class='comment_item'><div class='comment_item_cont clearfix'><div class='t_face'><img src='../../img/default_avatar.png'></div><div class='t_content'><div><div class='t_info'><span class='t_username'></span></div></div><div class='comment_content clearfix'><div class='t_txt'>"+value.content+"</div><div class='reply'><span class='datetime'>"+value.create_time+"</span></div></div></div></div></div></div>");
+		
+		}
+
+		function saveComment(){
+			
+			
+			var data=getEntity();
+			data.createTime=(new Date()).Format("yyyy-MM-dd hh:mm:ss");
+			data.content=$("#txtContent").val();
+			data.cmsContentId=cmsContentId;
+			data.cmsChannelId=cmsChannelId;
+			data.cmsSiteId=cmsSiteId;
+			call(managementContext.addServiceName, data, function(result) {
+				//alert(JSON.stringify(result));
+				//bindAddData(result.data);
+				$("#txtContent").val("");
+			});
+			
+		}	
+		
+		function closeDetailDialog(){
+			window.location.href="CmsContentDetail.htm";
+		}
+		
+</script>
+
+</head>
+
+<body>
+	<div id="stlCommentContainer" class="stlCommentContainer">
+		<div class="post_box post_box_top post_box_showall">
+			<p class="post_box_count">
+				已有<span class="f_red">4</span>条评论
+			</p>
+			<div class="post_box_cont clearfix">
+				<textarea id="txtContent" placeholder="请输入评论内容"></textarea>
+			</div>
+			<div class="cmnt_user_cont clearfix">
+				<!---->
+				<!---->
+				<a href="javascript:;" onclick="saveComment();" class="post_btn post_btn_disbled">发布</a>
+				<!---->
+			</div>
+		</div>
+		<div class="b_cont2">
+			<div id="comment_list">
+				<div class="c_title">
+					<span class="cmenu">最新评论</span>
+				</div>
+				<!---->
+				<!---->
+				<!---->
+			</div>
+				<ul class="breadcrumb breadcrumb-button">
+					<input style="color: #666; margin: -4px 3px 0 15px;height: 33px;cursor: pointer;border: none;font-size: 16px;background: url(./images/bg.png) 0 -40px no-repeat;"
+					 onclick="closeDetailDialog();"	type="submit" name="ctl02" value="返 回" class="btn">
+				</ul>
+		</div>
+	</div>
+</body>
+</html>

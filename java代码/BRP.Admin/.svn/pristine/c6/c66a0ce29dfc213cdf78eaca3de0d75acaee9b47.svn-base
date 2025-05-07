@@ -1,0 +1,675 @@
+<ServiceHandlers>
+    <!-- 发送邮件 -->
+    <ServiceHandler Name="SendEmail"
+                    Type="strosoft.sys.service.SendEmailServiceHandler"/>
+    <!-- 登录 -->
+    <ServiceHandler Name="Login"
+                    Type="strosoft.sys.service.LoginServiceHandler"/>
+    <!-- 修改密码 -->
+    <ServiceHandler Name="ChangePassword"
+                    Type="strosoft.sys.service.ChangePasswordServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUserManager"
+                    DataEntityType="strosoft.sys.data.SysUser"/>
+    <!-- 上传文件服务 -->
+    <ServiceHandler Name="UploadFile"
+                    Type="strosoft.sys.service.UploadFileServiceHandler"/>
+    <!-- SysUser -->
+    <ServiceHandler Name="GetSysUserList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.ViewSysUserManager"
+                    TableName="view_sys_user">
+        <SearchItems>
+            <SearchItem FieldName="employee_no" Operation="like"
+                        ParameterName="employeeNo"/>
+            <SearchItem FieldName="login_name" Operation="like"
+                        ParameterName="loginName"/>
+            <SearchItem FieldName="true_name" Operation="like"
+                        ParameterName="trueName"/>
+            <SearchItem FieldName="sys_organization_id"
+                        Operation="idtree" ParameterName="sysOrganizationId"
+                        TreeTableName="sys_organization"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="GetSysUser"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUserManager"/>
+    <ServiceHandler Name="AddSysUser"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUserManager"
+                    DataEntityType="strosoft.sys.data.SysUser" EncryptFields="password"
+                    TableName="sys_user" PrimaryKeys="id">
+        <RequredFields>
+            <RequiredField DataName="loginName" Caption="账号"></RequiredField>
+            <RequiredField DataName="trueName" Caption="姓名"></RequiredField>
+            <RequiredField DataName="password" Caption="密码"></RequiredField>
+        </RequredFields>
+        <UniqueFields>
+            <UniqueField DataName="loginName" Caption="账号"
+                         FieldName="login_name"></UniqueField>
+            <UniqueField DataName="employeeNo" Caption="员工编号"
+                         FieldName="employee_no"></UniqueField>
+        </UniqueFields>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateSysUser"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUserManager"
+                    DataEntityType="strosoft.sys.data.SysUser" EncryptFields="password"
+                    TableName="sys_user" PrimaryKeys="id">
+        <RequredFields>
+            <RequiredField DataName="loginName" Caption="账号"></RequiredField>
+            <RequiredField DataName="trueName" Caption="姓名"></RequiredField>
+            <RequiredField DataName="employeeNo" Caption="员工编号"></RequiredField>
+        </RequredFields>
+        <UniqueFields>
+            <UniqueField DataName="loginName" Caption="账号"
+                         FieldName="login_name"></UniqueField>
+            <UniqueField DataName="employeeNo" Caption="员工编号"
+                         FieldName="employee_no"></UniqueField>
+        </UniqueFields>
+    </ServiceHandler>
+    <ServiceHandler Name="SetSysUserEnabled"
+                    Type="strosoft.sys.service.SetSysUserEnabledServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUserManager"/>
+    <ServiceHandler Name="DeleteSysUser"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUserManager"/>
+    <ServiceHandler Name="BatchDeleteSysUser"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUserManager"/>
+    <!-- SysRole -->
+    <ServiceHandler Name="GetSysRoleList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRoleManager"
+                    TableName="sys_role" Condition="name != '超级管理员'">
+        <SearchItems>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+            <SearchItem FieldName="description" Operation="like"
+                        ParameterName="description"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="AddSysRole"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRoleManager"
+                    DataEntityType="strosoft.sys.data.SysRole" TableName="sys_role"/>
+    <ServiceHandler Name="DeleteSysRole"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRoleManager"/>
+    <ServiceHandler Name="GetSysRole"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRoleManager"/>
+    <ServiceHandler Name="UpdateSysRole"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRoleManager"
+                    DataEntityType="strosoft.sys.data.SysRole"/>
+    <ServiceHandler Name="BatchDeleteSysRole"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRoleManager"/>
+
+    <!-- SysUserRole -->
+    <ServiceHandler Name="GetSysUserRoleList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUserRoleManager"
+                    TableName="sys_user_role">
+        <SearchItems>
+            <SearchItem FieldName="sys_user_id" Operation="equal"
+                        ParameterName="sysUserId"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="SaveSysUserRoles"
+                    Type="strosoft.sys.service.SaveSysUserRolesServiceHandler"/>
+    <!--SysRolePermission -->
+    <ServiceHandler Name="AddSysRolePermission"
+                    Type="strosoft.sys.service.AddSysRolePermissionServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRolePermissionManager"
+                    DataEntityType="strosoft.sys.data.SysRolePermission"/>
+    <ServiceHandler Name="GetSysRolePermissionListById"
+                    Type="strosoft.sys.service.GetSysRolePermissionListByIdServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRolePermissionManager"
+                    DataEntityType="strosoft.sys.data.SysRolePermission"/>
+
+
+    <!--SysOrganization -->
+    <ServiceHandler Name="GetSysOrganizationList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysOrganizationManager"
+                    TableName="sys_organization" OrderBy="display_order">
+        <SearchItems>
+            <SearchItem Operation="like" FieldName="name" ParameterName="name"></SearchItem>
+            <SearchItem Operation="like" FieldName="description" ParameterName="description"></SearchItem>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="AddSysOrganization"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysOrganizationManager"
+                    DataEntityType="strosoft.sys.data.SysOrganization"/>
+    <ServiceHandler Name="DeleteSysOrganization"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysOrganizationManager"/>
+    <ServiceHandler Name="GetSysOrganization"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysOrganizationManager"/>
+    <ServiceHandler Name="UpdateSysOrganization"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysOrganizationManager"
+                    DataEntityType="strosoft.sys.data.SysOrganization"/>
+    <ServiceHandler Name="BatchDeleteSysOrganization"
+                    Type="strosoft.sys.service.BatchDeleteSysOrganizationServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysOrganizationManager"/>
+
+    <ServiceHandler Name="GetViewSysOrganization"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.ViewSysOrganizationManager"
+                    DataEntityType="strosoft.sys.data.ViewSysOrganization"
+                    TableName="view_sys_organization">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="id" DataName="id"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewSysOrganizationList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.ViewSysOrganizationManager"
+                    DataEntityType="strosoft.sys.data.ViewSysOrganization"
+                    TableName="view_sys_organization">
+        <SearchItems>
+            <SearchItem Operation="like" FieldName="name" ParameterName="name"></SearchItem>
+            <SearchItem Operation="like" FieldName="description" ParameterName="description"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetSysOrganizationTree"
+                    Type="strosoft.app.service.GetSysOrganizationTreeServiceHandler">
+        <SearchItems>
+            <SearchItem Operation="like" FieldName="name" ParameterName="name"></SearchItem>
+            <SearchItem Operation="like" FieldName="description" ParameterName="description"></SearchItem>
+        </SearchItems>
+    </ServiceHandler>
+
+    <!--sys_setting -->
+    <ServiceHandler Name="GetSysSettingList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.ViewSysSettingManager"
+                    TableName="view_sys_setting" OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="code" Operation="like"
+                        ParameterName="code"/>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+            <SearchItem FieldName="sys_setting_category_code"
+                        Operation="codetree" ParameterName="sysSettingCategoryCode"
+                        TreeTableName="sys_setting_category"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="AddSysSetting"
+                    Type="strosoft.app.service.AddSysSettingServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingManager"
+                    DataEntityType="strosoft.sys.data.SysSetting" TableName="sys_setting">
+        <RequredFields>
+            <RequiredField DataName="code" Caption="编号"/>
+            <RequiredField DataName="name" Caption="应用名称"/>
+        </RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateSysSetting"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingManager"
+                    DataEntityType="strosoft.sys.data.SysSetting"/>
+    <ServiceHandler Name="DeleteSysSetting"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingManager"
+                    DataEntityType="strosoft.sys.data.SysSetting"/>
+    <ServiceHandler Name="BatchDeleteSysSetting"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingManager"/>
+    <ServiceHandler Name="SaveSysSettings"
+                    Type="strosoft.sys.service.SaveSysSettingsServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingManager"
+                    DataEntityType="strosoft.sys.data.SysSetting"/>
+    <ServiceHandler Name="GetSysSetting"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingManager"/>
+    <!-- sys_setting_category -->
+    <ServiceHandler Name="GetSysSettingCategoryList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingCategoryManager"
+                    TableName="sys_setting_category" OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+            <SearchItem FieldName="code" Operation="equal"
+                        ParameterName="sysSettingCategoryCode"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="AddSysSettingCategory"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingCategoryManager"
+                    DataEntityType="strosoft.sys.data.SysSettingCategory"/>
+    <ServiceHandler Name="DeleteSysSettingCategory"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingCategoryManager"/>
+    <ServiceHandler Name="GetSysSettingCategory"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingCategoryManager"/>
+    <ServiceHandler Name="BatchDeleteSysSettingCategory"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingCategoryManager"/>
+    <ServiceHandler Name="UpdateSysSettingCategory"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysSettingCategoryManager"
+                    DataEntityType="strosoft.sys.data.SysSettingCategory"/>
+    <!-- sys_data_type -->
+    <ServiceHandler Name="GetSysDataTypeList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysDataTypeManager"
+                    TableName="sys_data_type" OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+            <SearchItem FieldName="code" Operation="equal"
+                        ParameterName="code"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="AddSysDataType"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysDataTypeManager"
+                    DataEntityType="strosoft.sys.data.SysDataType"/>
+    <ServiceHandler Name="DeleteSysDataType"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysDataTypeManager"/>
+    <ServiceHandler Name="GetSysDataType"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysDataTypeManager"/>
+    <ServiceHandler Name="UpdateSysDataType"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysDataTypeManager"
+                    DataEntityType="strosoft.sys.data.SysDataType"/>
+    <ServiceHandler Name="BatchDeleteSysDataType"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysDataTypeManager"/>
+    <!-- sys_ui_control -->
+    <ServiceHandler Name="GetSysUiControlList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUiControlManager"
+                    TableName="sys_ui_control" OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+            <SearchItem FieldName="code" Operation="equal"
+                        ParameterName="code"/>
+        </SearchItems>
+    </ServiceHandler>
+
+    <ServiceHandler Name="AddSysUiControl"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUiControlManager"
+                    DataEntityType="strosoft.sys.data.SysUiControl"/>
+
+    <ServiceHandler Name="GetSysUiControl"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUiControlManager"/>
+    <ServiceHandler Name="UpdateSysUiControl"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUiControlManager"
+                    DataEntityType="strosoft.sys.data.SysUiControl"/>
+    <ServiceHandler Name="DeleteSysUiControl"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUiControlManager"/>
+    <ServiceHandler Name="BatchDeleteSysUiControl"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUiControlManager"/>
+
+
+    <!-- sys_basic_table -->
+    <ServiceHandler Name="GetSysBasicTableList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataEntityType="strosoft.sys.model.SysBasicTable"
+                    DataManagerType="strosoft.sys.model.SysBasicTableManager"
+                    TableName="view_sys_basic_table" OrderBy="table_name">
+        <!-- 如果有查询条件进行配置 Operation 为相等查询(equal)或模糊查询(like) FieldName与ServiceHanlder里面的参数名称相对应
+            ParameterName必须跟前台 input中ID后面的 自定义名称相对应 -->
+        <SearchItems>
+            <SearchItem FieldName="table_name" Operation="like"
+                        ParameterName="basicTableName"/>
+            <SearchItem FieldName="title" Operation="like"
+                        ParameterName="title"/>
+            <SearchItem FieldName="sys_basic_table_type_code"
+                        Operation="equal" ParameterName="sysBasicTableTypeCode"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="AddSysBasicTable"
+                    Type="strosoft.sys.service.AddSysBasicTableServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableManager"
+                    DataEntityType="strosoft.sys.data.SysBasicTable"/>
+
+    <ServiceHandler Name="UpdateSysBasicTable"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableManager"
+                    DataEntityType="strosoft.sys.data.SysBasicTable"/>
+    <ServiceHandler Name="GetSysBasicTable"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableManager"/>
+    <ServiceHandler Name="DeleteSysBasicTable"
+                    Type="strosoft.sys.service.DeleteSysBasicTableServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableManager"/>
+    <ServiceHandler Name="BatchDeleteSysBasicTable"
+                    Type="strosoft.sys.service.BatchDeleteSysBasicTableServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableManager"/>
+    <ServiceHandler Name="GetSysBasicTableSql"
+                    Type="strosoft.sys.service.GetSysBasicTableSqlServiceHandler"/>
+    <ServiceHandler Name="GetSysBasicTableSqls"
+                    Type="strosoft.sys.service.GetSysBasicTableSqlsServiceHandler"/>
+
+    <!-- sys_basic_table_relation -->
+    <ServiceHandler Name="GetSysBasicTableRelationList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataEntityType="strosoft.sys.data.SysBasicTableRelation"
+                    DataManagerType="strosoft.sys.model.SysBasicTableRelationManager"
+                    TableName="sys_basic_table_relation">
+        <SearchItems>
+            <SearchItem FieldName="basic_table_name" Operation="equal"
+                        ParameterName="basicTableName"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteSysBasicTableRelation"
+                    Type="strosoft.sys.service.DeleteSysBasicTableRelationServiceHandler"
+                    DataEntityType="strosoft.sys.data.SysBasicTableRelation"></ServiceHandler>
+    <ServiceHandler Name="AddSysBasicTableRelation"
+                    Type="strosoft.sys.service.AddSysBasicTableRelationServiceHandler"></ServiceHandler>
+
+
+    <!-- sys_basic_table_field -->
+    <ServiceHandler Name="AddSysBasicTableField"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableFieldManager"
+                    DataEntityType="strosoft.sys.data.SysBasicTableField"
+                    TableName="sys_basic_table_field" PrimaryKeys="tableName,fieldName">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="table_name" Caption="表名"
+                        DataName="tableName"></PrimaryKey>
+            <PrimaryKey FieldName="field_name" Caption="字段名"
+                        DataName="fieldName"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetSysBasicTableField"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableFieldManager"
+                    DataEntityType="strosoft.sys.data.SysBasicTableField"
+                    TableName="sys_basic_table_field">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="table_name" Caption="表名"
+                        DataName="tableName"></PrimaryKey>
+            <PrimaryKey FieldName="field_name" Caption="字段名"
+                        DataName="fieldName"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="GetSysBasicTableFieldList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableFieldManager"
+                    DataEntityType="strosoft.sys.data.SysBasicTableField"
+                    TableName="sys_basic_table_field"/>
+    <ServiceHandler Name="UpdateSysBasicTableField"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableFieldManager"
+                    DataEntityType="strosoft.sys.data.SysBasicTableField"
+                    TableName="sys_basic_table_field" PrimaryKeys="tableName,fieldName">
+        <RequredFields>
+            <RequiredField DataName="tableName" Caption="表名"></RequiredField>
+            <RequiredField DataName="fieldName" Caption="字段名"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteSysBasicTableField"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableFieldManager"
+                    DataEntityType="strosoft.sys.data.SysBasicTableField"
+                    TableName="sys_basic_table_field">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="table_name" Caption="表名"
+                        DataName="tableName"></PrimaryKey>
+            <PrimaryKey FieldName="field_name" Caption="字段名"
+                        DataName="fieldName"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+    <ServiceHandler Name="BatchDeleteSysBasicTableField"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableFieldManager"
+                    DataEntityType="strosoft.sys.data.SysBasicTableField"
+                    TableName="sys_basic_table_field">
+        <PrimaryKeys>
+            <PrimaryKey FieldName="table_name" Caption="表名"
+                        DataName="tableName"></PrimaryKey>
+            <PrimaryKey FieldName="field_name" Caption="字段名"
+                        DataName="fieldName"></PrimaryKey>
+        </PrimaryKeys>
+    </ServiceHandler>
+
+    <ServiceHandler Name="AddCustomTableFieldFromTable"
+                    Type="strosoft.sys.service.AddCustomTableFieldFromTableServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableFieldManager"
+                    DataEntityType="strosoft.sys.data.SysBasicTableField"
+                    TableName="sys_basic_table_field"/>
+
+    <ServiceHandler Name="MoveCustomField"
+                    Type="strosoft.sys.service.MoveCustomFieldTableServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysBasicTableFieldManager"
+                    DataEntityType="strosoft.sys.data.SysBasicTableField"
+                    TableName="sys_basic_table_field"/>
+
+    <!-- SysMenu -->
+    <ServiceHandler Name="GetSysMenuList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.ViewSysMenuManager"
+                    TableName="view_sys_menu" OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+            <SearchItem FieldName="description" Operation="like"
+                        ParameterName="description"/>
+            <SearchItem FieldName="sys_menu_type_code"
+                        Operation="equal" ParameterName="sysMenuTypeCode"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="GetSysMenu"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysMenuManager"/>
+    <ServiceHandler Name="AddSysMenu"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysMenuManager"
+                    DataEntityType="strosoft.sys.data.SysMenu">
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteSysMenu"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysMenuManager"/>
+    <ServiceHandler Name="BatchDeleteSysMenu"
+                    Type="strosoft.sys.service.BatchDeleteSysMenuServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysMenuManager"/>
+    <ServiceHandler Name="UpdateSysMenu"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysMenuManager"
+                    DataEntityType="strosoft.sys.data.SysMenu"/>
+    <ServiceHandler Name="GetAdminMenuList"
+                    Type="strosoft.sys.service.GetAdminMenuListServiceHandler"/>
+    <ServiceHandler Name="ResetAdminPermissions"
+                    Type="strosoft.sys.service.ResetAdminPermissionsServiceHandler"/>
+    <ServiceHandler Name="GetRolePermissionTree"
+                    Type="strosoft.app.service.GetRolePermissionTreeServiceHandler">
+    </ServiceHandler>
+
+    <!-- 取得系统用户视图列表 -->
+    <ServiceHandler Name="GetViewSysUserList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.sys.model.ViewSysMenuManager"
+                    TableName="view_sys_user" Condition="login_name != 'admin'"
+                    OrderBy="ifnull(enabled,0) desc, create_time desc"
+                    EncryptFields="password">
+        <SearchItems>
+            <SearchItem FieldName="employee_no" Operation="like"
+                        ParameterName="employeeNo"/>
+            <SearchItem FieldName="true_name" Operation="like"
+                        ParameterName="trueName"/>
+            <SearchItem FieldName="login_name" Operation="like"
+                        ParameterName="loginName"/>
+            <SearchItem FieldName="sys_organization_id"
+                        Operation="idtree" ParameterName="sysOrganizationId"
+                        TreeTableName="sys_organization"/>
+        </SearchItems>
+    </ServiceHandler>
+
+    <!-- SysFunction -->
+    <ServiceHandler Name="GetSysFunction"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysFunctionManager"/>
+    <ServiceHandler Name="AddSysFunction"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysFunctionManager"
+                    DataEntityType="strosoft.sys.data.SysFunction"
+                    TableName="sys_function" PrimaryKeys="code">
+        <RequredFields>
+            <RequiredField DataName="code" Caption="编码"/>
+            <RequiredField DataName="name" Caption="名称"/>
+            <RequiredField DataName="resource" Caption="所属菜单"/>
+        </RequredFields>
+        <UniqueFields>
+            <UniqueField DataName="code" Caption="编码"
+                         FieldName="code"></UniqueField>
+        </UniqueFields>
+    </ServiceHandler>
+    <ServiceHandler Name="AddSysFunctionList"
+                    Type="strosoft.sys.service.AddSysFunctionListServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysFunctionManager"
+                    DataEntityType="strosoft.sys.data.SysFunction"
+                    TableName="sys_function" PrimaryKeys="code"/>
+    <ServiceHandler Name="DeleteSysFunction"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysFunctionManager"/>
+    <ServiceHandler Name="BatchDeleteSysFunction"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysFunctionManager">
+        <RequredFields>
+            <RequiredField DataName="code" Caption="编码"/>
+            <RequiredField DataName="name" Caption="名称"/>
+            <RequiredField DataName="resource" Caption="所属菜单"/>
+        </RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateSysFunction"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysFunctionManager"
+                    DataEntityType="strosoft.sys.data.SysFunction"/>
+    <!-- 查询修改记录 -->
+    <!-- SysMenu -->
+    <ServiceHandler Name="GetSysOperationLogList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    TableName="view_sys_operation_log">
+        <SearchItems>
+            <SearchItem FieldName="operation_type_code"
+                        Operation="like" ParameterName="operationTypeCode"/>
+            <SearchItem FieldName="operator_true_name"
+                        Operation="like" ParameterName="operatorTrueName"/>
+            <SearchItem FieldName="operate_time" Operation="like"
+                        ParameterName="operateTime"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="GetSysOperationLog"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysOperationLogManager"
+                    DataEntityType="strosoft.sys.data.SysOperationLog"/>
+    <!-- 添加验证应用信息 -->
+    <ServiceHandler Name="SysAddApplication"
+                    Type="strosoft.sys.service.SysAddApplicationServiceHandler"/>
+    <!-- 获取系统用户登录列表 -->
+    <ServiceHandler Name="GetApplicationsLoginList"
+                    Type="strosoft.sys.service.GetApplicationsLoginListServiceHandler"/>
+    <!-- 检查是否已经登录，不是登录服务 -->
+    <ServiceHandler Name="CheckLogin"
+                    Type="strosoft.sys.service.CheckLoginServiceHandler"/>
+    <!-- 踢出指定已登录系统用户 -->
+    <ServiceHandler Name="SysKickOutActiveUser"
+                    Type="strosoft.sys.service.SysKickOutActiveUserServiceHandler"/>
+
+    <ServiceHandler Name="DownloadFile"
+                    Type="strosoft.sys.service.DownloadFileServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysUploadFileManager">
+        <RequredFields>
+            <RequiredField DataName="id" Caption="文件id"/>
+        </RequredFields>
+    </ServiceHandler>
+    <ServiceHandlers>
+        <ServiceHandler
+                Name="GetViewSysMenuSysFunctionListByUserId"
+                Type="strosoft.sys.service.GetViewSysMenuSysFunctionListByUserIdServiceHandler"
+                DataManagerType="strosoft.sys.model.ViewSysMenuSysFunctionManager"
+                DataEntityType="strosoft.sys.data.ViewSysMenuSysFunction"
+                TableName="view_sys_menu_sys_function"/>
+    </ServiceHandlers>
+    <!-- 获取登录类型列表 -->
+    <ServiceHandler Name="GetLoginTypeList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    TableName="sys_login_type" OrderBy="display_order"/>
+    <!-- 登录后获取前端菜单 -->
+    <ServiceHandler Name="GetFrontMenuListByUserId"
+                    Type="strosoft.sys.service.GetFrontMenuListByUserIdServiceHandler"/>
+    <!-- 取得角色的菜单列表 -->
+    <ServiceHandler Name="GetMenuListBySysRoleId"
+                    Type="strosoft.sys.service.GetMenuListBySysRoleIdServiceHandler"/>
+    <!-- 登录后获取前端菜单 -->
+    <ServiceHandler Name="GetMenuListByUserIdAndMenuType"
+                    Type="strosoft.sys.service.GetMenuListByUserIdAndMenuTypeServiceHandler">
+        <RequredFields>
+            <RequiredField DataName="sysUserId" Caption="用户id"/>
+            <RequiredField DataName="menuTypeCode" Caption="菜单类型"/>
+        </RequredFields>
+    </ServiceHandler>
+    <!-- 保存角色权限 -->
+    <ServiceHandler Name="SaveSysRolePermissions"
+                    Type="strosoft.sys.service.SaveSysRolePermissionsServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRolePermissionManager"
+                    DataEntityType="strosoft.sys.data.SysRolePermission"/>
+
+    <ServiceHandler Name="GetDatabaseBackupList"
+                    Type="strosoft.tools.service.GetDatabaseBackupListServiceHandler">
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteDatabaseBackup"
+                    Type="strosoft.tools.service.DeleteDatabaseBackupServiceHandler">
+    </ServiceHandler>
+    <ServiceHandler Name="RestoreDataDocumentBuilder"
+                    Type="strosoft.tools.service.RestoreDataDocumentBuilderServiceHandler">
+    </ServiceHandler>
+    <!-- 备份数据库 -->
+    <ServiceHandler Name="AddDatabaseBackup"
+                    Type="strosoft.tools.service.AddDatabaseBackupServiceHandler">
+    </ServiceHandler>
+    <!-- 取得指定用户的角色列表 -->
+    <ServiceHandler Name="GetSysRoleListBySysUserId"
+                    Type="strosoft.sys.service.GetSysRoleListBySysUserIdServiceHandler">
+    </ServiceHandler>
+    <!-- 系统初始化 -->
+    <ServiceHandler Name="ResetSystem"
+                    Type="strosoft.sys.service.ResetSystemServiceHandler">
+    </ServiceHandler>
+    <!-- 取得指定类型的菜单列表 -->
+    <ServiceHandler Name="GetSysMenuListBySysMenuTypeCode"
+                    Type="strosoft.sys.service.GetSysMenuListBySysMenuTypeCodeServiceHandler">
+    </ServiceHandler>
+    <!-- 设置启用状态 -->
+    <ServiceHandler Name="SetEnabled"
+                    Type="strosoft.sys.service.SetEnabledServiceHandler"/>
+    <!-- 审核通过 -->
+    <ServiceHandler Name="Approve"
+                    Type="strosoft.sys.service.ApproveServiceHandler"/>
+    <!-- 审核退回 -->
+    <ServiceHandler Name="Reject"
+                    Type="strosoft.sys.service.RejectServiceHandler">
+    </ServiceHandler>
+    <!-- 导出 -->
+    <ServiceHandler Name="Export"
+                    Type="strosoft.sys.service.ExportServiceHandler">
+    </ServiceHandler>
+    <!-- 取得服务状态列表 -->
+    <ServiceHandler Name="GetServiceStatusList"
+                    Type="strosoft.app.service.GetServiceStatusListServiceHandler"/>
+    <!-- 取得服务状态列表 -->
+    <ServiceHandler Name="ClearServiceStatus"
+                    Type="strosoft.app.service.ClearServiceStatusServiceHandler"/>
+    <!-- 取得角色的权限列表 -->
+    <ServiceHandler
+            Name="GetSysRolePermissionListBySysRoleId"
+            Type="strosoft.sys.service.GetSysRolePermissionListBySysRoleIdServiceHandler"/>
+</ServiceHandlers>

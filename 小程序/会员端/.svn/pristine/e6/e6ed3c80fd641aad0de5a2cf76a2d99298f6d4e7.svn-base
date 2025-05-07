@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="13842eed-f4af-408e-8950-42d2ae3a99f8" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBowerSettings">
+    <bower-package value="" />
+    <bower.json value="" />
+  </component>
+  <component name="ProjectId" id="1wdALdjJ526tn10L3MJO1VlPQBK" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="go.formatter.settings.were.checked" value="true" />
+    <property name="go.import.settings.migrated" value="true" />
+    <property name="js.last.introduce.type" value="LET" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.standard" value="true" />
+    <property name="node.js.detected.package.stylelint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.standard" value="" />
+    <property name="node.js.selected.package.stylelint" value="" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="ts.external.directory.path" value="D:\Intelli\IntelliJ IDEA 2021.1.3\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>C:\Users\Administrator\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="SvnFileUrlMappingImpl">
+    <option name="myMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\Work\HB\UniGJY" />
+          <option name="myCopyRoot" value="D:\Work\HB\UniGJY" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+    <option name="myMoreRealMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="D:\Work\HB\UniGJY" />
+          <option name="myCopyRoot" value="D:\Work\HB\UniGJY" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="13842eed-f4af-408e-8950-42d2ae3a99f8" name="Default Changelist" comment="" />
+      <created>1628778038518</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1628778038518</updated>
+      <workItem from="1628778040982" duration="351000" />
+      <workItem from="1628778408731" duration="66000" />
+      <workItem from="1628778489153" duration="3384000" />
+      <workItem from="1628837045513" duration="29000" />
+      <workItem from="1628951894574" duration="319000" />
+      <workItem from="1629003341463" duration="13000" />
+      <workItem from="1629091877276" duration="3382000" />
+      <workItem from="1629214538125" duration="5000" />
+      <workItem from="1629712269139" duration="1344000" />
+      <workItem from="1629715812554" duration="6000" />
+      <workItem from="1629767652892" duration="628000" />
+      <workItem from="1629769422049" duration="599000" />
+      <workItem from="1629781119947" duration="66000" />
+      <workItem from="1629781342279" duration="6560000" />
+      <workItem from="1629789596286" duration="8812000" />
+      <workItem from="1629854488983" duration="9920000" />
+      <workItem from="1629882001277" duration="601000" />
+      <workItem from="1629940901177" duration="14233000" />
+      <workItem from="1630027903311" duration="816000" />
+      <workItem from="1630030365226" duration="285000" />
+      <workItem from="1630040564263" duration="4003000" />
+      <workItem from="1630057017721" duration="4581000" />
+      <workItem from="1630136092747" duration="2042000" />
+      <workItem from="1630145610184" duration="2398000" />
+      <workItem from="1630288704539" duration="4320000" />
+      <workItem from="1630309517735" duration="6914000" />
+      <workItem from="1630397804712" duration="7525000" />
+      <workItem from="1630504319917" duration="3000" />
+      <workItem from="1632894678106" duration="4005000" />
+      <workItem from="1635750149800" duration="1490000" />
+      <workItem from="1636110003358" duration="2000" />
+      <workItem from="1636168806649" duration="3808000" />
+      <workItem from="1636181025816" duration="68000" />
+      <workItem from="1640597605514" duration="1620000" />
+      <workItem from="1640932875711" duration="3000" />
+      <workItem from="1640932921843" duration="1000" />
+      <workItem from="1640937143512" duration="12000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

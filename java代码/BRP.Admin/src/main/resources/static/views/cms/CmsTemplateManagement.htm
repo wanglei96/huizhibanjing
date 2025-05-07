@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>模板管理的主界面</title>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/management.js"></script>
+<script type="text/javascript">
+	managementContext.dataName = "CmsTemplate";
+	managementContext.tableName = "cms_template";
+	managementContext.primaryKeyName = "id";
+	managementContext.isCms = true;
+	managementContext.detailPageMode = "Page";
+	managementContext.operationColumnWidth = 180;
+	managementContext.customTableColumns = [{
+			field : 'name',
+			title : '文件名称',
+			fixed : true,
+			width : 320,
+			align : 'left'
+		},{
+			field : 'related_file_name',
+			title : '模板文件',
+			fixed : true,
+			width : 320,
+			align : 'left'
+		},{
+			field : 'url',
+			title : '生成文件路径',
+			fixed : true,
+			width : 320,
+			align : 'center'
+		},{
+			field : 'tName',
+			title : '模板类型',
+			width : 100,
+			align : 'left'
+		},{
+			field : 'encode',
+			title : '编码',
+			fixed : true,
+			width : 80,
+			align : 'left'
+		}];
+	function bindControls() {
+		//绑定模板列表
+		bindCodeNameTree(
+				"ulCmsTemplate",
+				"cms_template_type",
+				"模板列表",
+				false,
+				function(node) {
+					bindData();
+				})
+	}
+	/*
+	取得组织机构节点Id
+	 */
+	function getSelectedcmsTemplate() {
+		var node = $("#ulCmsTemplate").tree("getSelected");
+		if (node == null || typeof(node) == "undefined") {
+			var parentCode = 0;
+			return parentCode;
+		}
+		return node.id;
+	}
+	/*
+	 * 取得请求参数
+	 */
+	function getParameters() {
+		var parameters = getParametersBase();
+		var cmsTemplateTypeCode = getSelectedcmsTemplate();
+		var cmsSiteId = $.cookie("cmsSiteId");
+		parameters.condition = "cms_site_id='" + cmsSiteId + "'";
+		if(cmsTemplateTypeCode != ""){
+			parameters.condition += "and cms_template_type_code='" + cmsTemplateTypeCode + "'";
+		}
+		return parameters;
+	}
+	
+	function openAddDialog() {
+		// 设置新增模式
+		setAddMode();
+		var cmsTemplateTypeCode = getSelectedcmsTemplate();
+			window.location.href = managementContext.detailPageName + "?mode=add"
+					+ "&selectedCmsTemplateTypeCode=" + cmsTemplateTypeCode + "&r="
+					+ Math.random();
+		event.stopPropagation();
+	}
+	/*
+	 * 取得操作按钮列表，默认为查看，修改，删除,默认按钮四个按钮
+	 */
+	function getOperationButtonHtmlArray(dataItem) {
+		var arrOpeartionButtonHtml = getOperationButtonHtmlArrayBase(dataItem);
+		if(dataItem.cms_template_type_code == "Channel" || dataItem.cms_template_type_code == "Content"){
+			var setDefaultHtml = getGridsetDefaultButtonHtml(dataItem);
+			arrOpeartionButtonHtml.push(setDefaultHtml);
+		}
+		return arrOpeartionButtonHtml;
+	}
+	/*
+	 * 取得查看设为默认按钮Html
+	 */
+	function getGridsetDefaultButtonHtml(dataItem) {
+		if(dataItem.is_system_default_content_template == 1){
+			return getGridButtonHtml(dataItem, "isDefault", "默认模板");
+		}
+		if(dataItem.is_system_default_channel_template == 1){
+			return getGridButtonHtml(dataItem, "isDefault", "默认模板");
+		}
+		return getGridButtonHtml(dataItem, "setDefault", "设为默认","SetDefault");
+	}
+	/*
+	 * 取得操作Html
+	 */
+	function getOperationHtml(dataItem) {
+		var arrOperationButtonHtml = getOperationButtonHtmlArray(dataItem);
+		var operationHtml = "<div class='grid_commands'>";
+		for ( var i = 0; i < arrOperationButtonHtml.length; i++) {
+			operationHtml += arrOperationButtonHtml[i];
+		}
+		operationHtml += "</div>";
+		return operationHtml;
+	}
+	/*
+	 * 取得按钮Html
+	 */
+	function getGridButtonHtml(dataItem, functionName, buttonText,buttonType) {
+		var primaryKey = getPrimaryKey(dataItem);
+		if(null != buttonType){
+			var buttonIdHtml = "id='btn"+buttonType+"_"+primaryKey+"'";
+		}
+		if(buttonText == "设为默认" && (dataItem.cms_template_type_code == "Channel" || dataItem.cms_template_type_code == "Content")){
+			var lnkViewHtml = "<a "+buttonIdHtml+" class='easyui-linkbutton grid_button' href='#' onclick=\"return "
+				+ functionName + "('" + dataItem.id+"','"+ dataItem.cms_template_type_code + "')\">" + buttonText + "</a>";
+		
+		}else{
+			var lnkViewHtml = "<a "+buttonIdHtml+" class='easyui-linkbutton grid_button' href='#' onclick=\"return "
+				+ functionName + "('" + dataItem.id + "')\">" + buttonText + "</a>";
+		
+		}
+		return lnkViewHtml;
+	}
+	/*
+	 * 设置默认模板
+	 */
+	function setDefault(id,template){
+		var data = new Object();
+		var cmsSiteId = $.cookie("cmsSiteId");
+		data.id = id;
+		data.template = template;
+		data.cmsSiteId = cmsSiteId;
+		call("SetDefaultTemplate", data, function(result) {
+			bindData();
+		});
+	}
+	function isDefault(){
+		//什么也不做
+	}
+	/*
+	 * 取得数据表列
+	 */
+	function getTableColumnsBase() {
+		var tableColumns = [ [ {
+			field : 'ck',
+			checkbox : true,
+			title : 'Code',
+			width : 30
+		}, {
+			field : 'operation',
+			title : '操作',
+			fixed : true,
+			width : managementContext.operationColumnWidth,
+			align : 'left'
+		} ] ];
+		if (managementContext.customTableColumns != null) {
+			addTableColumns(tableColumns, managementContext.customTableColumns)
+		}
+		return tableColumns;
+	}
+</script>
+
+</head>
+
+<body>
+	<div class="easyui-layout" style="width:100%;" fit="true">
+		<div region="west" split="true" title=""
+			style="width:150px;overflow: hidden;" id="divMenuPanel">
+			<p
+				style="margin:0;background-color: #d9edf7;font-weight:bold;">
+			</p>
+			<ul id="ulCmsTemplate" class="easyui-tree">
+			</ul>
+		</div>
+		<div id="content" region="center" style="padding:1px;">
+			<div class="toolbar_panel" id="divToolbar">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add"
+					plain="true" onclick="openAddDialog()" id="btnAdd">新增</a> <a href="#"
+					class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+					onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a id="lnkRefreshPage" href="#"
+					class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+					onclick="refreshPage()">刷新</a>
+			</div>
+			<div id="divSearchPanel" class="search_panel easyui-panel">
+				<div class="search_item">
+					<span class="search_item_caption">名称:</span> <input
+						id="txtSearchName" class="search_item_textbox easyui-textbox">
+				</div>
+				<div class="search_item_command">
+					<a href="#" class="easyui-linkbutton" plain="true"
+						iconCls="icon-search" onclick="query()">查询</a>
+				</div>
+			</div>
+			<table id="tableGrid">
+			</table>
+		</div>
+	</div>
+
+</body>
+</html>

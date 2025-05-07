@@ -1,0 +1,46 @@
+package BRP.service;
+
+import net.sf.json.JSONObject;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
+
+/**
+ * 获取门店会员统计信息
+ */
+public class GetMemberInfoTotalServiceHandler extends ServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        Integer companyId = jData.getInt("companyId");
+        String sql = String.format("SELECT\n" +
+                        "    IFNULL(SUM(CASE WHEN mc.expire_date <= CURRENT_DATE() THEN 1 ELSE 0 END), 0) AS expired_count,\n" +
+                        "    GROUP_CONCAT(IF(mc.expire_date <= CURRENT_DATE(), mc.id, NULL) SEPARATOR ', ') AS expired_ids,\n" +
+                        "    IFNULL(SUM(CASE WHEN mc.expire_date <= CURRENT_DATE() AND mc.member_id NOT IN (SELECT member_id FROM member_communica_log) THEN 1 ELSE 0 END), 0) AS expired_not_communica_count,\n" +
+                        "    GROUP_CONCAT(IF(mc.expire_date <= CURRENT_DATE() AND mc.member_id NOT IN (SELECT member_id FROM member_communica_log), mc.id, NULL) SEPARATOR ', ') AS expired_not_communica_ids,\n" +
+                        "    IFNULL(SUM(CASE WHEN mc.expire_date <= CURRENT_DATE() + INTERVAL 30 DAY AND mc.expire_date > CURRENT_DATE() THEN 1 ELSE 0 END), 0) AS expiring_thirty_day_count,\n" +
+                        "    GROUP_CONCAT(IF(mc.expire_date <= CURRENT_DATE() + INTERVAL 30 DAY AND mc.expire_date > CURRENT_DATE(), mc.id, NULL) SEPARATOR ', ') AS expiring_thirty_day_ids,\n" +
+                        "    IFNULL(SUM(CASE WHEN mc.is_stop_card IS TRUE THEN 1 ELSE 0 END), 0) AS suspend_member_count,\n" +
+                        "    GROUP_CONCAT(IF(mc.is_stop_card IS TRUE, mc.id, NULL) SEPARATOR ', ') AS suspend_member_ids,\n" +
+                        "    IFNULL(SUM(CASE WHEN mc.expire_date <= CURRENT_DATE() AND mc.member_id IN (SELECT member_id FROM book WHERE company_id = %d) THEN 1 ELSE 0 END), 0) AS expired_books_count,\n" +
+                        "    GROUP_CONCAT(IF(mc.expire_date <= CURRENT_DATE() AND mc.member_id IN (SELECT member_id FROM book WHERE company_id = %d), mc.id, NULL) SEPARATOR ', ') AS expired_books_ids,\n" +
+                        "    COUNT(DISTINCT CASE WHEN bo.member_id IS NULL THEN mc.member_id END) AS not_borrowed_for_fourteen_days_count,\n" +
+                        "    GROUP_CONCAT(DISTINCT CASE WHEN bo.member_id IS NULL THEN mc.id END) AS not_borrowed_for_fourteen_days_ids\n" +
+                        "FROM member_card AS mc\n" +
+                        "LEFT JOIN member AS m ON mc.member_id = m.id\n" +
+                        "LEFT JOIN (\n" +
+                        "    SELECT DISTINCT member_id\n" +
+                        "    FROM book_order\n" +
+                        "    WHERE create_time >= CURRENT_DATE() - INTERVAL 14 DAY\n" +
+                        ") AS bo ON mc.member_id = bo.member_id \n" +
+                        "WHERE mc.company_id = %d AND mc.member_id IS NOT NULL AND mc.disabled IS NOT TRUE;",
+                companyId, companyId, companyId);
+        ArrayList<LinkedHashMap<String, Object>> alData = MyBatisManager.getInstance().executeHashMapList(sql);
+        JSONObject jResult = JsonHelper.toJSONObject(alData.get(0));
+        this.writeSuccessResponse(response, jResult);
+    }
+}

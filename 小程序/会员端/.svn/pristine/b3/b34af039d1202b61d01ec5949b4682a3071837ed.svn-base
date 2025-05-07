@@ -1,0 +1,647 @@
+<template>
+	<view>
+		<view class="container">
+			<view class="h10"></view>
+			<view class="line70 highlight160Panel" style="top: 0;">
+				<view class="line60 center highlight160">
+					图书信息
+				</view>
+			</view>
+			<view class="contentPanel" style="border-radius: 18rpx; margin-top: -35rpx;">
+				<!-- <div class="latest-item" >已借阅</div> -->
+				<image class="" v-if="IsBorrow" src="../../static/image/common/IsBorrow.png" mode="aspectFit" style="width: 100rpx; height: 80rpx; position: absolute; right: 30rpx;"></image>
+				<view class="booksList">
+					<view class="books-info">
+						<view class="img">
+							<image :src="bookInfo | toBookImageFilePath" mode="aspectFit"></image><!-- aspectFit -->
+						</view>
+						<view class="info">
+							<!-- <view class="f30 line60" style="font-weight: bold;">图书信息</view> -->
+							<view class="f26 ">
+								<text class="booksInfoTitle" style="">书名：</text>{{bookInfo.bookName | toNull}}
+							</view>
+							<view class="f26 ">
+								<text class="booksInfoTitle" style="">作者：</text>{{bookInfo.author | toNull}}
+							</view>
+							<view class="f26 ">
+								<text class="booksInfoTitle" style="">书柜位置：</text>{{bookInfo.bookcaseName | toNull}}
+							</view>
+							<view class="f26 ellipsis"><text class="booksInfoTitle">状态：</text>{{bookInfo.isBookAvailable | ToIsBookAvailable }}</view>
+							<view class="f26 "><text class="booksInfoTitle">分类：</text>{{bookInfo.bookTagNames | toNull}}</view>
+							<view class="f26 "><text class="booksInfoTitle">适合年龄：</text>{{bookInfo.ageGroupNames | toNull}} </view>
+							<view class="f26 "><text class="booksInfoTitle">系列：</text>{{bookInfo.bookSeriesName | toNull}} </view>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view v-show="isbooksList">
+				<view class="line70 highlight160Panel">
+					<view class="line60 center highlight160">
+						同系列图书
+					</view>
+				</view>
+				<view class="contentPanel" style="height: 270rpx;"> <!-- 绘本系列 -->
+					<view class="line20"></view>
+				<!-- 	<view class="series" style="float: left; width: 90rpx;height: 250rpx;" >
+						<view style="width: 90rpx; text-align: center;"> 
+							<image :src="imageRootUrl + 'image/home/series.png'" class="size50" style="margin-top: 20rpx;"></image>
+						</view>
+						<view class="center seriesname" style="width:90rpx;"><text class="f24">{{bookInfo.bookSeriesName}}</text></view>	
+					</view> -->
+					<view style="float: right; width: calc(100% - 5rpx);">
+						<scroll-view class="scroll-view_H" scroll-x="true" @scroll="scroll" @scrolltolower="lower">
+							<view v-for="(item, index) in booksList" :key="index" style="" class="scroll-view-item_H">
+								<view style="position: relative;overflow: hidden;height: 100% ;width: 100%;" @tap="clickTobooksDetail(item)">
+									<view style="cursor: pointer;"><!-- :src="adminRootUrl + item.imageFilePath" -->
+										<image :src="item | toBookImageFilePath" mode="aspectFit"
+											style=" height: 210rpx;display: block;width: 95% ;  border:  2rpx solid rgb(211 211 211); border-radius: 10rpx;">
+										</image>
+										<view class="line50 center f24">{{item.bookName}}</view>
+									</view>
+								</view>
+							</view>
+						</scroll-view>
+					</view>
+					
+				</view>
+			</view>
+			<view class="line70 highlight160Panel">
+				<view class="line60 center highlight160">
+					图书内容介绍
+				</view>
+			</view>
+			<view class="contentPanel"> <!-- 图书内容介绍 -->
+			<view class="line10"></view>
+				<!-- <rich-text :nodes="bookInfo.introduction"></rich-text> -->
+				<mp-html :content="bookInfo.introduction" />
+			</view>
+			<view class="h180"></view>
+		</view>
+		<view class="btn">
+			<view class="back" @tap="clickCollection()" v-if="isMark == false">收藏</view>
+			<view class="back" @tap="clickCancelCollection()" v-else>取消收藏</view>
+			<view class="signUp" @tap="clickBorrow()" v-if="bookInfo.isBookAvailable == 1">借阅</view>
+			<view class="signUp" @tap="clickAddBorrowNotice()" v-else>可借时通知</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import common from "@/js/common.js";
+	import config from "@/js/config.js";
+	import util from "@/js/util.js";
+	import mpHtml from '@/components/mp-html/mp-html'
+	let statusBarHeight = uni.getSystemInfoSync().statusBarHeight; // 状态栏 高度
+	let that = null;
+	export default {
+		data() {
+			return {
+				url: "http://admin.8630.net/WYB/UploadFile/headerTopbg.png",
+				imageRootUrl: config.imageRootUrl, //图片地址
+				adminRootUrl: config.adminRootUrl + "/", //后端图片地址
+				statusBarHeight, // 状态栏 高度
+				head_is_fixed: 0,
+				bookSkuID: '',
+				bookInfo: {},
+				booksList: [], //同系列
+				loadingText: "正在加载...",
+				showLoadMore: false,
+				pageIndex: 0, //页数
+				pageSize: 5, //条数
+				pageCount: 0, //最大页数
+				isbooksList:false,
+				list: [{
+						id: 1,
+						name: '密码花园2',
+						url: config.imageRootUrl + 'image/common/bookb1.jpg',
+					}, {
+						id: 2,
+						name: '安徒生童话全集2',
+						url: config.imageRootUrl + 'image/common/bookb2.jpg',
+					},
+					{
+						id: 3,
+						name: '窗边的小豆豆2',
+						url: config.imageRootUrl + 'image/common/bookb3.jpg',
+					}, {
+						id: 4,
+						name: '夏洛的网2',
+						url: config.imageRootUrl + 'image/common/bookb4.jpg',
+					},
+					{
+						id: 5,
+						name: '柳林风声2',
+						url: config.imageRootUrl + 'image/common/bookb5.jpg',
+					}, {
+						id: 6,
+						name: '格林童话2',
+						url: config.imageRootUrl + 'image/common/bookb6.jpg',
+					},
+					{
+						id: 5,
+						name: '柳林风声2',
+						url: config.imageRootUrl + 'image/common/bookb7.jpg',
+					}
+				],
+				old: {
+					scrollTop: 0
+				},
+				isMark:false,//是否收藏
+				memberBookmarkID:'',//收藏ID
+				IsBorrow:false,//是否借阅
+			};
+		},
+		components: {
+			mpHtml
+		},
+		onReady() {},
+		onShow() {
+			wx.showShareMenu({
+				withShareTicket:true,
+				//设置下方的Menus菜单，才能够让发送给朋友与分享到朋友圈两个按钮可以点击
+				menus:["shareAppMessage","shareTimeline"]
+			})
+		},
+		onPageScroll(e) {
+			that.head_is_fixed = e.scrollTop > 0 ? 1 : 0
+		},
+		onLoad(option) {
+			that = this;
+			that.bookSkuID = option.bookSkuID
+			that.bindData(); //GetViewBook
+		},
+		methods: {
+			bindData() {
+				that.bindGetViewBook(); //绑定书籍信息
+				that.bindIsBookMark();//是否收藏
+				
+				that.bindIsBorrow();
+			},
+			bindIsBorrow(){//是否借阅
+				var data = {};
+				data.memberId = common.getMemberId()
+				data.bookSkuId  = that.bookSkuID
+				data.fields = "count(*) as count"
+				common.call("GetViewBookOrderItemList", data, function(result) {
+					if (result.data.dataList[0].count > 0) {
+						that.IsBorrow = true
+					} else{
+						that.IsBorrow = false
+					}
+				})
+			},
+			bindGetViewBook() { //绑定书籍信息
+				var data = {};
+				data.id = that.bookSkuID
+				common.call("GetBookSkuInfo", data, function(result) {
+					//console.log(result)
+					that.bookInfo = result.data[0]
+					if(that.bookInfo.bookcaseName ==null){
+						that.bookInfo.bookcaseName = "无"
+					}
+					if (that.bookInfo.introduction != "" && that.bookInfo.introduction != null) {
+						var str = that.bookInfo.introduction
+						let reg = new RegExp('<img', 'g') //g代表全部
+						//console.log(reg)
+						let newMsgs = str.replace(reg, '<img width="100%" '); 	
+						//console.log(newMsgs)
+						that.bookInfo.introduction = newMsgs;
+						that.bookInfo.introduction =common.formatTable(newMsgs);
+						// console.log(common.formatTable(newMsgs))
+					} else {
+						that.bookInfo.introduction = ""
+					}
+					//console.log(that.bookInfo.introduction)
+					that.bindbookSeries(); //同系列
+				})
+			},
+			scroll: function(e) {
+				//console.log(e)
+				this.old.scrollTop = e.detail.scrollTop
+			},
+			clickToBack() {
+				uni.navigateBack();
+			},
+			bindbookSeries() { //同系列
+				var data = {};
+				if(that.bookInfo.bookSeriesId ==null || that.bookInfo.bookSeriesId =="" || that.bookInfo.bookSeriesId=="null"){
+					return
+				}
+				data.bookSeriesId = that.bookInfo.bookSeriesId
+				if(common.getCommunityId() == "" || common.getCommunityId() == null ){
+					 data.condition = 'company_id=(SELECT id FROM company where is_default is true) and is_online is  true and id !='+that.bookSkuID
+				}else{
+					data.companyId = common.getCommunityId()
+					data.condition= "is_online is  true and id !="+that.bookSkuID //线上是否可见
+				}
+				data.pageIndex = that.pageIndex
+				data.pageSize =  that.pageSize
+				common.call("GetViewBookSkuList", data, function(result) {
+					//console.log(result)  
+					that.booksList.push(...result.data.dataList);
+					that.pageCount = result.data.pageCount;
+					that.pageIndex = result.data.pageIndex;
+					that.pageSize = result.data.pageSize;
+					if (that.booksList.length == 0 || that.booksList.length <= 10) {
+						that.loadingText = "没有更多数据了"
+					}
+					if(that.booksList.length == 0){
+						that.isbooksList =false
+					}else{
+						that.isbooksList =true
+					}
+				})
+			},
+			lower(e) {
+				console.log("滚动到底部")
+				if ((that.pageIndex + 1) == that.pageCount) {
+					that.loadingText = "没有更多数据了";
+				} else if ((that.pageIndex + 1) < that.pageCount) {
+					that.pageIndex = that.pageIndex + 1;
+					that.showLoadMore = true;
+					that.loadingText = "加载更多";
+					that.bindbookSeries(); //绑定数据
+				}
+			},
+			bindIsBookMark(){//是否收藏
+				var memberId = uni.getStorageSync('memberId');
+				if (memberId == null || memberId == "") {
+					return;
+				}
+				var data = {};
+				data.memberId = common.getMemberId()
+				data.bookSkuId = that.bookSkuID
+				common.call("GetMemberBookmarkByMemberIdAndBookSkuId", data, function(result) {
+					console.log(result.data)
+					if(result.data ==null){
+						that.isMark =false
+					}else{
+						
+						that.isMark =true
+						that.memberBookmarkID = result.data.id
+						console.log(that.isMark)
+					}
+				});
+			},
+			clickCollection() { //收藏
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				var data = {};
+				data.memberId = common.getMemberId()
+				data.bookSkuId = that.bookSkuID
+				common.call("AddMemberBookmark", data, function(result) {
+					console.log(result)
+					uni.showToast({
+						title: '收藏成功！',
+						icon: "none",
+						duration: 2500
+					});
+					that.bindIsBookMark();
+				}, function(e) {
+					console.log(e)
+					if (e.success == false) {
+						uni.showModal({
+							title: "提示",
+							content: e.errorMessage,
+							showCancel: false,
+							confirmText: "确定",
+						});
+					}
+				});
+			},
+			clickCancelCollection(){//取消收藏
+				var data = {};
+				data.tableName = "member_bookmark";
+				data.condition = "member_id = " + common.getMemberId() +" and book_sku_id=" + that.bookSkuID
+				common.call("DeleteMemberBookmark", data, function(result) {
+					uni.showModal({
+						title: '提示',
+						content: "取消成功！",
+						showCancel: false,//没有取消按钮的弹框
+						success: function (res) {
+							if (res.confirm) {
+								that.bindIsBookMark();
+							} 
+					}});
+				})
+			},
+			clickBorrow() { //借阅
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				var data = {};
+				data.memberId = common.getMemberId()
+				data.bookSkuId  = that.bookSkuID
+				data.fields = "count(*) as count"
+				condition:"is_returned is not true"
+				common.call("GetViewBookOrderItemList", data, function(result) {
+					if (result.data.dataList[0].count > 0) {
+						uni.showModal({
+							title: '提示',
+							content: '您已经借过了是否还要借？',
+							showCancel: true, //没有取消按钮的弹框
+							success: function(res) {
+								if (res.confirm) {
+									that.Borrow();
+								}
+							}
+						});
+					} else {
+						that.Borrow();
+					}
+				})
+			},
+			Borrow() { //借阅
+				var data = {};
+				data.memberId = common.getMemberId()
+				data.companyId = common.getCommunityId()
+				data.bookSkuId = that.bookSkuID
+				common.call("AddOnLineBorrowBookOrder", data, function(result) {
+					console.log(result)
+					//借阅成功！您借阅的图书，将在几月几号（星期几）为您配送，请注意查收。
+					uni.showModal({
+						title: "提示", 
+						content: "借阅成功！您借阅的图书，将在" + result.data + "为您配送，请注意查收。",
+						showCancel: false,
+						confirmText: "确定",
+					});
+					that.bindGetViewBook(); //绑定书籍信息
+					that.bindIsBorrow();
+					// that.bookInfo.isBookAvailable = 1
+				}, function(e) {
+					console.log(e)
+					if (e.success == false) {
+						uni.showModal({
+							title: "提示",
+							content: e.errorMessage,
+							showCancel: false,
+							confirmText: "确定",
+						});
+					}
+				})
+			},
+			clickAddBorrowNotice() { //加入到可借通知
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				var data = {};
+				data.memberId = common.getMemberId()
+				data.bookSkuId = that.bookSkuID
+				common.call("AddMemberBookSubscription", data, function(result) {
+					console.log(result)
+					uni.showModal({
+						title: "提示",
+						content: "已加入到可借通知！",
+						showCancel: false,
+						confirmText: "确定",
+					});
+				}, function(e) {
+					console.log(e)
+					if (e.success == false) {
+						uni.showModal({
+							title: "提示",
+							content: e.errorMessage,
+							showCancel: false,
+							confirmText: "确定",
+						});
+					}
+				});
+			},
+			clickTobooksDetail(item) { //图书详情
+				// uni.redirectTo({
+				// 	url: "booksDetail?bookSkuID=" + item.id  // 无线下钻  返回只能返回到首页去
+				// })
+				uni.navigateTo({
+					url: "booksDetail?bookSkuID=" + item.id  // 只能下钻到十层，返回会默认一级一级的返回
+				})
+			},
+		},
+		filters: {
+			ToIsBookAvailable(val) {
+				if (val == 1) {
+					return "可借"
+				} else if (val == 0) {
+					return "不可借"
+				} else {
+					return ""
+				}
+			},
+			toNull(val){				if(val ==null){					return ""				}else{					return val				}			},
+			toBookImageFilePath(item){
+				if(item.imageFilePath !="" && item.imageFilePath !=null){
+					return that.adminRootUrl + "/" + item.imageFilePath
+				}else{
+					return "../../static/image/common/default.jpg"
+				}
+			},
+			 		}
+	};
+</script>
+
+<style lang="scss">
+	@import url("/css/common.css");
+
+	page {
+		background: #5EAC59;
+	}
+	
+	.container {}
+	.latest-item{
+		 position: absolute;
+		  top: 96rpx;
+		  right: -1px;
+		  height: 10rpx;
+		  line-height: 10rpx;
+		  font-size: 28rpx;
+		  color: #ffffff;
+		  background-color: #ffcc00;
+		  padding: 20rpx;
+		  border-radius: 5px;
+		  transform: rotate(40deg); /* 将元素旋转45度 */
+		  transform-origin: right top; /* 旋转的原点在右上角 */
+	}
+	.booksList {
+		width: 100%;
+		display: block;
+		position: relative;
+
+		.books-info {
+			display: flex;
+			width: calc(100%);
+			padding: 10rpx 10rpx 10rpx 10rpx;
+			flex-wrap: nowrap;
+			border-bottom: 1px solid #dedede;
+			justify-content: center;
+			    align-items: center;
+			&:last-child {
+				border-bottom: none;
+			}
+
+			.img {
+				width: calc(30vw - 70rpx);
+				height: calc(28vw);
+				display: inline-block;
+				overflow: hidden;
+				flex-shrink: 0;
+				margin-right: 20upx;
+
+				image {
+					width: calc(30vw - 70rpx);
+					height: calc(27vw);
+					border-radius: 20rpx;
+				}
+			}
+
+			.info {
+				width: 100%;
+				// height: calc(27vw);
+				overflow: hidden;
+				flex-wrap: wrap;
+				align-content: space-between;
+				position: relative;
+			}
+
+			.booksInfoTitle {
+				color: #999999;
+				font-size: 26rpx;
+			}
+		}
+	}
+
+	.highlight160Panel {
+		background: white;
+		// border-radius: 40rpx;
+		padding: 2px;
+		position: relative;
+		top: 35rpx;
+		width: 180rpx;
+		// margin-left: -20rpx;
+		border-top-right-radius: 30rpx;
+		border-top-left-radius: 30rpx;
+		border-bottom-right-radius: 30rpx;
+	}
+
+	.highlight160 {
+		background: #FFD965;
+		border-radius: 15px;
+		border-bottom-left-radius: 7px;
+		border-bottom-right-radius: 7px;
+		font-size: 24rpx;
+		font-weight: bold;
+		color: #000000;
+	}
+
+	.scroll-view_H {
+		white-space: nowrap;
+		width: 100%;
+
+	}
+
+	.scroll-view-item_H {
+		display: inline-block;
+		width: 30%;
+		height: 250rpx;
+		line-height: 250rpx;
+		text-align: center;
+		font-size: 36rpx;
+		margin-left: 2%;
+	}
+	.series{
+		width: 80rpx;height: 250rpx;
+		
+	}
+	.seriesname {
+		writing-mode: vertical-lr;
+		text-orientation: upright;
+		text-align: left;
+		// font-family: Arial, sans-serif;
+		letter-spacing:4rpx;
+		line-height: 66rpx;
+		font-size: 24rpx;
+		font-weight: 600;
+		width: 70rpx;
+		height: 200rpx;
+		
+		writing-mode: vertical-lr; /* 设置文字竖排 */
+		text-orientation: upright; /* 设置文字排列方向 */
+		overflow: hidden; /* 隐藏溢出部分 */
+		line-height: 32rpx; /* 设置行高 */
+		
+		display: flex; /* 使用 Flexbox 布局 */
+		justify-content: center; /* 水平居中 */
+		align-items: center; /* 垂直居中 */
+		
+		
+		// width: 70rpx; /* 设置宽度 */
+		// height: 180rpx; /* 设置高度 */
+		// display: flex; /* 使用 Flexbox 布局 */
+		// flex-direction: column; /* 垂直排列 */
+		// justify-content: center; /* 主轴居中 */
+		// align-items: center; /* 交叉轴居中 */
+		// overflow: hidden; /* 隐藏溢出部分 */
+		// text-align: center; /* 文字水平居中 */
+		// writing-mode: vertical-rl; /* 设置文字竖排 */
+		// text-orientation: upright; /* 设置文字排列方向 */
+		// text{
+		// 	 overflow: hidden; /* 隐藏溢出部分 */
+		// 	        text-overflow: ellipsis; /* 使用省略号显示溢出文字 */
+		// 	        white-space: nowrap; /* 防止文字换行 */
+		// }
+	}
+
+	.btn {
+		margin-top: 20px;
+		bottom: 0;
+		width: 100%;
+		height: 120rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		position: fixed;
+		width: 100%;
+		height: 150rpx;
+		background-color: #ffffff;
+		bottom: 0;
+		z-index: 8;
+	}
+
+	.back {
+		color: #FACC3F;
+		width: 120px;
+		height: 80rpx;
+		border-radius: 10rpx;
+		justify-content: center;
+		align-items: center;
+		font-size: 27rpx;
+		line-height: 80rpx;
+		text-align: center;
+		margin-left: 20rpx;
+		margin-right: 20rpx;
+		border: 1px solid #FACC3F;
+		border-radius: 448rpx;
+		font-weight: bold;
+		font-size: 26rpx;
+
+	}
+
+	.signUp {
+		width: 120px;
+		height: 80rpx;
+		border-radius: 10rpx;
+		justify-content: center;
+		align-items: center;
+		font-size: 26rpx;
+		line-height: 80rpx;
+		text-align: center;
+		margin-left: 20rpx;
+		margin-right: 20rpx;
+		background: #FACC3F;
+		border-radius: 448rpx;
+		font-weight: bold;
+		font-size: 26rpx;
+	}
+</style>

@@ -1,0 +1,802 @@
+<template>
+	<view>
+		<view class="" style="padding-top:0">
+			<view class="head-content-fixed" :style="{'background':head_is_fixed == 1?'#5EAC59':''}">
+				<!-- style="border-bottom: 1rpx solid rgba(0,0,0,0.1);" -->
+				<view class="head-content-fixed-content ">
+					<view class="head-top-nav-title center" style="font-size: 16px;    font-weight: 700;">
+						<view class="contactservicePanel"  @click="clickCallPhone()">
+							<image :src="imageRootUrl + 'image/common/service.png'" style=" width: 185rpx; height:56rpx"></image>
+						</view>
+						慧至半径童书馆
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="container">
+			<view class="contentPanel" style="padding: 10rpx; border-radius: 24rpx;"><!-- 搜索 -->
+				<view class="line70">
+					<view class="top_search_btn_iamgePanel" style="">
+						<image :src="imageRootUrl + 'image/common/scan.png'" style="" @tap.stop="clickToRichScan()"></image>
+					</view>
+					<view class="top_search_btn_inputPanel" style="">
+						<!-- <input class="top_search_btn_input" type="text" style="" placeholder="请输入书籍名称、系列、ISBN"/> -->
+						<uni-search-bar radius="5" class="top_search_btn_input" v-model="searchVal" cancelButton="none"
+							@confirm="search" placeholder="请输入书籍名称、系列、ISBN、作者">
+						</uni-search-bar>
+					</view>
+					<view class="top_search_btn f26" style="" @click="clickToSearch()">搜索</view>
+				</view>
+			</view>
+			<view class="h40"></view>
+			<view class="slideshow"><!-- 轮播图 -->
+				<view class="swiper-box">
+					<swiper circular="true" autoplay="true" @change="swiperChange">
+						<swiper-item v-for="swiper in swiperList" :key="swiper.id">
+							<image :src="adminRootUrl + swiper.imageFilePath" @click="clickSlideDetail(swiper)"></image> <!-- mode="aspectFill" -->
+						</swiper-item>
+					</swiper>
+					<view class="indicator">
+						<view class="dots" v-for="(swiper, index) in swiperList"
+							:class="[currentSwiper >= index ? 'on' : '']" :key="index"></view>
+					</view>
+				</view>
+			</view>
+			<view class="h40"></view>
+			<view class="contentPanel h150"> <!-- 导航栏 -->
+				<view class="left25 h150" v-for="(item,index) in HomeNavigationLst" :key="index" @click="clickToPage(item)">
+					<view class="line90 center">
+						<image :src="adminRootUrl + item.imageFilePath" class="size80" style=" margin-top: 10rpx;">
+						</image>
+					</view>
+					<view class="line60 center f28" style="font-weight: 600;">{{item.name}}</view>
+				</view>
+				<!-- <view class="left25 h150" @click="clickToHomeGoodNightStory()">
+					<view class="line90 center">
+						<image :src= "imageRootUrl + 'image/home/wags.png'" class="size80" style=" margin-top: 10rpx;">
+						</image>
+					</view>
+					<view class="line60 center f28" style="font-weight: 600;">晚安故事</view>
+				</view>
+				<view class="left25 h150">
+					<view class="line90 center">
+						<image :src= "imageRootUrl + 'image/home/sgjs.png'" class="size80" style=" margin-top: 10rpx;">
+						</image>
+					</view>
+					<view class="line60 center f28" style="font-weight: 600;">书馆介绍</view>
+				</view>
+				<view class="left25 h150">
+					<view class="line90 center">
+						<image :src= "imageRootUrl + 'image/home/jyzn.png'"  class="size80" style=" margin-top: 10rpx;">
+						</image>
+					</view>
+					<view class="line60 center f28" style="font-weight: 600;">借阅指南</view>
+				</view> -->
+				<view class="clear"></view>
+			</view>
+			<view class="h40"></view>
+			<view class="contentPanel"> <!-- 新书上架 -->
+				<view class="line60" @click="clickToNewBooksMore()">
+					<view class="left50 left line60">
+						<view class="moreiamge" style="">
+							<image :src="imageRootUrl + 'image/home/new.png'" mode="" class="size60"></image>
+						</view>
+						<view class="moretitle f30">新书上架</view>
+					</view>
+					<view class="right_50 more line60 right f26">更多></view>
+				</view>
+				<view class="h20"></view>
+				<view style="">
+
+					<!-- <swiper class="swiper" :vertical="false" :autoplay="true" :circular="false" display-multiple-items="3" interval="3000000">
+						<block v-for="(item, index) in newBoosList1" :key="index">
+							<swiper-item>
+								<view style="position: relative;overflow: hidden;height: 100% ;width: 90%;margin-left: 3%;">
+									<view style="cursor: pointer;">
+										<image :src="item.url" mode="aspectFit" style=" height: 210rpx;display: block;width: 95% ;border:  2rpx solid rgb(211 211 211); border-radius: 10rpx;"></image>
+										<view class="line70 center f24">{{item.name}}</view>
+									</view>
+								</view>
+							</swiper-item>
+						</block>
+					</swiper> -->
+					<cc-nav-swiper :list="newBoosList" :rowCount="2" :columnCount="3"></cc-nav-swiper>
+				</view>
+			</view>
+			<view class="h40"></view>
+			<view class="contentPanel"> <!-- 年龄专区 -->
+				<view class="line60">
+					<view class="left50 left line60">
+						<view class="moreiamge" style="">
+							<image :src="imageRootUrl + 'image/home/age.png'" mode="" class="size60"></image>
+						</view>
+						<view class="moretitle f30">年龄专区</view>
+					</view>
+					<view class="right_50 more line60 right f26" @click="clickToAgeMore()">更多></view>
+				</view>
+				<view class="h20"></view>
+				<view class="line60">
+					<view v-for="(item,index) in ageTypeList" :key="index" class="f26 line60 left18 center age " :class="{ ageselected: ageTypeIndex === index }" @click="clickAgeType(item,index)">
+						{{item.name}}
+					</view>
+				</view>
+				<view class="h20"></view>
+				<scroll-view class="scroll-view_H" scroll-x="true" @scroll="scroll" @scrolltolower="lower" style="height: 250rpx;">
+					<view v-for="(item, index) in ageBoosList" :key="index" style="" class="scroll-view-item_H">
+						<view style="position: relative;overflow: hidden;height: 100% ;width: 100%;">
+							<view style="cursor: pointer;" @tap.stop="clickToBooksDetail(item)">
+								<image :src="item | toBookImageFilePath" mode="aspectFit" style=" height: 210rpx;display: block;width: 95% ;  border:  2rpx solid rgb(211 211 211); border-radius: 10rpx;">
+								</image>
+								<view class="line50 center f24 bookName">{{item.bookName}}</view>
+							</view>
+						</view>
+					</view>
+					<!-- <view class="scroll-view-item_H">
+						<view style="position: relative;overflow: hidden;height: 100% ;width: 100%;">
+							<view style="cursor: pointer;">
+								<view class=" more   f26">更多</view>
+							</view>
+						</view>
+					</view> -->
+				</scroll-view>
+				<view class="clear"></view>
+				<image :src="imageRootUrl + 'image/home/booksbottom.png'" style="width: 100%; height: 28rpx;"></image>
+			</view>
+			<view class="h40"></view>
+			<view> <!-- 必读书单 -->
+				<image :src="imageRootUrl + 'image/home/bidu.jpg'" style="width: 100%;height: 30.7vw;border-radius:40rpx"
+					@click="clickToRequiredBook()"></image>
+			</view>
+			<view class="h40" v-if="IsShowGoodNightStory"></view>
+			<view class="contentPanel" v-if="IsShowGoodNightStory"> <!-- 晚安故事 -->
+				<view class="line60">
+					<view class="left50 left line60">
+						<view class="moreiamge" style="">
+							<image :src="imageRootUrl + 'image/home/wanan.png'" mode="" class="size60"></image>
+						</view>
+						<view class="moretitle f30">晚安故事</view>
+					</view>
+					<view class="right_50 more line60 right f26" @click="clickToHomeGoodNightStory()">更多></view>
+				</view>
+				<view class="h20"></view>
+				<scroll-view class="scroll-view_H" scroll-x="true" @scroll="scroll">
+					<view v-for="(item, index) in goodNightStoryList" :key="index" style="" class="scroll-view-item_H">
+						<view style="position: relative;overflow: hidden;height: 100% ;width: 100%;"
+							@click="clickToGoodNightStoryDetail(item,index)">
+							<view style="cursor: pointer;    ">
+								<!-- adminRootUrl + item.coverImageFilePath -->
+								<image :src="item | toVideoImage" mode="aspectFit"
+									style=" height: 210rpx;display: block;width: 95% ;  border:  2rpx solid rgb(211 211 211); border-radius: 10rpx;">
+								</image>
+								<view class="line50 center f24" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{item.title}}</view>
+							</view>
+						</view>
+					</view>
+					<!-- <view class="scroll-view-item_H">
+						<view style="position: relative;overflow: hidden;height: 100% ;width: 100%;">
+							<view style="cursor: pointer;">
+								<view class=" more   f26">更多</view>
+							</view>
+						</view>
+					</view> -->
+				</scroll-view>
+				<image :src="imageRootUrl + 'image/home/booksbottom.png'" style="width: 100%; height: 28rpx;"></image>
+			</view>
+			<view class="h40"></view>
+			<view class="contentPanel"> <!-- 精彩推荐 -->
+				<view class="line60">
+					<view class="left50 left line60">
+						<view class="moreiamge" style="">
+							<image :src="imageRootUrl + 'image/home/jctj.png'" mode="" class="size60"></image>
+						</view>
+						<view class="moretitle f30">精彩推荐</view>
+					</view>
+					<view class="right_50 more line60 right f26" @click="clickToActivityMore()">更多></view>
+				</view>
+				<view v-for="(item,index) in homeRecommendList" :key="index">
+					<view class="h20"></view>
+					<image :src="adminRootUrl + item.detailImageFilePath" style="width: 100%;height: 30.7vw;border-radius: 20rpx;" @click="clickToActivityDetail(item)" ></image>
+				</view>
+				<!-- <view class="h20"></view>
+				<image :src= "imageRootUrl + 'image/swiper/1.png'"  style="width: 100%;height: 30.7vw;"></image>
+				<view class="h20"></view>
+				<image :src= "imageRootUrl + 'image/swiper/3.png'" style="width: 100%;height: 30.7vw;"></image>
+				<view class="h20"></view>
+				<image :src= "imageRootUrl + 'image/swiper/2.png'" style="width: 100%;height: 30.7vw;"></image>
+				<view class="h20"></view>
+				<image :src= "imageRootUrl + 'image/swiper/4.png'"  style="width: 100%;height: 30.7vw;"></image> -->
+			</view>
+
+			<view class="h140"></view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import common from "@/js/common.js";
+	import config from "@/js/config.js";
+	import util from "@/js/util.js";
+	import WXBizDataCrypt from "@/js/WXBizDataCrypt.js";
+	let statusBarHeight = uni.getSystemInfoSync().statusBarHeight; // 状态栏 高度
+	import searchbar from '@/components/uni-search-bar/uni-search-bar.vue' //搜索
+	import navSwiper from '@/components/cc-nav-swiper/cc-nav-swiper.vue' //搜索
+	let that = null;
+	export default {
+		data() {
+			return {
+				url: "http://admin.8630.net/WYB/UploadFile/headerTopbg.png",
+				imageRootUrl: config.imageRootUrl, //图片地址
+				adminRootUrl: config.adminRootUrl + "/", //后端图片地址
+				statusBarHeight, // 状态栏 高度
+				searchVal: '',
+				head_is_fixed: 0,
+				currentSwiper: 0,
+				swiperList: [
+					// { id: 1, src: 'url1', url: config.imageRootUrl + 'image/swiper/1.png' },
+					// { id: 2, src: 'url2', url: config.imageRootUrl + 'image/swiper/2.png' },
+					// { id: 3, src: 'url3', url: config.imageRootUrl + 'image/swiper/3.png' },
+					// { id: 4, src: 'url3', url: config.imageRootUrl + 'image/swiper/4.png' },
+					// { id: 5, src: 'url3', url: config.imageRootUrl + 'image/swiper/5.png' }
+				], //图片轮播
+				newBoosList: [
+					// {id:1,title:'密码花园',image:config.imageRootUrl +'image/common/bookb1.jpg',},{id:2,title:'安徒生童话全集',image:config.imageRootUrl +'image/common/bookb2.jpg',},
+					// {id:3,title:'窗边的小豆豆',image:config.imageRootUrl +'image/common/bookb3.jpg',},{id:4,title:'夏洛的网',image:config.imageRootUrl +'image/common/bookb4.jpg',},
+					// {id:5,title:'柳林风声',image:config.imageRootUrl +'image/common/bookb5.jpg',},{id:6,title:'格林童话',image:config.imageRootUrl +'image/common/bookb6.jpg',},
+					// {id:1,title:'密码花园1',image:config.imageRootUrl +'image/common/bookb7.jpg',},{id:2,title:'安徒生童话全集1',image:config.imageRootUrl +'image/common/bookb1.jpg',},
+					// {id:3,title:'窗边的小豆豆1',image:config.imageRootUrl +'image/common/bookb2.jpg',},{id:4,title:'夏洛的网1',image:config.imageRootUrl +'image/common/bookb3.jpg',},
+					// {id:5,title:'柳林风声1',image:config.imageRootUrl +'image/common/bookb4.jpg',},{id:6,title:'格林童话1',image:config.imageRootUrl +'image/common/bookb5.jpg',},
+					// {id:1,title:'密码花园2',image:config.imageRootUrl +'image/common/bookb6.jpg',},{id:2,title:'安徒生童话全集2',image:config.imageRootUrl +'image/common/bookb7.jpg',},
+					// {id:3,title:'窗边的小豆豆2',image:config.imageRootUrl +'image/common/bookb1.jpg',},{id:4,title:'夏洛的网2',image:config.imageRootUrl +'image/common/bookb2.jpg',},
+					// {id:5,title:'柳林风声2',image:config.imageRootUrl +'image/common/bookb3.jpg',},{id:6,title:'格林童话2',image:config.imageRootUrl +'image/common/bookb4.jpg',},
+				], //新书上架列表
+				ageTypeCode: 'all',
+				ageTypeList: [ // {code:'all',name:'全部'},{code:'0',name:'0-2岁'},{code:'3',name:'3-6岁'},{code:'7',name:'7-10岁'},{code:'11',name:'11-14岁'},
+				],
+				ageTypeID: -1,
+				ageBoosList: [
+					// {id:1,name:'密码花园2',url:config.imageRootUrl +'image/common/bookb1.jpg',},{id:2,name:'安徒生童话全集2',url:config.imageRootUrl +'image/common/bookb2.jpg',},
+					// {id:3,name:'窗边的小豆豆2',url:config.imageRootUrl +'image/common/bookb3.jpg',},{id:4,name:'夏洛的网2',url:config.imageRootUrl +'image/common/bookb4.jpg',},
+					// {id:5,name:'柳林风声2',url:config.imageRootUrl +'image/common/bookb5.jpg',},{id:6,name:'格林童话2',url:config.imageRootUrl +'image/common/bookb6.jpg',},
+					// {id:5,name:'柳林风声2',url:config.imageRootUrl +'image/common/bookb7.jpg',}
+				],
+				ageLoadingText: "正在加载...",
+				ageShowLoadMore: false,
+				agePageIndex: 0, //页数
+				agePageSize: 5, //条数
+				agePageCount: 0, //最大页数
+				goodNightStoryList: [],
+				homeRecommendList: [], //精彩推荐  (俱乐部活动)
+				ageTypeIndex: 0, //选中年龄类型index  默认为0 选中全部
+				scrollTop: 0,
+				old: {
+					scrollTop: 0
+				},
+				HomeNavigationLst: [], //导航栏
+				IsShowGoodNightStory:false,//是否显示晚安故事
+			};
+		},
+		components: {
+			searchbar,
+			navSwiper
+		},
+		onReady() {},
+		onShow() {
+			// if (common.isLogin() == false) {
+				// #ifdef MP-WEIXIN
+				wx.login({
+					success(res) {
+						if (res.code) {
+							var data = {};
+							data.code = res.code;
+							data.WXAppID = config.appId;
+							common.call("GetWxaSession", data, function(result) {
+								console.log(result.data)
+								// var sessionKey = result.data.SessionKey;
+								// var cryptor = new WXBizDataCrypt(config.appId, sessionKey);
+								// var decryptedData = cryptor.decryptData(e.detail.encryptedData, e.detail.iv)
+
+							})
+						} else {
+							console.log('登录失败！' + res.errMsg)
+						}
+					}
+				});
+				// #endif
+			// }
+			that.bindSlide(); //绑定轮播图
+			
+			that.binGetViewHomeNewBookList(); //绑定新书上架
+			that.bindAgeGroupList(); //绑定年龄专区书本列表
+			that.bindGetViewStoryVideoList(); //绑定晚安故事列表
+			that.bindGetViewHomeRecommendList(); //绑定精彩推荐列表  (俱乐部活动) 
+			that.bindIsShowGoodNightStory(); //绑定是否显示晚安故事
+			wx.showShareMenu({
+				withShareTicket:true,
+				//设置下方的Menus菜单，才能够让发送给朋友与分享到朋友圈两个按钮可以点击
+				menus:["shareAppMessage","shareTimeline"]
+			})
+		},
+		onPageScroll(e) {
+			that.head_is_fixed = e.scrollTop > 0 ? 1 : 0
+		},
+		onLoad(options) {
+			that = this; 
+			// uni.setStorageSync("companyId","47");
+			// uni.setStorageSync("memberId","112");
+			// uni.setStorageSync("companyId","35");
+			// uni.setStorageSync("memberId","122");
+			// uni.setStorageSync("companyId","64"); 
+			// uni.setStorageSync("memberId","158");  //客户
+			//uni.setStorageSync("memberId","170"); //我自己的
+			// uni.setStorageSync("memberId","170");
+			if ("scene" in options) {
+				var scene = decodeURIComponent(options.scene);
+				console.log("scene", scene);
+				var sceneParts = scene.split("-");
+				var sceneType = sceneParts[0];
+				var value = sceneParts[1];
+				if (sceneType == "companyId") {
+					console.log(value)
+					uni.setStorageSync("companyId", value);
+					console.log(uni.getStorageSync("memberId"))
+				}
+			}
+		},
+		methods: {
+			bindIsShowGoodNightStory(){
+				var data = {};
+				data.code ="IsShowGoodNightStory"
+				common.call("GetSysSetting", data, function(result) {
+					console.log(result.data)
+					if(result.data.value == "true"){
+						that.IsShowGoodNightStory = true
+					}else{
+						that.IsShowGoodNightStory = false
+					}
+					console.log("IsShowGoodNightStory："+that.IsShowGoodNightStory )
+					that.bindGetHomeNavigationList(); //绑定导航按钮
+				});
+			},
+			bindSlide() { //绑定轮播图
+				var data = {};
+				data.condition = "cms_channel_code='Slide'";
+				common.call("GetViewCmsContentList", data, function(result) {
+					console.log(result)
+					that.swiperList = result.data.dataList
+				})
+			},
+			clickSlideDetail(item){//轮播图跳转
+				if(item.text !="" && item.text !=null && item.text !="undefined" && item.text !=undefined ){
+					console.log(item.id)
+					console.log(item.text)
+					setTimeout(() => {
+						uni.navigateTo({
+							url: 'slideDetail?cmsContentID=' + item.id
+						});
+					}, 200);
+				}
+			},
+			bindGetHomeNavigationList() { //绑定导航按钮
+				var data = {};
+				that.HomeNavigationLst = [];
+				common.call("GetViewHomeNavigationList", data, function(result) {
+					//console.log(result) 
+					for (var i = 0; i < result.data.dataList.length; i++) {
+						
+						let item ={
+							imageFilePath : result.data.dataList[i].imageFilePath,
+							name: result.data.dataList[i].name,
+							path:result.data.dataList[i].path,
+						}
+						if(result.data.dataList[i].name == "晚安故事"){
+							if(that.IsShowGoodNightStory == false){
+								continue
+							}
+						}
+						that.HomeNavigationLst.push(item);
+					}
+				})
+			},
+			binGetViewHomeNewBookList() { //绑定新书上架书本列表
+				var data = {};
+				data.companyId = common.getCommunityId()
+				common.call("GetHomeNewBookShowList", data, function(result) {
+					//console.log(result) 
+					that.newBoosList = result.data
+				})
+			},
+			bindAgeGroupList() { //绑定年龄列表
+				that.ageTypeList = []
+				var data = {};
+				data.enabled = true;
+				data.orderBy = 'display_order';
+				common.call("GetAgeGroupList", data, function(result) {
+					let ageData = {
+						id: -1,
+						name: "全部"
+					}
+					that.ageTypeList.push(ageData)
+					for (let i = 0; i < result.data.dataList.length; i++) {
+						let ageDatas = {
+							id: result.data.dataList[i].id,
+							name: result.data.dataList[i].name,
+						}
+						that.ageTypeList.push(ageDatas)
+					}
+					//console.log(that.ageTypeList)
+					
+					that.binGetAgeBookList(); //绑定年龄专区书本列表
+				})
+			},
+			binGetAgeBookList() { //绑定年龄专区书本列表
+				//console.log(that.ageTypeList[that.ageTypeIndex].id)
+				var data = {};
+				if (that.ageTypeList[that.ageTypeIndex].id != -1) {
+					data.ageGroupSelectValue = that.ageTypeList[that.ageTypeIndex].id //年龄段ID
+				}
+				data.pageIndex = that.agePageIndex
+				data.pageSize =that.agePageSize
+				
+				data.orderBy = "create_time desc";
+				// data.condition= "is_online is  true" //线上是否可见
+				 console.log(common.getCommunityId())
+				if(common.getCommunityId() == "" || common.getCommunityId() == null ){
+					 data.condition = 'company_id=(SELECT id FROM company where is_default is true) and is_online is  true'
+				}else{
+					data.companyId = common.getCommunityId()
+					data.condition= "is_online is  true" //线上是否可见
+				}
+				common.call("GetViewBookSkuInfoList", data, function(result) {
+					//console.log(result) 
+					// that.ageBoosList = result.data.dataList
+					that.ageBoosList.push(...result.data.dataList);
+					that.agePageCount = result.data.pageCount;
+					that.agePageIndex = result.data.pageIndex;
+					that.agePageSize = result.data.pageSize;
+					if (that.ageBoosList.length == 0 || that.ageBoosList.length <= 10) {
+						that.ageLoadingText = "没有更多数据了"
+					}
+				})
+			},
+			bindGetViewStoryVideoList() { //绑定晚安故事列表
+				var data = {};
+				data.pageSize = 10000
+				data.orderBy = "is_pay , create_time desc";
+				common.call("GetViewStoryVideoList", data, function(result) {
+					console.log(result)
+					that.goodNightStoryList = result.data.dataList
+				})
+			},
+			bindGetViewHomeRecommendList() { //绑定精彩推荐列表  (俱乐部活动)
+				// uni.setStorageSync("companyId",35);
+				var data = {};
+				if(common.getCommunityId() == "" || common.getCommunityId() == null ){
+					 data.condition = 'company_id=(SELECT id FROM company where is_default is true) and is_home is true'
+				}else{
+					data.companyId = common.getCommunityId()
+					data.condition = "is_home is true"
+				}
+				data.pageSize = 10000
+				data.orderBy = "is_top desc"
+				common.call("GetViewClubActivityList", data, function(result) {
+					//console.log(result) 
+					that.homeRecommendList = result.data.dataList
+				})
+			},
+			swiperChange(event) { //轮播图指示器
+				this.currentSwiper = event.detail.current;
+			},
+			clickAgeType(item, index) { //年龄类型选中
+				console.log(index)
+				that.ageTypeIndex = index
+				that.ageTypeID = item.id
+				
+				
+				that.ageBoosList=[]
+				that.agePageIndex = 0 
+				that.agePageSize = 5
+				that.binGetAgeBookList(); //绑定年龄专区书本列表
+			},
+			scroll: function(e) {
+				//console.log(e)
+				this.old.scrollTop = e.detail.scrollTop
+			},
+			lower(e) {
+				console.log("滚动到底部")
+				if ((that.agePageIndex + 1) == that.agePageCount) {
+					that.ageLoadingText = "没有更多数据了";
+				} else if ((that.agePageIndex + 1) < that.agePageCount) {
+					that.agePageIndex = that.agePageIndex + 1;
+					that.ageShowLoadMore = true;
+					that.ageLoadingText = "加载更多";
+					that.binGetAgeBookList(); //绑定年龄转区数据
+				}
+			},
+			clickToBooksDetail(item) { //跳转图书详情
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'booksDetail?bookSkuID=' + item.id
+					});
+				}, 200);
+			},
+			clickToSearch() { //跳转到搜索界面
+				//console.log(that.searchVal);
+				// let url = ""
+				// if (that.searchVal == "") {
+				// 	url = "search"
+				// } else {
+				// 	url = "search?searchVal=" + that.searchVal
+				// }
+				// setTimeout(() => {
+				// 	uni.navigateTo({
+				// 		url: "search?searchVal=" + that.searchVal
+				// 	});
+				// }, 200);
+				
+				setTimeout(() => {
+					uni.setStorageSync("searchContent", that.searchVal);
+					uni.switchTab({
+						url: "/pages/category/index" 
+					})
+				}, 100);
+			},
+			clickToAgeMore() { //年龄专区更多  ageGroupId
+				// setTimeout(() => {
+				// 	uni.navigateTo({
+				// 		url: "search?ageGroupId=" + that.ageTypeID
+				// 	});
+				// }, 200);
+				// ageGroupSelectValue
+				setTimeout(() => {
+					uni.setStorageSync("ageTypeIndex",that.ageTypeIndex)
+					uni.switchTab({
+						url: "/pages/category/index" 
+					})
+				}, 100);
+			},
+			clickToNewBooksMore() { //新书上架更多
+				setTimeout(() => {
+					// uni.navigateTo({
+					// 	url: "newBooks"
+					// });
+					uni.switchTab({
+						url: "/pages/category/index" 
+					})
+				}, 100);
+			},
+			clickToPage(item) { //导航栏跳转界面
+				if(item.name =="我要借书"){
+					uni.switchTab({
+						url: "/pages/category/index" 
+					})
+				}else{
+					setTimeout(() => {
+						uni.navigateTo({
+							url: item.path
+						});
+					}, 100);
+				}
+				
+			},
+			clickToIWantBook() { //我要借书
+				setTimeout(() => {
+					uni.navigateTo({
+						url: "search?searchVal=" + that.searchVal
+					});
+				}, 200);
+			},
+			clickToHomeGoodNightStory() { //跳转晚安故事 (更多)
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'homeGoodNightStory'
+					});
+				}, 200);
+			},
+			clickToGoodNightStoryDetail(item, index) { //晚安故事详情
+				setTimeout(() => {
+					uni.navigateTo({
+						url: '/pages/user/goodNightStoryDetail?id=' + item.id + "&index=" + index
+					});
+				}, 200);
+			},
+			clickToActivityMore() { //跳转更多活动
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'homeActivity'
+					});
+				}, 200);
+			},
+			clickToActivityDetail(item) { //跳转到俱乐部详情
+				setTimeout(() => {
+					uni.navigateTo({
+						url: '/pages/user/activityDetail?id=' + item.id + "&type=home" 
+					});
+				}, 200);
+			},
+			clickToRequiredBook() { //跳转到必读书单
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'requiredBook'
+					});
+				}, 200);
+			},
+			clickCallPhone() { //拨打电话
+				console.log(111);
+				var data = {};
+				data.code = "ServicePhone";
+				common.call('GetViewCmsChannelByCode', data, function(res) {
+					console.log(res)
+					// wx.makePhoneCall({
+					//   phoneNumber: res.data.description //仅为示例，并非真实的电话号码
+					// })
+					
+				});
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'serviceQRCodeCall'
+					});
+				}, 200);
+			},
+			async clickToRichScan() {
+				uni.scanCode({
+					autoZoom:false,//是否启用自动放大，默认启用
+					onlyFromCamera:true,//是否只能从相机扫码，不允许从相册选择图片
+					hideAlbum:true,//是否隐藏相册（不允许从相册选择图片），只能从相机扫码。默认值为 false。
+					scanType: ['barCode'],//扫码类型  barCode:一维码  qrCode:二维码  datamatrix:Data Matrix 码  pdf417:PDF417 条码
+					success: (res) => { 
+						console.log(res)
+						console.log("res.result="+ res.result)
+						setTimeout(() => {
+							that.scanToBooksDetail(res.result);
+						}, 200); ;
+
+					},
+					fail: (err) => {
+						// 需要注意的是小程序扫码不需要申请相机权限
+						console.log(err)
+					}
+				});
+			},
+			scanToBooksDetail(sn) { //扫码跳转图书详情
+				if(sn =="" || sn ==null){
+					uni.showToast({
+						title: '请重新扫码',
+						icon: "none",
+					duration:2500
+					});
+					return;
+				}
+				var data = {};
+				data.sn = sn;
+				data.companyId = common.getCommunityId()
+				common.call('GetViewBookInfoList', data, function(res) {
+					console.log(res.data)
+					if(res.data.dataList.length <= 0 ){
+						uni.showToast({
+							title: '请重新扫码',
+							icon: "none",
+						duration:2500
+						});
+						return;
+					}else{
+						setTimeout(() => {
+							uni.navigateTo({
+								url: 'booksDetail?bookSkuID=' + res.data.dataList[0].bookSkuId
+							});
+						}, 200);
+					}
+				});
+			},
+		},
+		filters: {
+			toVideoImage(item){
+				if(item.videoImageFilePath == null || item.videoImageFilePath ==""){
+					return that.adminRootUrl + item.coverImageFilePath
+				}else{
+					return  that.adminRootUrl + item.videoImageFilePath
+				}
+			},
+			toBookImageFilePath(item){
+				if(item.imageFilePath !="" && item.imageFilePath !=null){
+					return that.adminRootUrl + "/" + item.imageFilePath
+				}else{
+					return "../../static/image/common/default.jpg"
+				}
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	@import url("/css/common.css");
+
+	page {
+		background-color: #5EAC59;
+	}
+
+	.container {
+
+		/* #ifdef MP-WEIXIN */
+		margin-top: 40px;
+		/* #endif */
+		/* #ifdef H5 */
+		margin-top: 0px;
+		/* #endif */
+		top: 120rpx;
+		z-index: 8;
+	}
+
+	.slideshow {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+
+		.swiper-box {
+			width: 100%;
+			height: 30.7vw;
+			overflow: hidden;
+			border-radius: 15upx;
+			box-shadow: 0upx 8upx 25upx rgba(0, 0, 0, 0.2);
+			//兼容ios，微信小程序
+			position: relative;
+			z-index: 1;
+
+			swiper {
+				width: 100%;
+				height: 30.7vw;
+
+				swiper-item {
+					image {
+						width: 100%;
+						height: 30.7vw;
+					}
+				}
+			}
+
+			.indicator {
+				position: absolute;
+				bottom: 20upx;
+				left: 20upx;
+				background-color: rgba(255, 255, 255, 0.4);
+				width: 150upx;
+				height: 5upx;
+				border-radius: 3upx;
+				overflow: hidden;
+				display: flex;
+
+				.dots {
+					width: 0upx;
+					background-color: rgba(255, 255, 255, 1);
+					transition: all 0.3s ease-out;
+
+					&.on {
+						width: (100%/5);
+					}
+				}
+			}
+		}
+	}
+
+
+
+	.scroll-view_H {
+		white-space: nowrap;
+		width: 100%;
+
+	}
+
+	.scroll-view-item_H {
+		display: inline-block;
+		width: 30%;
+		height: 250rpx;
+		line-height: 250rpx;
+		text-align: center;
+		font-size: 36rpx;
+		margin-left: 2%;
+	}
+	.bookName{
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+</style>

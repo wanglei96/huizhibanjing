@@ -1,0 +1,151 @@
+.page {
+	padding: 5px;
+}
+
+.toolbar_panel {
+	padding: 3px;
+	padding-left: 10px;
+}
+
+.search_panel {
+	padding: 5px;
+	margin-bottom: 5px;
+}
+
+.data_panel {
+	clear: both;
+}
+
+.detail_commandbar {
+	padding: 10px;
+}
+
+.search_item {
+	float: left;
+	width: 299px;
+}
+
+.search_item_caption {
+	font-size: 12px;
+	width: 100px;
+	text-align: right;
+	display: inline-block;
+}
+
+.search_item_command {
+	float: left;
+	width: 100px;
+}
+
+.grid_button {
+	padding: 0px 10px 0px 2px;
+}
+
+.grid_commands {
+	
+}
+
+.grid_commands a {
+	color: #000;
+	text-decoration: none;
+}
+
+.detail_form {
+	margin: 0;
+	padding: 20px;
+}
+/* .form_item{
+	margin-bottom:10px;
+} */
+.form_textbox{
+	width:100%;
+}
+.form_textarea{
+	width:100%;
+	height:120px;
+}
+.form_item{
+	width: 50%;
+    line-height: 30px;
+    min-height: 30px;
+    float: left;
+    display: table;
+    padding:0px;
+    margin-top: 0px;
+}
+.form_item_full{
+	width: 100%;
+    line-height: 30px;
+    min-height: 30px;
+    float: left;
+    display: table;
+    padding:0px;
+    margin-top: 0px;
+}
+.form_item_caption{
+    width: 30%;
+    text-align: right;
+    float: left;
+    line-height: 30px;
+    min-height: 30px;
+    display: table-cell;
+    vertical-align: middle;
+}
+.form_item_value {
+    padding-top: 3px;
+    width: 70%;
+    float: right;
+    min-height: 30px;
+    line-height: 30px;
+    display: table-cell;
+    vertical-align: middle;
+}
+.form_item_full_caption{
+    width: 15%;
+    text-align: right;
+    float: left;
+    line-height: 30px;
+    min-height: 30px;
+    display: table-cell;
+    vertical-align: middle;
+}
+.form_item_full_value{
+    padding-top: 3px;
+    width: 85%;
+    float: right;
+    min-height: 30px;
+    line-height: 30px;
+    display: table-cell;
+    vertical-align: middle;
+}
+.formDetail{
+	margin: 0;
+	padding: 20px 60px 20px 0px;
+}
+.photo{
+	max-width: 30px;
+	max-height: 30px;
+	border: 1px;
+	position: relative;
+    cursor: pointer;
+    float: left;
+}
+.inputFilePath{
+	width:330px;/* 
+    position: relative;
+    left: -49px;
+    top: -6px; */
+    font-size: 12px;
+    position: relative;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    vertical-align: middle;
+    display: inline-block;
+    overflow: hidden;
+    -moz-border-radius: 4px 4px 4px 4px;
+    -webkit-border-radius: 4px 4px 4px 4px;
+    border-radius: 4px 4px 4px 4px;
+    height: 22px;
+    line-height: 22px;
+    float: left;
+}

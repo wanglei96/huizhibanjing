@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "三明市儿童书屋",
+  "navigationBarBackgroundColor": "#5EAC59",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+    "uni-search-bar": "/components/uni-search-bar/uni-search-bar"
+  }
+}

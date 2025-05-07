@@ -1,0 +1,541 @@
+<ServiceHandlers>
+    <!-- CmsChannel -->
+    <ServiceHandler Name="GetCmsChannelList"
+                    Type="strosoft.cms.service.GetViewCmsChannelListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager" TableName="view_cms_channel"
+                    OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsChannel"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"/>
+    <ServiceHandler Name="GetCmsChannelIdListWidthPromission"
+                    Type="strosoft.cms.service.GetCmsChannelIdListWidthPromissionServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"/>
+
+
+    <ServiceHandler Name="AddCmsChannel"
+                    Type="strosoft.cms.service.AddCmsChannelServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"
+                    DataEntityType="strosoft.cms.data.CmsChannel">
+        <RequredFields>
+            <RequiredField DataName="name" Caption="标题"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+
+    <ServiceHandler Name="UpdateCmsChannel"
+                    Type="strosoft.cms.service.UpdateCmsChannelServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"
+                    DataEntityType="strosoft.cms.data.CmsChannel"/>
+
+    <ServiceHandler Name="DeleteCmsChannel"
+                    Type="strosoft.cms.service.DeleteCmsChannelServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"/>
+    <ServiceHandler Name="BatchDeleteCmsChannel"
+                    Type="strosoft.cms.service.BatchDeleteCmsChannelServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"/>
+    <!-- 匹配模板 -->
+    <ServiceHandler Name="TemplateMatch"
+                    Type="strosoft.cms.service.TemplateMatchServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"/>
+    <!-- 取消模板匹配 -->
+    <ServiceHandler Name="CancleTemplateMatch"
+                    Type="strosoft.cms.service.CancleTemplateMatchServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"/>
+    <!-- 设置默认模板 -->
+    <ServiceHandler Name="SetDefaultTemplate"
+                    Type="strosoft.cms.service.SetDefaultTemplateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"/>
+    <!-- 设置角色栏目权限 -->
+    <ServiceHandler Name="AddCmsChannelPermission"
+                    Type="strosoft.sys.service.AddCmsChannelSysRolePermissionServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRoleCmsChannelPermissionManager"
+                    DataEntityType="strosoft.sys.data.SysRoleCmsChannelPermission"/>
+
+    <ServiceHandler Name="GetSysRoleCmsChannelPermissionListById"
+                    Type="strosoft.sys.service.GetSysRoleCmsChannelPermissionListByIdServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRoleCmsChannelPermissionManager"
+                    DataEntityType="strosoft.sys.data.SysRoleCmsChannelPermission"/>
+
+    <ServiceHandler Name="GetSysRoleCmsChannelPermissionListBySysUserId"
+                    Type="strosoft.sys.service.GetSysRoleCmsChannelPermissionListBySysUserIdServiceHandler"
+                    DataManagerType="strosoft.sys.model.SysRoleCmsChannelPermissionManager"
+                    DataEntityType="strosoft.sys.data.SysRoleCmsChannelPermission"/>
+
+    <!-- cmsContent -->
+    <ServiceHandler Name="GetCmsContentList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager"
+                    TableName="view_cms_content" OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="title" Operation="like"
+                        ParameterName="title"/>
+            <SearchItem FieldName="author" Operation="like"
+                        ParameterName="author"/>
+            <SearchItem FieldName="source" Operation="like"
+                        ParameterName="source"/>
+            <SearchItem FieldName="cmsContentStatusCode" Operation="like"
+                        ParameterName="cmsContentStatusCode"/>
+            <SearchItem FieldName="cms_channel_id" Operation="like"
+                        ParameterName="cmsChannelId"/>
+            <SearchItem FieldName="cms_channel_code" Operation="like"
+                        ParameterName="cmsChannelCode"/>
+            <SearchItem FieldName="id" Operation="like"
+                        ParameterName="id"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentListWidthPermission"
+                    Type="strosoft.cms.service.GetViewCmsContentListWidthPermissionServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager" TableName="view_cms_content"
+                    OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="title" Operation="like"
+                        ParameterName="title"/>
+            <SearchItem FieldName="author" Operation="like"
+                        ParameterName="author"/>
+            <SearchItem FieldName="source" Operation="like"
+                        ParameterName="source"/>
+            <SearchItem FieldName="is_recommend" Operation="equal"
+                        ParameterName="isRecommend"/>
+            <SearchItem FieldName="is_hot" Operation="equal"
+                        ParameterName="isHot"/>
+            <SearchItem FieldName="is_top" Operation="equal"
+                        ParameterName="isTop"/>
+            <SearchItem FieldName="is_highlight" Operation="equal"
+                        ParameterName="isHighlight"/>
+        </SearchItems>
+    </ServiceHandler>
+
+    <ServiceHandler Name="GetCmsContent"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager"/>
+
+    <ServiceHandler Name="AddCmsContent"
+                    Type="strosoft.cms.service.AddCmsContentServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager"
+                    DataEntityType="strosoft.cms.data.CmsContent">
+        <RequredFields>
+            <RequiredField DataName="title" Caption="标题"></RequiredField>
+            <RequiredField DataName="cmsChannelId" Caption="所属栏目"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsContent"
+                    Type="strosoft.cms.service.UpdateCmsContentServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager"
+                    DataEntityType="strosoft.cms.data.CmsContent">
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsContent"
+                    Type="strosoft.cms.service.DeleteCmsContentServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager"/>
+    <ServiceHandler Name="BatchDeleteCmsContent"
+                    Type="strosoft.cms.service.BatchDeleteCmsContentServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager"/>
+
+    <!-- 审核状态 -->
+    <ServiceHandler Name="Approve"
+                    Type="strosoft.sys.service.ApproveServiceHandler">
+    </ServiceHandler>
+
+    <!-- cmsComment 评论 -->
+    <ServiceHandler Name="GetCmsCommentList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentManager"
+                    TableName="view_cms_comment" OrderBy="display_order">
+
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsComment"
+                    Type="strosoft.cms.service.AddCmsCommentServiceHandler"
+                    DataManagerType="strosoft.sys.model.CmsCommentManager"
+                    DataEntityType="strosoft.cms.data.CmsComment"/>
+
+    <ServiceHandler Name="UpdateCmsComment"
+                    Type="strosoft.app.service.UpdateIdNameTableServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentManager">
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsComment"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentManager"/>
+    <ServiceHandler Name="BatchDeleteCmsComment"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsCommentManager"/>
+
+
+    <!-- 批量 转移 -->
+    <ServiceHandler Name="Transfer"
+                    Type="strosoft.cms.service.CmsTransferServiceHandler">
+        <RequredFields>
+            <RequiredField DataName="cmsSiteId" Caption="站点"></RequiredField>
+            <RequiredField DataName="cmsChannelId" Caption="目标栏目"></RequiredField>
+            <RequiredField DataName="cmsContentTransferCode"
+                           Caption="转移类型"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+    <!-- 转移内容 -->
+    <ServiceHandler Name="TransferCmsContent"
+                    Type="strosoft.cms.service.CmsTransferCmsContentServiceHandler">
+        <RequredFields>
+            <RequiredField DataName="cmsSiteId" Caption="站点"></RequiredField>
+            <RequiredField DataName="cmsChannelId" Caption="目标栏目"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+
+
+    <!-- cmsTemplate -->
+    <ServiceHandler Name="GetCmsTemplateList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"
+                    TableName="view_cms_template" OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+        </SearchItems>
+    </ServiceHandler>
+
+    <ServiceHandler Name="GetCmsTemplate"
+                    Type="strosoft.cms.service.GetCmsTemplateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"/>
+
+    <ServiceHandler Name="AddCmsTemplate"
+                    Type="strosoft.cms.service.AddCmsTemplateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplate">
+        <RequredFields>
+            <RequiredField DataName="name" Caption="模板名称"></RequiredField>
+            <RequiredField DataName="cmsTemplateTypeCode" Caption="模板文件"></RequiredField>
+            <RequiredField DataName="cmsTemplateTypeCode" Caption="模板类型"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+
+    <ServiceHandler Name="UpdateCmsTemplate"
+                    Type="strosoft.cms.service.UpdateCmsTemplateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplate">
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsTemplate"
+                    Type="strosoft.cms.service.DeleteCmsTemplateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"/>
+    <ServiceHandler Name="BatchDeleteCmsTemplate"
+                    Type="strosoft.cms.service.BatchDeleteCmsTemplatetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateManager"/>
+    <!-- 匹配模板 -->
+    <ServiceHandler Name="TemplateMatch"
+                    Type="strosoft.cms.service.TemplateMatchServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"/>
+    <!-- 取消模板匹配 -->
+    <ServiceHandler Name="CancleTemplateMatch"
+                    Type="strosoft.cms.service.CancleTemplateMatchServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelManager"/>
+
+    <!-- 模板标签管理 -->
+    <ServiceHandler Name="GetCmsTemplateTagList"
+                    Type="strosoft.app.service.GetListServiceHandler" DataManagerType="strosoft.sys.model.IdDataManager"
+                    TableName="cms_template_tag" OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+            <SearchItem FieldName="element_name" Operation="like"
+                        ParameterName="elementName"/>
+            <SearchItem FieldName="handler_name" Operation="like"
+                        ParameterName="handlerName"/>
+            <SearchItem FieldName="description" Operation="like"
+                        ParameterName="description"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsTemplateTag"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"/>
+
+    <ServiceHandler Name="AddCmsTemplateTag"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateTag"/>
+
+    <ServiceHandler Name="UpdateCmsTemplateTag"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"
+                    DataEntityType="strosoft.cms.data.CmsTemplateTag">
+    </ServiceHandler>
+
+    <ServiceHandler Name="DeleteCmsTemplateTag"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"/>
+    <ServiceHandler Name="BatchDeleteCmsTemplateTag"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsTemplateTagManager"/>
+
+
+    <!-- 包含文件管理 -->
+    <ServiceHandler Name="GetCmsIncludeList"
+                    Type="strosoft.app.service.GetListServiceHandler" DataManagerType="strosoft.sys.model.IdDataManager"
+                    TableName="cms_include" OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsInclude"
+                    Type="strosoft.cms.service.GetCmsIncludeServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager"/>
+
+    <ServiceHandler Name="AddCmsInclude"
+                    Type="strosoft.cms.service.AddCmsIncludeServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager"
+                    DataEntityType="strosoft.cms.data.CmsInclude"/>
+
+    <ServiceHandler Name="UpdateCmsInclude"
+                    Type="strosoft.cms.service.UpdateCmsIncludeServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager"
+                    DataEntityType="strosoft.cms.data.CmsInclude">
+    </ServiceHandler>
+
+    <ServiceHandler Name="DeleteCmsInclude"
+                    Type="strosoft.cms.service.DeleteCmsIncludeServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager"/>
+
+    <ServiceHandler Name="BatchDeleteCmsInclude"
+                    Type="strosoft.cms.service.BatchDeleteCmsIncludeServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsIncludeManager"/>
+
+
+    <!-- 站点管理表 -->
+    <ServiceHandler Name="GetCmsSiteList"
+                    Type="strosoft.app.service.GetListServiceHandler" TableName="view_cms_site"
+                    OrderBy="display_order">
+        <SearchItems>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"/>
+            <SearchItem FieldName="description" Operation="like"
+                        ParameterName="description"/>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsSite"
+                    Type="strosoft.app.service.GetServiceHandler" DataManagerType="strosoft.cms.model.CmsSiteManager"
+                    DataEntityType="strosoft.cms.data.CmsSite"/>
+    <ServiceHandler Name="AddCmsSite"
+                    Type="strosoft.cms.service.AddCmsSiteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteManager"
+                    DataEntityType="strosoft.cms.data.CmsSite">
+    </ServiceHandler>
+    <ServiceHandler Name="UpdateCmsSite"
+                    Type="strosoft.app.service.UpdateServiceHandler" DataManagerType="strosoft.cms.model.CmsSiteManager"
+                    DataEntityType="strosoft.cms.data.CmsSite">
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsSite"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsSiteManager"/>
+
+    <ServiceHandler Name="BuildIndex"
+                    Type="strosoft.cms.service.BuildIndexServiceHandler">
+    </ServiceHandler>
+    <!-- 移动cms元素 -->
+    <ServiceHandler Name="MoveCms"
+                    Type="strosoft.cms.service.MoveCmsServiceHandler">
+    </ServiceHandler>
+    <!-- 生成页面 -->
+    <ServiceHandler Name="CmsBuild"
+                    Type="strosoft.cms.service.CmsBuildServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsBuildManager">
+        <RequredFields>
+            <RequiredField DataName="cmsChannelList" Caption="所选栏目"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsBuildProgress"
+                    Type="strosoft.cms.service.GetCmsBuildProgressServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsBuildManager"/>
+    <!-- 删除站点所有内容页 -->
+    <ServiceHandler Name="RemoveAllContentPage"
+                    Type="strosoft.cms.service.RemoveAllContentPageServiceHandler">
+    </ServiceHandler>
+    <ServiceHandler Name="AddCmsLanguage"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language"
+                    PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="编码"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="编码"></RequiredField>
+            <RequiredField DataName="name" Caption="名称"></RequiredField>
+            <RequiredField DataName="cmsSiteId" Caption="站点ID"></RequiredField>
+            <RequiredField DataName="path" Caption="生成路径"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsLanguage"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language"/>
+    <ServiceHandler Name="GetCmsLanguageList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language">
+        <SearchItems>
+            <SearchItem FieldName="code" Operation="like"
+                        ParameterName="code"></SearchItem>
+            <SearchItem FieldName="name" Operation="like"
+                        ParameterName="name"></SearchItem>
+            <SearchItem FieldName="cms_site_id" Operation="equal"
+                        ParameterName="cmsSiteId"></SearchItem>
+        </SearchItems>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsLanguageListCustom"
+                    Type="strosoft.cms.service.GetCmsLanguageListCustomServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language"/>
+    <ServiceHandler Name="UpdateCmsLanguage"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language"
+                    PrimaryKeys="code">
+        <UniqueFields>
+            <UniqueField FieldName="code" DataName="code" Caption="编码"></UniqueField>
+        </UniqueFields>
+        <RequredFields>
+            <RequiredField DataName="code" Caption="编码"></RequiredField>
+            <RequiredField DataName="name" Caption="名称"></RequiredField>
+            <RequiredField DataName="cmsSiteId" Caption="站点ID"></RequiredField>
+            <RequiredField DataName="path" Caption="生成路径"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="SwitchIsOnCmsLanguage"
+                    Type="strosoft.cms.service.SwitchIsOnCmsLanguageServiceHandler"/>
+    <ServiceHandler Name="DeleteCmsLanguage"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language"/>
+    <ServiceHandler Name="BatchDeleteCmsLanguage"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language"/>
+    <!-- 设置Cms默认语言 -->
+    <ServiceHandler Name="SetDefaultCmsLanguage"
+                    Type="strosoft.cms.service.SetDefaultCmsLanguageServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsLanguage" TableName="cms_language"/>
+
+    <ServiceHandler Name="AddCmsChannelLanguage"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsChannelLanguage"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language"/>
+    <ServiceHandler Name="GetCmsChannelLanguageList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language"/>
+    <ServiceHandler Name="UpdateCmsChannelLanguage"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsChannelLanguage"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language"/>
+    <ServiceHandler Name="BatchDeleteCmsChannelLanguage"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsChannelLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsChannelLanguage" TableName="cms_channel_language"/>
+    <ServiceHandler Name="AddCmsContentLanguage"
+                    Type="strosoft.app.service.AddServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+        <RequredFields></RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="GetCmsContentLanguage"
+                    Type="strosoft.app.service.GetServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language"/>
+    <ServiceHandler Name="GetCmsContentLanguageList"
+                    Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language"/>
+    <ServiceHandler Name="UpdateCmsContentLanguage"
+                    Type="strosoft.app.service.UpdateServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language"
+                    PrimaryKeys="id">
+        <UniqueFields>
+            <UniqueField FieldName="id" DataName="id" Caption="ID"></UniqueField>
+        </UniqueFields>
+    </ServiceHandler>
+    <ServiceHandler Name="DeleteCmsContentLanguage"
+                    Type="strosoft.app.service.DeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language"/>
+    <ServiceHandler Name="BatchDeleteCmsContentLanguage"
+                    Type="strosoft.app.service.BatchDeleteServiceHandler"
+                    DataManagerType="strosoft.cms.model.CmsContentLanguageManager"
+                    DataEntityType="strosoft.cms.data.CmsContentLanguage" TableName="cms_content_language"/>
+
+    <!-- 多语言支持接口 -->
+    <!-- 根据栏目ID获取对应栏目下的所有多语言栏 -->
+    <ServiceHandler Name="GetViewCmsChannelInfoChannelIdCustom"
+                    Type="strosoft.cms.service.GetViewCmsChannelInfoChannelIdCustomServiceHandler">
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+    <ServiceHandler Name="GetViewCmsContentInfoContentIdCustom"
+                    Type="strosoft.cms.service.GetViewCmsContentInfoContentIdCustomServiceHandler">
+        <RequredFields>
+            <RequiredField DataName="id" Caption="ID"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+    <!-- 根据栏目ID和内容ID下载附件 -->
+    <ServiceHandler Name="DownloadCmsFileServiceHandler"
+                    Type="strosoft.cms.service.DownloadCmsFileServiceHandler"/>
+    <!-- 查看并设置浏览量 -->
+    <ServiceHandler Name="GetCmsContentPageView"
+                    Type="strosoft.cms.service.GetCmsContentPageViewServiceHandler">
+    </ServiceHandler>
+    <!-- CMS查询 -->
+    <ServiceHandler Name="CmsSearch"
+                    Type="strosoft.cms.service.CmsSearchServiceHandler">
+        <RequredFields>
+            <RequiredField DataName="keywords" Caption="关键字"></RequiredField>
+            <RequiredField DataName="cmsLanguageCode" Caption="cmsLanguageCode"></RequiredField>
+            <RequiredField DataName="currentChannelId" Caption="currentChannelId"></RequiredField>
+        </RequredFields>
+    </ServiceHandler>
+    <!-- 根据栏目编码取得栏目实体对象 -->
+    <ServiceHandler Name="GetViewCmsChannelByCode"
+                    Type="strosoft.cms.service.GetViewCmsChannelByCodeServiceHandler"/>
+    <ServiceHandler Name="GetViewCmsContentList" Type="strosoft.app.service.GetListServiceHandler"
+                    DataManagerType="strosoft.cms.model.ViewCmsContentManager"
+                    DataEntityType="strosoft.cms.data.ViewCmsContent" TableName="view_cms_content">
+        <PrimaryKeys></PrimaryKeys>
+        <SearchItems>
+            <SearchItem Operation="like" FieldName="title" ParameterName="title"></SearchItem>
+            <SearchItem Operation="like" FieldName="author" ParameterName="author"></SearchItem>
+            <SearchItem Operation="like" FieldName="source" ParameterName="source"></SearchItem>
+            <SearchItem Operation="equal" FieldName="cms_channel_id" ParameterName="cmsChannelId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="cms_content_status_code"
+                        ParameterName="cmsContentStatusCode"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="publish_date" BeginDateParameterName="publishDateBegin"
+                        EndDateParameterName="publishDateEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+        </SearchItems>
+    </ServiceHandler>
+</ServiceHandlers>

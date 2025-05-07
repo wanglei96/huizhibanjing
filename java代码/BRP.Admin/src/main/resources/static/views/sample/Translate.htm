@@ -1,0 +1,37 @@
+<html>
+<head>
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<link rel="stylesheet" href="../../themes/custom/easyui.css"
+	type="text/css"></link>
+<script>
+	$(function() {
+		//执行命令
+		$("#btnTranslate")
+				.click(
+						function() {
+							var data = new Object();
+							data.sourceText = $("#txtSourceText").val();
+							data.sourceLanguage = $("#txtSourceLanguage").val();
+							data.targetLanguage = $("#txtTargetLanugage").val();
+
+							call("Translate", data, function(result) {
+								alert(JSON.stringify(result));
+							});
+						});
+	});
+</script>
+</head>
+<body>
+<input type="text" id="txtSourceText" value="我们都是中国人"/>
+<input type="text" id="txtSourceLanguage" value="zh"/>
+<input type="text" id="txtTargetLanugage" value="en"/>
+	<input id="btnTranslate" value="翻译" type="button" />
+</body>
+</html>

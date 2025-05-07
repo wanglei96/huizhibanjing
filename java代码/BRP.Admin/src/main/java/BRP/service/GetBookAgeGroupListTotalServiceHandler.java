@@ -1,0 +1,57 @@
+package BRP.service;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+import strosoft.app.util.JsonHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+
+public class GetBookAgeGroupListTotalServiceHandler extends ServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        String companyId = jData.getString("companyId");
+        String companyIdCondition = "";
+        String condition = "";
+        if (companyId != "null") {
+            companyIdCondition = " AND bs.company_id =" + companyId;
+            condition = "and company_id =" + companyId;
+        }
+        String sql = "SELECT \n" +
+                "    bg.age_group_name AS name,\n" +
+                "    COUNT(bs.id) AS value\n" +
+                "FROM \n" +
+                "    book_sku bs\n" +
+                "LEFT JOIN \n" +
+                "    view_book_sku_age_group bg ON bg.book_sku_id = bs.id\n"+
+                "where  bg.age_group_name IS NOT NULL \n"
+                + companyIdCondition + "\n" +
+                "GROUP BY \n" +
+                "    bg.age_group_name\n" +
+                "UNION\n" +
+                "SELECT \n" +
+                "    '未分年龄' AS name,\n" +
+                "    COUNT(bs.id) AS value\n" +
+                "FROM \n" +
+                "    book_sku bs\n" +
+                "WHERE \n" +
+                "    bs.id NOT IN (SELECT book_sku_id FROM view_book_sku_age_group) " + condition + "\n" +
+                " ORDER BY\n" +
+                "    CASE name\n" +
+                "        WHEN '0-2岁' THEN 1\n" +
+                "        WHEN '3-6岁' THEN 2\n" +
+                "        WHEN '7-10岁' THEN 3\n" +
+                "        WHEN '11-14岁' THEN 4\n" +
+                "        WHEN '未分年龄' THEN 5\n" +
+                "        ELSE 6\n" +
+                "    END;";
+        ArrayList<LinkedHashMap<String, Object>> alData = MyBatisManager.getInstance().executeHashMapList(sql);
+        JSONArray jResult = JsonHelper.toJSONArray(alData);
+        this.writeSuccessResponse(response, jResult);
+    }
+}

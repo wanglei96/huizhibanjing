@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "check-box": "/components/uni-tr/table-checkbox"
+  }
+}

@@ -1,0 +1,171 @@
+package BRP.model;
+
+import BRP.data.*;
+import org.apache.ibatis.session.SqlSession;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.util.ClassHelper;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.StringHelper;
+import strosoft.app.util.Tracer;
+
+import java.io.IOException;
+import java.util.List;
+
+public class BookInOrderManager extends BookInOrderMaster {
+    private static BookInOrderManager _instance;
+
+    private BookInOrderManager() {
+        this.setTableName("book_in_order");
+        this.setTypeName("BookInOrder");
+    }
+
+    public static BookInOrderManager getInstance() {
+        if (_instance == null) {
+            _instance = new BookInOrderManager();
+        }
+        return _instance;
+    }
+
+    /**
+     * 添加扫码入库单
+     *
+     * @param companyId
+     * @param bookSn
+     * @param isEnabled
+     * @throws Exception
+     */
+    public ViewBookInOrder addBookInOrder(Integer companyId, String bookSn, Boolean isEnabled) throws Exception {
+        SqlSession sqlSession = MyBatisManager.getInstance().openSession();
+        try {
+            String timBookSn = bookSn.trim();
+
+            Book theBook = BookManager.getInstance().getEntityBySn(sqlSession, timBookSn, companyId);
+
+            if (theBook == null) {
+                throw new Exception("请核对图书编号，该图书编号未找到图书！");
+            }
+            Integer memberId = theBook.getMemberId();
+
+            String condition = String.format(
+                    "book_id= %d and deliver_status_code='%s' and book_order_type_code='%s'",
+                    theBook.getId(), DeliverStatusCodes.Storageing, BookOrderTypeCodes.Return);
+            List<BookOrderItem> lstBookOrderItem = BookOrderItemManager.getInstance().
+                    getList(sqlSession, condition, "create_time desc");
+            if (lstBookOrderItem.size() == 0) {
+                throw new Exception("请核对图书编号，该图书编号未找到借阅记录！");
+            }
+            BookOrderItem theBookOrderItem = lstBookOrderItem.get(0);
+            //修改配送单详情
+            theBookOrderItem.setDeliverStatusCode(DeliverStatusCodes.Storageed);
+            theBookOrderItem.setIsReturned(true);
+            BookOrderItemManager.getInstance().update(sqlSession, theBookOrderItem);
+
+
+            //修改单据还书状态为完成
+            String bookOrderCondition = String.format("book_order_id = %d and book_order_type_code = '%s'",
+                    theBookOrderItem.getBookOrderId(), BookOrderTypeCodes.Return);
+            List<BookOrderItem> bookOrderItemList = BookOrderItemManager.getInstance().getList(sqlSession, bookOrderCondition);
+            boolean allDelivered = bookOrderItemList.stream()
+                    .allMatch(item -> item.getDeliverStatusCode().equals(DeliverStatusCodes.Storageed));
+            BookOrder theBookOrder = BookOrderManager.getInstance().getEntity(sqlSession, theBookOrderItem.getBookOrderId());
+            if (allDelivered) {
+                theBookOrder.setBookOrderReturnStatusCode(BookOrderReturnStatusCodes.Finished);
+                BookOrderManager.getInstance().update(sqlSession, theBookOrder);
+            }
+
+            //获取这本图书的借阅item
+            String borrowedCondition = String.format(
+                    "company_id= %d and  book_id= %d and member_id=%d " +
+                            " and book_order_type_code='%s' and is_returned is true",
+                    companyId, theBook.getId(), theBookOrder.getMemberId(), BookOrderTypeCodes.Borrow);
+            List<ViewBookOrderItem> lstBorrowedViewBookOrderItem = ViewBookOrderItemManager.getInstance().
+                    getList(sqlSession, borrowedCondition, "create_time desc");
+            if (lstBorrowedViewBookOrderItem.size() > 0) {
+                String strBookReturnTime = DateHelper.getDateTimeString();
+                String sql = String.format("update book_order_item set " +
+                        "book_in_stocks_time = '%s' \n" +
+                        "where id = %d", strBookReturnTime, lstBorrowedViewBookOrderItem.get(0).getId());
+                MyBatisManager.getInstance().executeUpdate(sqlSession, sql);
+            }
+            //添加入库单
+            BookInOrder newBookInOrder = new BookInOrder();
+            newBookInOrder.setBookOrderItemId(theBookOrderItem.getId());
+            newBookInOrder.setBookInOrderStatusCode("WaitCloudStockIn");
+            newBookInOrder.setIsEnabled(isEnabled);
+            newBookInOrder.setBookcaseId(theBook.getBookcaseId());
+            Integer newBookInOrderId = this.add(sqlSession, newBookInOrder);
+
+            //修改图书状态
+            if (isEnabled) {
+                theBook.setBookStatusCode(BookStatusCodes.On);
+            } else {
+                theBook.setBookStatusCode(BookStatusCodes.Off);
+            }
+            theBook.setBorrowStatusCode(BorrowStatusCodes.In);
+            theBook.setIsAvailable(true);
+            theBook.setMemberId(null);
+            BookManager.getInstance().update(sqlSession, theBook);
+
+
+            Boolean showUnlock = false;
+            Integer borrowingQuantity = 0;
+            //获取会员信息
+            if (memberId != null) {
+                //获取会员卡
+                MemberCard memberCard = MemberCardManager.getInstance().getEntityByMemberId(sqlSession, memberId);
+                if (memberCard != null) {
+                    if ( !StringHelper.isNullOrEmpty(memberCard.getMemberCardStatusCode()) && memberCard.getMemberCardStatusCode().equals("Locked")) {
+                        //获取会员等待入库图书数量
+                        String storageingCondition = String.format("member_id = %d and book_order_type_code='%s' and deliver_status_code='%s'"
+                                , memberId, BookOrderTypeCodes.Return, DeliverStatusCodes.Storageing);
+                        Integer count = ViewBookOrderItemManager.getInstance().getCount(sqlSession, storageingCondition);
+                        if (count == 0) {
+                            memberCard.setMemberCardStatusCode("Normal");
+                            MemberCardManager.getInstance().update(sqlSession, memberCard);
+                        }
+                        showUnlock = true;
+                        borrowingQuantity = count;
+                    }
+                }
+            }
+            ViewBookInOrder newViewBookInOrder = ViewBookInOrderManager.getInstance().getEntityById(sqlSession, newBookInOrderId);
+            BookInOrderInfo newBookInOrderInfo = (BookInOrderInfo) ClassHelper.copyObject(BookInOrderInfo.class, newViewBookInOrder);
+            newBookInOrderInfo.setBorrowingQuantity(borrowingQuantity);
+            newBookInOrderInfo.setShowUnlock(showUnlock);
+
+            //判断会员是否添加了借阅通知
+            String subscriptionCondition = String.format("book_sku_id = %d ", theBook.getBookSkuId());
+            List<ViewMemberBookSubscription> lstViewMemberBookSubscription =
+                    ViewMemberBookSubscriptionManager.getInstance().getList(sqlSession, subscriptionCondition);
+            if (lstViewMemberBookSubscription.size() > 0 && isEnabled) {
+                //添加消息记录
+                for (ViewMemberBookSubscription item : lstViewMemberBookSubscription) {
+                    Message message = new Message();
+                    message.setMemberId(item.getMemberId());
+                    message.setMessageTypeCode(MessageTypeCodes.BookCanBorrowed);
+                    message.setPushTime(DateHelper.getCurrentTimestamp());
+                    message.setCompanyId(companyId);
+                    message.setContent(String.format("您添加的可借阅通知图书《%s》已归还，请及时查看。", item.getBookName()));
+                    MessageManager.getInstance().add(sqlSession, message);
+                }
+                // 将发送模板消息的操作放入一个新的线程中执行
+                new Thread(() -> {
+                    try {
+                        //发送消息
+                        MessageManager.getInstance().sendCanBorrowedMessage(lstViewMemberBookSubscription);
+                    } catch (Exception e) {
+                        // 处理发送消息失败的情况
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+            MyBatisManager.getInstance().commitSession(sqlSession);
+            return newBookInOrderInfo;
+        } catch (Exception ex) {
+            MyBatisManager.getInstance().rollbackSession(sqlSession);
+            throw ex;
+        } finally {
+            MyBatisManager.getInstance().closeSession(sqlSession);
+        }
+    }
+}

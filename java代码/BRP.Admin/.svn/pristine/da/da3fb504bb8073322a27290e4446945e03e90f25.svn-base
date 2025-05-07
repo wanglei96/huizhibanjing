@@ -1,0 +1,120 @@
+package BRP.service;
+
+import BRP.data.BookOutOrder;
+import BRP.data.BookOutOrderInfo;
+import BRP.data.Member;
+import BRP.data.ViewBookOutOrder;
+import BRP.model.MemberManager;
+import BRP.model.ViewBookOutOrderManager;
+import strosoft.app.model.ListInfo;
+import strosoft.app.service.GetListServiceHandler;
+import strosoft.app.service.GetListServiceHandlerContext;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+import strosoft.app.util.StringHelper;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * 获取找书出库列表，按照订单分组
+ */
+public class GetBookOutOrderInfoListServiceHandler extends GetListServiceHandler {
+    @Override
+    protected void processListInfo(ListInfo listInfo) throws Exception {
+        super.processListInfo(listInfo);
+        ArrayList<LinkedHashMap<String, Object>> dataList = (ArrayList<LinkedHashMap<String, Object>>) listInfo.getDataList();
+
+        GetListServiceHandlerContext context = this.getContext();
+        String orderBy =context.getOrderBy();
+
+        StringBuilder allIds = new StringBuilder();
+        boolean isFirst = true;
+
+        for (LinkedHashMap<String, Object> item : dataList) {
+            String ids = (String) item.get("ids");
+            if (ids != null && !ids.isEmpty()) {
+                for (String id : ids.split(",")) {
+                    String trimmedId = id.trim();
+                    if (isFirst) {
+                        allIds.append(trimmedId);
+                        isFirst = false;
+                    } else {
+                        allIds.append(",").append(trimmedId);
+                    }
+                }
+            }
+        }
+
+        String idsAsString = allIds.toString();
+        List<ViewBookOutOrder> lstViewBookOutOrder = new ArrayList<>();
+        if(!StringHelper.isNullOrEmpty(idsAsString)){
+            String condition = "id in (" + idsAsString + ")";
+            lstViewBookOutOrder = ViewBookOutOrderManager.getInstance().getList(condition,orderBy);
+
+        }
+
+
+
+        //List<ViewBookOutOrder> lstViewBookOutOrder = JsonHelper.toJavaList(ViewBookOutOrder.class, dataList);
+
+
+        Set<Integer> setBookOrderId = new LinkedHashSet<>(lstViewBookOutOrder.stream()
+                .map(ViewBookOutOrder::getBookOrderId)
+                .collect(Collectors.toList()));
+        List<BookOutOrderInfo> lstBookOrderItemInfoList = new ArrayList<BookOutOrderInfo>();
+
+        //Map<String, Integer> areaNameCount = new HashMap<>();
+        Map<String, Integer> lineNameCount = new HashMap<>();
+
+        for (Integer bookOrderIdItem : setBookOrderId) {
+            List<ViewBookOutOrder> lstViewBookOutOrderItem =
+                    lstViewBookOutOrder.stream().filter(viewBookOutOrder -> viewBookOutOrder.getBookOrderId().equals(bookOrderIdItem)).collect(Collectors.toList());
+            BookOutOrderInfo bookOutOrderInfo = new BookOutOrderInfo();
+            String deliverAreaName = lstViewBookOutOrderItem.get(0).getDeliverAreaName();
+            Integer deliverAreaNumber =  lstViewBookOutOrderItem.get(0).getDeliverAreaNumber();
+            //int currentCount = areaNameCount.getOrDefault(deliverAreaName, 0) + 1;
+            //areaNameCount.put(deliverAreaName, currentCount);
+            if(deliverAreaNumber!=null){
+                bookOutOrderInfo.setDeliverAreaName(deliverAreaName + deliverAreaNumber + "号");
+            }else{
+                bookOutOrderInfo.setDeliverAreaName(deliverAreaName);
+            }
+
+
+            String deliverLineName = lstViewBookOutOrderItem.get(0).getDeliverLineName();
+            int lineCount = lineNameCount.getOrDefault(deliverLineName, 0) + 1;
+            lineNameCount.put(deliverLineName, lineCount);
+            bookOutOrderInfo.setDeliverLineName(deliverLineName + lineCount + "号");
+
+
+            Long yFountNum =
+                    lstViewBookOutOrder.stream().filter(viewBookOutOrder ->
+                                    viewBookOutOrder.getBookOrderId().equals(bookOrderIdItem) &&
+                                            viewBookOutOrder.getBookOutOrderStatusCode().equals("Found")
+                            )
+                            .count();
+
+            bookOutOrderInfo.setBookOrderId(bookOrderIdItem);
+            bookOutOrderInfo.setMemberId(lstViewBookOutOrderItem.get(0).getMemberId());
+            bookOutOrderInfo.setMemberNo(lstViewBookOutOrderItem.get(0).getMemberNo());
+            bookOutOrderInfo.setMemberName(lstViewBookOutOrderItem.get(0).getMemberName());
+            bookOutOrderInfo.setAddress(lstViewBookOutOrderItem.get(0).getAddress());
+            bookOutOrderInfo.setDeliverAreaId(lstViewBookOutOrderItem.get(0).getDeliverAreaId());
+            bookOutOrderInfo.setMemberMobilePhone(lstViewBookOutOrderItem.get(0).getMemberMobilePhone());
+            bookOutOrderInfo.setPickTotal(lstViewBookOutOrderItem.size());
+            bookOutOrderInfo.setyPicKNum(yFountNum.intValue());
+            bookOutOrderInfo.setnPicKNum(lstViewBookOutOrderItem.size() - yFountNum.intValue());
+            bookOutOrderInfo.setChildren(lstViewBookOutOrderItem);
+            bookOutOrderInfo.setErrorRemark(lstViewBookOutOrderItem.get(0).getErrorRemark());
+            if (lstViewBookOutOrderItem.get(0).getDeliverTime() != null) {
+                String deliverTimeText = DateHelper.timestampToString(lstViewBookOutOrderItem.get(0).getDeliverTime(), "yyyy-MM-dd");
+                bookOutOrderInfo.setDeliverTimeText(deliverTimeText);
+            } else {
+                bookOutOrderInfo.setDeliverTimeText("");
+            }
+            lstBookOrderItemInfoList.add(bookOutOrderInfo);
+        }
+        listInfo.setDataList(lstBookOrderItemInfoList);
+    }
+}

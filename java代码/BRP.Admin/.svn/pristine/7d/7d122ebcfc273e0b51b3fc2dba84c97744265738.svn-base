@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>用户管理</title>
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css?v=2"></link>
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css"></link>
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js?v=2"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/management.js"></script>
+
+<link rel="stylesheet" href="../../css/common.css" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script>
+	managementContext.tableName = "sys_function";
+	managementContext.dataName = "SysFunction";
+	managementContext.operationColumnWidth = 150;
+	managementContext.primaryKeyName = "code";
+	var menuList;
+	managementContext.customTableColumns = [ {
+		field : 'code',
+		title : '操作编号',
+		fixed : true,
+		width : 150,
+		align : 'center'
+	}, {
+		field : 'name',
+		title : '操作名称',
+		fixed : true,
+		width : 150,
+		align : 'center'
+	}, {
+		field : 'display_order',
+		title : '显示顺序',
+		fixed : true,
+		width : 80,
+		align : 'center'
+	} ];
+	/*
+	绑定控件
+	 */
+	function bindControls() {
+		//绑定菜单树
+		bindIdNameTree("ulSysMenu", "sys_menu", "目录结构", false,
+				function(node) {
+					bindData();
+				});
+		//绑定菜单树
+		bindComboTree("ctResource", "sys_menu", 0, "id", "name", "parent_id", null);
+	}
+	/*
+	 * 弹出新增对话框
+	 */
+	function openAddDialog() {
+		// 设置新增模式
+		setAddMode();
+		//设置新增的所属菜单
+		var node = $("#ulSysMenu").tree("getSelected");
+		$("#ctResource").combotree("setValue",node==null?0:node.id);
+		openDialog("divDetailDialog", '新增' + managementContext.title);
+		event.stopPropagation();
+	}
+	/*
+	 * 绑定树型表
+	 */
+	function bindComboTree(controlId, tableName, parentValue, valueFieldName,
+			textFieldName, parentFieldName, multiple, condition) {
+		var data = new Object();
+		data.tableName = tableName;
+		data.orderBy = "display_order";
+		data.condition = condition;
+		call("GetTable", data, function(result) {
+			//设置菜单列表
+			menuList =  result.data;
+			var comboTreeData = getComboTreeData(result.data, parentValue,
+					valueFieldName, textFieldName, parentFieldName);
+			var firstItem = new Object();
+			firstItem.id = parentValue;
+			firstItem.text = "空";
+			comboTreeData.insert(0, firstItem);
+			// alert(JSON.stringify(comboTreeData));
+			$("#" + controlId).combotree({
+				multiple : multiple,
+				data : comboTreeData
+			});
+			// 选中默认值
+			for ( var i = 0; i < result.data.length; i++) {
+				var dataItem = result.data[i];
+				if (dataItem.is_default) {
+					$("#" + controlId).combotree("setValue",
+							dataItem[valueFieldName]);
+				}
+			}
+		});
+	}
+	/*
+	 * 取得所属菜单值
+	 */
+	function getSelectedSysOrganizationVale() {
+		var node = $("#ulSysMenu").tree("getSelected");
+		if (node == null) {
+			var parentId = 0;
+			return parentId;
+		}
+		return node.attributes.value;
+	}
+	/*
+	 * 绑定数据
+	 */
+	function bindData() {
+		var requestParameters = getParameters();
+		var sysOrganizationValue = getSelectedSysOrganizationVale();
+		requestParameters.condition = "resource = '"+sysOrganizationValue+"'";
+		requestParameters.tableName = "sys_function";
+		call("GetList", requestParameters, function(
+				result) {
+			outputData(result.data.dataList);
+			// 设置分页
+			if (managementContext.allowPaging) {
+				setPager(result.data);
+			}
+		});
+	}
+	/*
+	 * 输出实体信息
+	 */
+	function outputEntity(dataItem) {
+		for(var i=0;i<menuList.length;i++){
+			if(menuList[i].value == dataItem.resource){
+				dataItem.resource = menuList[i].id;
+				dataItem.code = dataItem.code.replace(menuList[i].value,"");
+			}
+		}
+		outputEntityBase(dataItem);
+	}
+	/*
+	 * 取得实体
+	 */
+	function getEntity() {
+		var newEntity = getEntityBase();
+		if(newEntity.resource == 0){
+			alert("所属目录不能为空");
+			return;
+		}
+		for(var i=0;i<menuList.length;i++){
+			if(menuList[i].id == newEntity.resource){
+				newEntity.resource = menuList[i].value;
+				newEntity.code =  menuList[i].value+newEntity.code;
+			}
+		}
+		return newEntity;
+	}
+</script>
+</head>
+<body>
+	<div class="easyui-layout" style="width:100%;" fit="true">
+		<div region="west" split="true" title="" style="width:150px;"
+			id="divMenuPanel">
+			<p style="padding:5px;margin:0;"></p>
+			<ul id="ulSysMenu" class="easyui-tree">
+			</ul>
+		</div>
+		<div id="content" region="center" style="padding:1px;">
+			<div class="toolbar_panel" id="divToolbar">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add"
+					plain="true" onclick="openAddDialog()" id="btnAdd">新增</a> <a href="#"
+					class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+					onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a id="lnkRefreshPage" href="#"
+					class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+					onclick="refreshPage()">刷新</a>
+			</div>
+			<div id="divSearchPanel" class="search_panel easyui-panel">
+			</div>
+			<table id="tableGrid">
+			</table>
+			<div id="divDetailDialog" class="easyui-dialog" style="width:400px"
+				closed="true" buttons="#dlg-buttons">
+				<input type="hidden" id="hid" value="" />
+				<form id="formDetail" method="post" novalidate
+					style="margin:0;padding:20px 50px">
+
+					<div style="margin-bottom:10px">
+						<input id="txtCode" name="txtCode"
+							class="easyui-textbox" label="操作编号:" style="width:100%" />
+					</div>
+					<div style="margin-bottom:10px">
+						<input id="txtName" name="txtName"
+							class="easyui-textbox" label="操作名称:" style="width:100%" />
+					</div>
+					<div style="margin-bottom:10px">
+						<input id="ctResource" name="ctResource"
+							class="easyui-combotree" label="所属栏目:" style="width:100%" />
+					</div>
+					<div style="margin-bottom:10px">
+						<input id="txtDisplayOrder" name="txtDisplayOrder"
+							class="easyui-textbox" label="显示顺序:" style="width:100%" />
+					</div>
+					<div style="margin-bottom:10px">
+						<input id="txtDescription" name="txtDescription"
+							class="easyui-textbox" label="描述:" multiline="true"
+							labelPosition="left" style="width:100%;height:120px;" />
+					</div>
+				</form>
+				<div id="dlg-buttons">
+					<a href="javascript:void(0)" class="easyui-linkbutton c6"
+						iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+					<a href="javascript:void(0)" class="easyui-linkbutton"
+						iconCls="icon-cancel" onclick="javascript:closeDetailDialog();"
+						style="width:90px">取消</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

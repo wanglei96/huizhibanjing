@@ -1,0 +1,740 @@
+<template>
+	<view>
+		<view class="container">
+			<view v-if="isLogin">
+				<view class="line80">
+					<view class="line80" style="float:left; ">
+						<button class="avatar-wrapper" open-type="chooseAvatar" @chooseavatar="onChooseAvatar">
+							<image :src="memberInfo.headImageFilePath | toImgPath"
+								style="width: 80rpx; height: 80rpx; border-radius: 40rpx;"></image>
+						</button>
+					</view>
+					<view class="line80 f28 c_white" style="float:left; margin-left: 10rpx; font-weight: bold; display: flex;align-items: center;">
+						昵称：{{memberInfo.nickname | toNull}}<image src="../../static/image/common/updatenickle.png"   style="width: 50rpx; height: 50rpx; margin-left: 20rpx;" @click="clickUpdateNickle()"></image>
+					</view>
+						<!-- <input class="nickname" type="nickname" :value="memberInfo.name" @blur="bindblur" placeholder="请输入昵称"/> -->
+				</view>
+				<view class="h40" v-if="type=='member'"></view>
+				<view class="contentPanel" v-if="type=='member'"> <!-- 会员信息 -->
+					<view class="h10"></view>
+					<view class="line220 userinfobb" style="width: 100%;">
+						<view class="left40" style="float: left; "> 
+							<view class="line45 f28"><text class="f28 userinfotext">会员:</text><text class="f28 userinfovaluetext">{{memberInfo.name | toNull}}</text></view>
+							<view class="line65 f28"><text class="f28 userinfotext">卡号:</text><text class="f28 userinfovaluetext">{{memberInfo.memberCardCardNo | tomemberCardCardNo}}</text></view>
+							<view class="line65 f28"><text class="f28 userinfotext">会员积分:</text><text class="f28 userinfovaluetext">{{memberInfo.score | toScore}}</text></view>
+						</view>
+						<view class="left60" style="float: left; ">
+							<view class="line45 f28 b center">会员权益</view>
+							<view class="line65">
+								<view class="line50 " :class="isDelivery ?'userinfobtn':'noGoodNightStory'" @click="clickToCategory()">配送到家</view> 
+								<view class="line50 " :class="isBorrowBook ?'userinfobtn':'noGoodNightStory'" @click="clickToCategory()">图书借阅</view>
+							</view>
+							<view class="line65">
+								<view class="line50 " :class="isClubActivity ?'userinfobtn':'noGoodNightStory'" @click="clickToActivity()">俱乐部会员</view> 
+								<view class="line50 " :class="isNightStory ?'userinfobtn':'noGoodNightStory'" @click="clickToGoodNightStory()" >晚安故事</view> 
+							</view>
+						</view>
+						<view class="h10 clear"></view>
+						<view class="line30 f28"><text class="f28 userinfotext">服务商：</text><text
+								class="f28 userinfovaluetext">{{memberInfo.companyName}}</text></view>
+						
+					</view>
+
+					<view class="line60">
+						<view class="left50 starTime f24">开卡时间：{{memberCardEffectiveDateText}}</view>
+						<view class="left50 endTime  f24">到期时间：{{memberCardExpireDateText}}</view>
+					</view>
+					<view class="line40">
+						<view class="left50 f24"><text class="f24 userinfotext">还能继续借阅：</text><text
+								class="f24 userinfovaluetext">{{days}}天</text></view>
+						<view class="left50 f24"><text class="f24 userinfotext">一次最多可借阅：</text><text
+								class="f24 userinfovaluetext">{{maxBorrowQuantity}}本</text></view>
+					</view>
+				</view>
+			</view>
+			<view v-else>
+				<view class="contentPanel center" @click="authorizedLogin()">
+					暂未登录，请先授权登录
+				</view>
+			</view>
+
+			<view class="h40" v-if="type=='member'"></view>
+			<view class="contentPanel" v-if="type=='member'"> <!-- 借阅信息 -->
+				<view class="line140">
+					<view class="left49 line80 onloanOrsavedPanel">
+						<view style="float: left;">
+							<image :src=" imageRootUrl + '/image/member/onloan.png'"
+								style=" width: 80rpx; height: 80rpx;"></image>
+						</view>
+						<view class="onloanTextPanel">
+							<view class="line40"><text class="f36 onloantext">{{totalCount}}</text><text
+									class="f24">本</text></view>
+							<view class="line40 f24">已借阅</view>
+						</view>
+					</view>
+					<view class="left1 line80 onloanOrsavedPanel bleft"></view>
+					<view class="left49 line80 onloanOrsavedPanel">
+						<view class="savedTextPanel" style="float: right;">
+							<view class="line40"><text class="f36 savedtext">{{totalAmount | toAmount}}</text><text
+									class="f24">元</text></view>
+							<view class="line40 f24">已节省买书费用</view>
+						</view>
+						<view style="float: right;">
+							<image :src=" imageRootUrl + '/image/member/saved.png'"
+								style=" width: 80rpx; height: 80rpx;"></image>
+						</view>
+						
+					</view>
+				</view>
+			</view>
+			<view class="h40" v-if="type!='member'"></view>
+			<view class="contentPanel center" v-if="type!='member'" style="display: inline-block; width: 95%;"
+				@click="clickToJionMember()">
+				<image :src=" imageRootUrl + '/image/member/vip.png'" style="width: 240rpx; height: 228rpx;"></image>
+				<view class="joinMember" style="">加入会员</view>
+			</view>
+			<view class="h40"></view>
+			<view class="contentPanel "> <!-- 按钮 -->
+				<view class="left33 h180" v-if="type=='member'" @click="clickToScoreRecord()">
+					<view class="line_130 center">
+						<image :src=" imageRootUrl + '/image/member/jfmx.png'" class="size100"
+							style=" margin-top: 35rpx;">
+						</image>
+					</view>
+					<view class="line_50 center f28">积分明细</view>
+				</view>
+				<view class="left33 h180"  @click="clickToActivity()">
+					<view class="line_130 center">
+						<image :src=" imageRootUrl + '/image/member/jlb.png'" class="size100"
+							style=" margin-top: 35rpx;">
+						</image>
+					</view>
+					<view class="line_50 center f28">俱乐部活动</view>
+				</view>
+				<view class="left33 h180"  @click="clickToGoodNightStory()" v-if="IsShowGoodNightStory">
+					<view class="line_130 center">
+						<image :src=" imageRootUrl + '/image/member/wags.png'" class="size100"
+							style=" margin-top: 35rpx;">
+						</image>
+					</view>
+					<view class="line_50 center f28">晚安故事</view>
+				</view>
+				<view class="left33 h180" @click="clickToBookMark()">
+					<view class="line_130 center">
+						<image :src=" imageRootUrl + '/image/member/sc.png'" class="size100"
+							style=" margin-top: 35rpx;">
+						</image>
+					</view>
+					<view class="line_50 center f28">我的收藏</view>
+				</view>
+				<view class="left33 h180" v-if="type=='member'" @click="clickToLoanableNotice()">
+					<view class="line_130 center">
+						<image :src=" imageRootUrl + '/image/member/notice.png'" class="size100"
+							style=" margin-top: 35rpx;">
+						</image>
+					</view>
+					<view class="line_50 center f28">可借通知</view>
+				</view>
+				<view class="left33 h180" v-if="type=='member'" @click="clickToLoanRecord()">
+					<view class="line_130 center">
+						<image :src=" imageRootUrl + '/image/member/jy.png'" class="size100"
+							style=" margin-top: 35rpx;">
+						</image>
+					</view>
+					<view class="line_50 center f28">借阅记录</view>
+				</view>
+				<view class="left33 h180" v-if="type=='member'" @click="clickToSuspendCard()">
+					<view class="line_130 center">
+						<image :src=" imageRootUrl + '/image/member/tk.png'" class="size100"
+							style=" margin-top: 35rpx;">
+						</image>
+					</view>
+					<view class="line_50 center f28">办理停卡</view>
+				</view>
+				<view class="left33 h180" v-if="type=='member'" @click="clickToMemberCardRecord()">
+					<view class="line_130 center">
+						<image :src=" imageRootUrl + '/image/member/bg.png'" class="size100"
+							style=" margin-top: 35rpx;">
+						</image>
+					</view>
+					<view class="line_50 center f28">会员卡变更记录</view>
+				</view>
+				<view class="left33 h180"  @click="clickToRetailOrder()">
+					<view class="line_130 center">
+						<image :src=" imageRootUrl + '/image/member/retailOrder.png'" class="size100"
+							style=" margin-top: 35rpx;">
+						</image>
+					</view>
+					<view class="line_50 center f28">我的订单</view>
+				</view>
+				<view class="left33 h180"  @click="clickToQuit()" v-if="isLogin == true">
+					<view class="line_130 center">
+						<image :src=" imageRootUrl + '/image/member/quit.png'" class="size100"
+							style=" margin-top: 35rpx;">
+						</image>
+					</view>
+					<view class="line_50 center f28">退出</view>
+				</view>
+				<!-- <view class="joinMember" style="" @click="clickToserviceQRCode();">加入会员</view> -->
+				<view class="clear h30"></view>
+			</view>
+			<view class="h150"></view>
+			
+		</view>
+		<uni-popup ref="popup" type="center" >
+		   <uni-popup-dialog ref="inputClose" title="修改昵称" @confirm="dialogInputConfirm">
+		        <view class="popupSty">
+		           <input class="nickname" type="nickname" v-model="nickname"  placeholder="请输入昵称" style="border: 1px solid #ddd; height: 80rpx; border-radius: 20rpx;"/>
+		        </view>
+		    </uni-popup-dialog>
+		</uni-popup>
+	</view>
+</template>
+
+<script>
+	import common from "@/js/common.js";
+	import config from "@/js/config.js";
+	import util from "@/js/util.js";
+	
+	import popup from "@/components/uni-popup/uni-popup.vue";
+	import popupdialog from "@/components/uni-popup-dialog/uni-popup-dialog.vue";
+	import transition from "@/components/uni-transition/uni-transition.vue"; 
+	let statusBarHeight = uni.getSystemInfoSync().statusBarHeight; // 状态栏 高度
+	let that = null;
+	export default {
+		data() {
+			return {
+				url: "http://admin.8630.net/WYB/UploadFile/headerTopbg.png",
+				imageRootUrl: config.imageRootUrl, //图片地址
+				adminRootUrl: config.adminRootUrl + "/", //后端图片地址
+				statusBarHeight, // 状态栏 高度
+				head_is_fixed: 0,
+				type: 'member', //类型为会员  member=会员    ordinary=普通用户
+				memberInfo: {}, //用户实体
+				isGoodNightStory: false, //是否显示晚安故事权益
+				memberCardEffectiveDateText: '', //开卡时间
+				memberCardExpireDateText: '', //到期时间
+				days: 0, //还能继续借多少天
+				totalCount: 0, //已借阅多少本
+				totalAmount: 0, //已节省买书费用
+				isLogin: false,
+				maxBorrowQuantity:0,
+				nickle:'',
+				isBorrowBook:false,//是否点亮图书借阅
+				isClubActivity:false,//是否点亮俱乐部活动
+				isDelivery:false,//是否点亮配送到家
+				isNightStory:false,//是否点亮晚安故事
+				nickname:'',//文本框里面的昵称
+				IsShowGoodNightStory:false,//是否显示晚安故事
+			};
+		},
+		components:{
+			popup,
+			popupdialog,
+			transition
+		},
+		onReady() {},
+		onShow() {
+			if (common.isLogin() == false) {
+				this.isLogin = false;
+			} else {
+				this.isLogin = true;
+				that.bindData(); //
+				that.GetViewClubActivity(); //获取已借阅本数和以节省买书费用
+				that.GetNightStoryOrderCount(); //判断是否在晚安故事订阅过
+			}
+			// that.bindData(); //
+			that.bindIsShowGoodNightStory(); //绑定是否显示晚安故事
+		},
+		onPageScroll(e) {
+			that.head_is_fixed = e.scrollTop > 0 ? 1 : 0
+		},
+		onLoad() {
+			that = this;
+		},
+		methods: {
+			bindIsShowGoodNightStory(){
+				var data = {};
+				data.code ="IsShowGoodNightStory"
+				common.call("GetSysSetting", data, function(result) {
+					console.log(result.data)
+					if(result.data.value == "true"){
+						that.IsShowGoodNightStory = true
+					}else{
+						that.IsShowGoodNightStory = false
+					}
+					console.log("IsShowGoodNightStory："+that.IsShowGoodNightStory )
+				});
+			},
+			bindblur(e){
+				that.nickname = e.detail.value
+				console.log(that.nickname)
+			},
+			clickUpdateNickle(){ //修改昵称
+				this.$refs.popup.open();
+			},
+			dialogInputConfirm(){ //修改昵称提交
+				if(that.nickname ==null || that.nickname ==""){
+					uni.showToast({
+						title: '请输入昵称',
+						icon: "none",
+						duration:1500
+					});
+					return
+				}
+				let data = {
+					id:common.getMemberId(),
+					nickname:that.nickname,//姓名
+				}
+				console.log(data)
+				common.call("UpdateMember", data, function(result) {
+					uni.showToast({
+						title: '修改成功！',
+						icon: "none",
+						duration:1500
+					});
+					that.bindData();
+				});
+			},
+			bindData() {
+				console.log(common.getMemberId())
+				var data = {};
+				data.id = common.getMemberId();
+				common.call("GetViewMember", data, function(result) {
+					console.log(result)
+					that.memberInfo = result.data;
+					that.nickname = that.memberInfo.nickname
+					if(that.memberInfo.nickname ==null || that.memberInfo.nickname ==""){
+						that.memberInfo.nickname = "暂无昵称"
+					}
+					if(that.memberInfo.memberCardMaxBorrowQuantity == null || that.memberInfo.memberCardMaxBorrowQuantity==""){
+						that.maxBorrowQuantity = 0 + that.memberInfo.extendQuantity
+					}else{
+						that.maxBorrowQuantity = that.memberInfo.memberCardMaxBorrowQuantity + that.memberInfo.extendQuantity
+					}
+					if (result.data.memberCardEffectiveDateText == "" || result.data.memberCardEffectiveDateText == null) {  //开卡时间
+						that.memberCardEffectiveDateText = ""
+					} else {
+						that.memberCardEffectiveDateText = result.data.memberCardEffectiveDateText.substring(0,
+							10) //开卡时间
+						var memberCardEffectiveDate = new Date(that.memberCardEffectiveDateText);
+						var year = memberCardEffectiveDate.getFullYear()
+						var month = memberCardEffectiveDate.getMonth() + 1
+						var day = memberCardEffectiveDate.getDate();
+
+						that.memberCardEffectiveDateText = year + "年" + month + "月" + day + "日"
+						console.log(that.memberCardEffectiveDateText)
+					}
+
+					if (result.data.memberCardExpireDateText == "" || result.data.memberCardExpireDateText == null) { //到期时间
+						that.memberCardExpireDateText = ""
+					} else {
+						that.memberCardExpireDateText = result.data.memberCardExpireDateText.substring(0,
+							10) //到期时间
+						var memberCardExpireDate = new Date(that.memberCardExpireDateText);
+						var year1 = memberCardExpireDate.getFullYear()
+						var month1 = memberCardExpireDate.getMonth() + 1
+						var day1 = memberCardExpireDate.getDate();
+						that.memberCardExpireDateText = year1 + "年" + month1 + "月" + day1 + "日"
+						console.log(that.memberCardExpireDateText)
+					}
+					if (that.memberCardEffectiveDateText != "" && that.memberCardExpireDateText != "") {
+						let diff = Math.abs(memberCardEffectiveDate - memberCardExpireDate);
+						let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+						that.days = days
+						console.log(days)
+					}
+					if (that.memberInfo.memberCardCardNo != null && that.memberInfo.memberCardCardNo != "") { //type:'member',//类型为会员  member=会员    ordinary=普通用户
+						that.type = "member"
+					} else {
+						that.type = "ordinary"
+					}
+				});
+				var datas = {};
+				datas.memberId = common.getMemberId();
+				common.call("GetMemberPermission", datas, function(result) {
+					console.log(result.data)
+					that.isBorrowBook =result.data.isBorrowBook//是否点亮图书借阅
+					that.isClubActivity=result.data.isClubActivity//是否点亮俱乐部活动
+					that.isDelivery=result.data.isDelivery//是否点亮配送到家
+					that.isNightStory=result.data.isNightStory//是否点亮晚安故事
+				});
+			},
+			GetNightStoryOrderCount() { ////判断是否在晚安故事订阅过
+				var data = {};
+				data.memberId = common.getMemberId()
+				common.call("GetNightStoryOrderCount", data, function(result) {
+					if (result.data.dataList[0].count > 0) {
+						that.isGoodNightStory = true
+					} else {
+						that.isGoodNightStory = false
+					}
+				});
+			},
+			GetViewClubActivity() { //获取已借阅本数和以节省买书费用
+				var data = {};
+				data.memberId = common.getMemberId();
+				common.call("GetBorrowReport", data, function(result) {
+					console.log(result)
+					that.totalCount = result.data.dataList[0].totalCount
+					that.totalAmount = result.data.dataList[0].totalAmount
+				});
+			},
+			onChooseAvatar(e) {
+				// this.uploadFilePromise(e.detail.avatarUrl)
+				// console.log(e)
+				uni.uploadFile({
+					url: config.serviceUrl + "?serviceName=UploadFile",
+					filePath: e.detail.avatarUrl,
+					name: 'file',
+					success: function(res) {
+						var result = JSON.parse(res.data);
+						console.log(result.data);
+						console.log(result.data.path);
+						that.memberInfo.headImageFilePath = result.data.path
+						var result = JSON.parse(res.data);
+						let data = {
+							id: common.getMemberId(), 
+							headImageFileId: result.data.id,
+						};
+						common.call("UpdateMember", data, result => {
+							uni.showModal({
+								title: '提示',
+								content: "上传成功！",
+								showCancel: false,
+							});
+						});
+					}
+				})
+			},
+			clickToCategory(){//跳转分类
+				setTimeout(() => {
+					uni.switchTab({
+						url: "/pages/category/index" 
+					})
+				}, 100);
+			},
+			clickToserviceQRCode() { //跳转加入会员
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'serviceQRCode'
+					});
+				}, 200);
+			},
+			clickToJionMember() { //跳转加入会员
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'joinMember'
+					});
+				}, 200);
+			},
+			clickToScoreRecord() { //跳转积分记录
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'scoreRecord'
+					});
+				}, 200);
+			},
+			clickToGoodNightStory() { //跳转晚安故事
+				if(!that.IsShowGoodNightStory){
+					return
+				}
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'goodNightStory'
+					});
+				}, 200);
+
+			},
+			clickToActivity() { //跳转俱乐部活动
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'activity'
+					});
+				}, 200);
+
+			},
+			clickToBookMark() { //跳转我的收藏
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'bookMark'
+					});
+				}, 200);
+
+			},
+			clickToLoanableNotice() { //跳转可借通知
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'loanableNotice'
+					});
+				}, 200);
+
+			},
+			clickToLoanRecord() { //跳转到借阅记录
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'loanRecord'
+					});
+				}, 200);
+
+			},
+			clickToSuspendCard() { //跳转到办理停卡
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'suspendCard'
+					});
+				}, 200);
+
+			},
+			clickToMemberCardRecord() { //跳转到会员卡变更记录
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'memberCardRecord'
+					});
+				}, 200);
+			},
+			clickToRetailOrder(){ //跳转到我的订单
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				setTimeout(() => {
+					uni.navigateTo({
+						url: 'retailOrder'
+					});
+				}, 200);
+			},
+			clickToQuit(){ //退出
+				var isValid = common.checkLogin();
+				if (!isValid) {
+					return;
+				}
+				that.totalCount= 0 //已借阅多少本
+				that.totalAmount= 0 //已节省买书费用
+				uni.removeStorageSync("memberId");
+				uni.removeStorageSync("companyId");
+				uni.removeStorageSync("wxOpenId");
+				uni.removeStorageSync("mobilePhone");
+				if (common.isLogin() == false) {
+					this.isLogin = false;
+				} else {
+					this.isLogin = true;
+					that.bindData(); //
+					that.GetViewClubActivity(); //获取已借阅本数和以节省买书费用
+					that.GetNightStoryOrderCount(); //判断是否在晚安故事订阅过
+				}
+			},
+			authorizedLogin() { //授权登录
+
+				uni.navigateTo({
+					url: '/pages/common/login'
+				})
+			},
+		},
+		filters: {
+			toImgPath: function(value) {
+				if (value == null || value == "") {
+					return "/static/image/common/uploadImage.png";
+				} else {
+					return that.adminRootUrl + value;
+				}
+			},
+			toScore: function(value) {
+				if (value == null || value == "") {
+					return 0;
+				} else {
+					return value;
+				}
+			},
+			toAmount: function(value) {
+				if (value == null || value == "") {
+					return 0;
+				} else {
+					return value;
+				}
+			},
+			toNull(val){
+				if(val ==null){
+					return ""
+				}else{
+					return val
+				}
+			},
+			tomemberCardCardNo(val){
+				
+				if(val ==null){
+					return ""
+				}else{
+					if(val.length >= 12){
+						return val.substring(0,12) +".."
+					}else{
+						return val
+					}
+				}
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	@import url("/css/common.css");
+
+	page {
+		background: #5EAC59;
+	}
+
+	.container {}
+
+	.userinfobb {
+		border-bottom: 1rpx solid #F3F3F3;
+	}
+
+	.userinfotext {
+		color: #999999;
+	}
+
+	.userinfovaluetext {
+		color: #333333;
+	}
+
+	.userinfobtn {
+		width: 180rpx;
+		height: 50rpx;
+		background: #FACC3F;
+		border-radius: 12rpx;
+		opacity: 1;
+		font-size: 23rpx;
+		text-align: center;
+		line-height: 50rpx;
+		margin-top: 7rpx;
+		float: right;
+		margin-left: 10rpx;
+		font-weight: 600;
+	}
+
+	.noGoodNightStory {
+		width: 180rpx;
+		height: 50rpx;
+		background: #c1c1c1;
+		color: white;
+		border-radius: 12rpx;
+		opacity: 1;
+		font-size: 23rpx;
+		text-align: center;
+		line-height: 50rpx;
+		margin-top: 7rpx;
+		float: right;
+		margin-left: 10rpx;
+		font-weight: 600;
+	}
+
+	.starTime {
+		color: #53D776;
+	}
+
+	.endTime {
+		color: #FE613D;
+	}
+
+	.onloanOrsavedPanel {
+		margin-top: 30rpx;
+	}
+
+	.bleft {
+		border-left: 1px solid #F3F3F3;
+	}
+
+	.onloanTextPanel {
+		float: left;
+		margin-left: 10rpx;
+	}
+
+	.savedTextPanel {
+		float: left;
+		margin-left: 10rpx;
+	}
+
+	.onloantext {
+		color: #FE613D;
+		font-weight: bold;
+	}
+
+	.savedtext {
+		color: #53D776;
+		font-weight: bold;
+	}
+
+	.joinMember {
+		width: 200rpx;
+		height: 70rpx;
+		line-height: 70rpx;
+		background-color: #FACC3F;
+		color: #000000;
+		border-radius: 50rpx;
+		text-align: center;
+		font-weight: 600;
+		font-size: 30rpx;
+		margin: 0 auto;
+	}
+
+	.avatar-wrapper {
+		border: none;
+		background: none;
+		/* position: inherit; */
+		padding: 0px;
+	}
+
+	uni-button:after {
+		border: none;
+	}
+
+	button::after {
+		border: none;
+	}
+	.popupSty {
+	    width: 100%; 
+	    overflow: hidden;
+	    >view {
+	        font-size: 14px;
+	        height: 50px;
+	        border-top: 1px solid rgba(0, 0, 0, 0.1);
+	        display: flex;;
+	        align-items: center;;
+	        justify-content: center;
+	        padding: 0 10px;
+	    }
+	
+	}
+</style>

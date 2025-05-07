@@ -1,0 +1,107 @@
+@charset "utf-8";
+.textbox-label{
+	width:150px;
+}
+.easyui-radiobox{
+	magin-left:20px;
+}
+.cmsContentProperty,.cmsContentStatus{
+	margin-left:20px;
+}
+.inline_block_div{
+	width: 180px;
+    display: inline-block;
+}
+.input-file{
+	width:68px;
+}
+.filePath{
+	width:350px;
+}
+.divPreview{
+	display:none;
+	width:300px;
+	height:300px;
+	position: absolute;
+	z-index:10000;
+	top:100px;
+	left:700px;
+}
+#picPreview{
+	width:250px;
+	height:auto;
+}
+.preview{
+	width:250px;
+	height:auto;
+}
+.imgThumb{
+	max-height:80px;
+	max-width:200px;
+}
+.photo{
+	max-width: 50px;
+	max-height: 50px;
+	border: 1px;
+	margin-top: 8px;
+	margin-left: 19px;
+}
+.CodeMirror-line-numbers {
+	width: 22px;
+	color: #aaa;
+	background-color: #eee;
+	text-align: right;
+	padding-right: .3em;
+	font-size: 10pt;
+	font-family: monospace;
+	padding-top: .4em;
+	line-height: 16px;
+}
+.divUlData{
+	float: left;
+}
+.inputFilePath{
+	width: 330px;
+    position: relative;
+    left: 5px;
+    top: 10px;
+    font-size: 12px;
+    position: relative;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    vertical-align: middle;
+    display: inline-block;
+    overflow: hidden;
+    -moz-border-radius: 4px 4px 4px 4px;
+    -webkit-border-radius: 4px 4px 4px 4px;
+    border-radius: 4px 4px 4px 4px;
+    height: 22px;
+    line-height: 22px;
+}
+.divCmsLanguageInfo{
+	position:fixed;
+	top:100px;
+	right: 30px;
+	height: 30px;
+	width: 50px;
+}
+.clear{
+	clear: both;
+}
+.copy_item{
+	height: 20px;
+	width: 20px;
+	line-height :20px;
+	display:inline-block;
+	cursor: pointer;
+}
+.copyIcon{
+	float: right;
+}
+.copyMessage{
+	display: none;
+	position: relative;
+    left: 613px;
+    top: 5px;
+    z-index: 9999999999;
+}

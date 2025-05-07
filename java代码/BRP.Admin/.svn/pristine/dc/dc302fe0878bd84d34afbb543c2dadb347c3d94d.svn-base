@@ -1,0 +1,419 @@
+package BRP.model;
+
+import BRP.data.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.common.MySqlConditionBuilder;
+import strosoft.app.util.DateHelper;
+import strosoft.app.util.JsonHelper;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class ViewMemberCardManager extends ViewMemberCardMaster {
+    private static ViewMemberCardManager _instance;
+
+    public static ViewMemberCardManager getInstance() {
+        if (_instance == null) {
+            _instance = new ViewMemberCardManager();
+        }
+        return _instance;
+    }
+
+    private ViewMemberCardManager() {
+        this.setTypeName("ViewMemberCard");
+    }
+
+    /**
+     * 获取会员借还书信息
+     *
+     * @param memberCartId
+     * @return
+     */
+    public BorrowReturnBookInfo getBorrowReturnBookInfo(Integer companyId, Integer memberCartId) throws Exception {
+        BorrowReturnBookInfo borrowReturnBookInfo = this.getListByMemmberInfo(memberCartId);
+        /*if (borrowReturnBookInfo != null) {
+            //获取已借绘本列表
+            List<ViewBookOrderItem> lstViewBookOrderItem = ViewBookOrderItemManager.getInstance()
+                    .getListByMemberId(companyId, borrowReturnBookInfo.getMemberId());
+            if (lstViewBookOrderItem != null && lstViewBookOrderItem.size() > 0) {
+                borrowReturnBookInfo.setBorrowBookList(lstViewBookOrderItem);
+            }
+            //获取会员损坏记录
+            List<ViewBookDamage> lstViewBookDamage = ViewBookDamageManager.getInstance()
+                    .getListByMemberId(borrowReturnBookInfo.getMemberId());
+            if (lstViewBookDamage != null && lstViewBookDamage.size() > 0) {
+                borrowReturnBookInfo.setBookDamageList(lstViewBookDamage);
+            }
+        }*/
+        return borrowReturnBookInfo;
+    }
+
+    /**
+     * 获取数据
+     *
+     * @param memberCartId
+     * @return
+     */
+    private BorrowReturnBookInfo getListByMemmberInfo(Integer memberCartId) throws Exception {
+        String sql = String.format("SELECT *,\n" +
+                "                       (SELECT COUNT(1) FROM book WHERE book.member_id = view_member_card_simple.member_id AND borrow_status_code = 'Out') AS borrowing_book_count,\n" +
+                "                       (SELECT COUNT(1) FROM view_book_order_item WHERE view_book_order_item.member_id = view_member_card_simple.member_id AND book_order_type_code = 'Borrow') AS borrowed_book_count,\n" +
+                "                       IFNULL((SELECT COUNT(1) FROM book_order WHERE book_order.member_id = view_member_card_simple.member_id AND book_order.id IN (SELECT book_order_id FROM book_order_item WHERE book_order_type_code = 'Borrow' AND book_order.id = book_order_item.book_order_id)), 0) AS borrow_count\n" +
+                "                FROM view_member_card_simple \n" +
+                "                WHERE id = %d;", memberCartId);
+        ArrayList<LinkedHashMap<String, Object>> alData = MyBatisManager.getInstance().executeHashMapList(sql);
+        if (alData.size() > 0) {
+            List<BorrowReturnBookInfo> borrowReturnBookInfo = JsonHelper.toJavaList(BorrowReturnBookInfo.class, alData);
+            return borrowReturnBookInfo.get(0);
+        } else {
+            return null;
+        }
+    }
+
+
+    /**
+     * 根据excel查询会员卡列表
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    public List<ViewMemberCard> getViewMemberCardListByExcel(String path, Integer companyId) throws Exception {
+        ArrayList<String> cardNoList = getCardNoLisByFile(path);
+        return getViewMemberCardListByCardNoLis(cardNoList, companyId);
+    }
+
+    public List<ViewMemberCard> getViewMemberCardListByCardNoLis(ArrayList<String> cardNoList, Integer companyId) throws Exception {
+        MySqlConditionBuilder sqlBuilder = new MySqlConditionBuilder();
+        sqlBuilder.addInCondition("card_no", (ArrayList<String>) cardNoList);
+        String condition = sqlBuilder.toString();
+        /*if (condition != null && !condition.isEmpty()) {
+            condition += "order by create_time desc";
+        }*/
+        return ViewMemberCardManager.getInstance().getList(condition);
+       /* String joinedString = cardNoList.stream()
+                .map(s -> "'" + s + "'")
+                .collect(Collectors.joining(", "));
+        String condition = String.format("(member_name IN (%s) OR card_no IN (%s)) and company_id = %d", joinedString, joinedString, companyId);
+        return ViewMemberCardManager.getInstance().getList(condition);*/
+    }
+
+    /**
+     * 获取会员卡号集合通过excel文件
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    public ArrayList<String> getCardNoLisByFile(String path) throws IOException {
+        File file = new File(path);
+        FileInputStream fis = new FileInputStream(file);
+        Workbook wb = null;
+        String[] split = file.getName().split("\\.");
+        if ("xls".equals(split[1])) {
+            wb = new HSSFWorkbook(fis);
+        } else if ("xlsx".equals(split[1])) {
+            wb = new XSSFWorkbook(fis);
+        }
+        Sheet sheet = wb.getSheetAt(0);
+
+        //excel中的会员卡号集合
+        ArrayList<String> cardNoList = new ArrayList<String>();
+        for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+            ViewMemberCard newViewMemberCard = new ViewMemberCard();
+            Row row = sheet.getRow(i);
+            if (isEmptyRow(row)) {
+                // 行为空，表示文件结束
+                break;
+            }
+
+            // 会员卡号
+            Cell cardNo = row.getCell(0);
+            String cardNoStr = getCellValueByCell(cardNo);
+            cardNoList.add(cardNoStr);
+        }
+        return cardNoList;
+    }
+
+    /**
+     * 判断行是否为空
+     */
+    private static boolean isEmptyRow(Row row) {
+        if (row == null) {
+            // 单元格非空
+            return true;
+        }
+        for (Cell cell : row) {
+            if (cell.getCellTypeEnum() != CellType.BLANK) {
+                // 单元格非空
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 获取单元格各类型值，返回字符串类型
+    public String getCellValueByCell(Cell cell) {
+        // 判断是否为null或空串
+        if (cell == null || cell.toString().trim().equals("")) {
+            return "";
+        }
+        String cellValue = "";
+        int cellType = cell.getCellType();
+        switch (cellType) {
+            case Cell.CELL_TYPE_NUMERIC: // 数字
+                short format = cell.getCellStyle().getDataFormat();
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    SimpleDateFormat sdf = null;
+                    if (format == 20 || format == 32) {
+                        sdf = new SimpleDateFormat("HH:mm");
+                    } else if (format == 14 || format == 31 || format == 57 || format == 58) {
+                        // 处理自定义日期格式：m月d日(通过判断单元格的格式id解决，id的值是58)
+                        sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        double value = cell.getNumericCellValue();
+                        Date date = DateUtil.getJavaDate(value);
+                        cellValue = sdf.format(date);
+                    } else {// 日期
+                        sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    }
+                    try {
+                        cellValue = sdf.format(cell.getDateCellValue());// 日期
+                    } catch (Exception e) {
+                        try {
+                            throw new Exception("exception on get date data !".concat(e.toString()));
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+                    } finally {
+                        sdf = null;
+                    }
+                } else {
+                    BigDecimal bd = new BigDecimal(cell.getNumericCellValue());
+                    cellValue = bd.toPlainString();// 数值 用BigDecimal包装再获取plainString，可以防止获取到科学计数值
+                }
+                break;
+            case Cell.CELL_TYPE_STRING: // 字符串
+                cellValue = cell.getStringCellValue();
+                break;
+            case Cell.CELL_TYPE_BOOLEAN: // Boolean
+                cellValue = cell.getBooleanCellValue() + "";
+                ;
+                break;
+            case Cell.CELL_TYPE_FORMULA: // 公式
+                cellValue = cell.getCellFormula();
+                break;
+            default:
+                cellValue = "";
+                break;
+        }
+        // 返回单元格值并去除首尾空格和去除空格
+        return cellValue.trim().replace(" ", "");
+    }
+
+
+    /**
+     * 获取老带新会员卡号通过excel文件
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    public JSONObject getRecommendMemberCardInfoByFile(String path) throws Exception {
+
+        File file = new File(path);
+        FileInputStream fis = new FileInputStream(file);
+        Workbook wb = null;
+        String[] split = file.getName().split("\\.");
+        if ("xls".equals(split[1])) {
+            wb = new HSSFWorkbook(fis);
+        } else if ("xlsx".equals(split[1])) {
+            wb = new XSSFWorkbook(fis);
+        }
+        Sheet sheet = wb.getSheetAt(0);
+
+        //excel中所有出现过的会员卡号集合
+        List<String> allMemberCardCardNoList = new ArrayList<>();
+        for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (isEmptyRow(row)) {
+                // 行为空，表示文件结束
+                break;
+            }
+            // 新会员卡号
+            Cell newMemberCardCardNo = row.getCell(0);
+            String newMemberCardCardNoStr = getCellValueByCell(newMemberCardCardNo);
+            allMemberCardCardNoList.add(newMemberCardCardNoStr);
+            // 推荐人会员卡号
+            Cell referrerCardCardNo = row.getCell(1);
+            String referrerCardCardNoStr = getCellValueByCell(referrerCardCardNo);
+            allMemberCardCardNoList.add(referrerCardCardNoStr);
+        }
+        //excel中所有出现过的会员卡号能查询到的会员卡信息集合
+        List<ViewMemberCard> viewMemberCardListByAllMemberCardSet = getViewMemberCardListByAllMemberCardSet(allMemberCardCardNoList);
+
+        // 获取excel中出现过的会员卡号能查询到的会员卡信息集合
+        JSONArray memberCardList = new JSONArray();
+        //异常会员卡号列表
+        JSONArray exceptionMemberCardList = new JSONArray();
+        for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (isEmptyRow(row)) {
+                // 行为空，表示文件结束
+                break;
+            }
+
+            // 新会员卡号
+            Cell newMemberCardCardNo = row.getCell(0);
+            String newMemberCardCardNoStr = getCellValueByCell(newMemberCardCardNo);
+
+            // 推荐人会员卡号
+            Cell referrerCardCardNo = row.getCell(1);
+            String referrerCardCardNoStr = getCellValueByCell(referrerCardCardNo);
+
+
+            if (newMemberCardCardNoStr.isEmpty() || referrerCardCardNoStr.isEmpty()) {
+                ViewActivityRecommendError activityRecommendError = new ViewActivityRecommendError();
+                activityRecommendError.setMemberCardNo(newMemberCardCardNoStr);
+                activityRecommendError.setReferrerCardNo(referrerCardCardNoStr);
+                activityRecommendError.setDisplayOrder(i);
+                if (newMemberCardCardNoStr.isEmpty()) {
+                    activityRecommendError.setErrorContext("新会员卡号或名称为空");
+                }
+                if (referrerCardCardNoStr.isEmpty()) {
+                    activityRecommendError.setErrorContext("推荐人卡号或名称为空");
+                }
+                exceptionMemberCardList.add(activityRecommendError);
+            } else {
+                ViewMemberCard newMemberCardCard = null;
+                ViewMemberCard referrerCardCard = null;
+                for (ViewMemberCard viewMemberCard : viewMemberCardListByAllMemberCardSet) {
+                    if (newMemberCardCardNoStr.equals(viewMemberCard.getCardNo())
+                            || newMemberCardCardNoStr.equals(viewMemberCard.getMemberName())) {
+                        newMemberCardCard = viewMemberCard;
+                    }
+                    if (referrerCardCardNoStr.equals(viewMemberCard.getCardNo())
+                            || referrerCardCardNoStr.equals(viewMemberCard.getMemberName())) {
+                        referrerCardCard = viewMemberCard;
+                    }
+                }
+                if (newMemberCardCard == null || referrerCardCard == null) {
+                    // 添加异常会员卡号Json数组信息
+                    ViewActivityRecommendError activityRecommendError = new ViewActivityRecommendError();
+                    activityRecommendError.setMemberCardNo(newMemberCardCardNoStr);
+                    activityRecommendError.setDisplayOrder(i);
+                    activityRecommendError.setReferrerCardNo(referrerCardCardNoStr);
+                    activityRecommendError.setNewMemberName(newMemberCardCard == null ? "" : newMemberCardCard.getMemberName());
+                    activityRecommendError.setReferrerName(referrerCardCard == null ? "" : referrerCardCard.getMemberName());
+                    if (newMemberCardCard == null) {
+                        activityRecommendError.setErrorContext("新会员未查询到会员信息");
+                    }
+                    if (referrerCardCard == null) {
+                        activityRecommendError.setErrorContext("推荐人未查询到会员信息");
+                    }
+                    exceptionMemberCardList.add(activityRecommendError);
+                } else if (newMemberCardCard.getReferrerId() == null ||
+                        !newMemberCardCard.getReferrerId().equals(referrerCardCard.getMemberId())) {
+                    // 添加异常会员卡号Json数组信息
+                    ViewActivityRecommendError activityRecommendError = new ViewActivityRecommendError();
+                    activityRecommendError.setMemberCardNo(newMemberCardCardNoStr);
+                    activityRecommendError.setReferrerCardNo(referrerCardCardNoStr);
+                    activityRecommendError.setDisplayOrder(i);
+                    activityRecommendError.setNewMemberName(newMemberCardCard == null ? "" : newMemberCardCard.getMemberName());
+                    activityRecommendError.setReferrerName(referrerCardCard == null ? "" : referrerCardCard.getMemberName());
+                    activityRecommendError.setErrorContext("新会员推荐人不是当前会员");
+                    exceptionMemberCardList.add(activityRecommendError);
+                } else {
+                    RecommendMemberCardInfo recommendMemberCardInfo = new RecommendMemberCardInfo();
+                    recommendMemberCardInfo.setNewMemberCardNo(newMemberCardCard.getCardNo());
+                    recommendMemberCardInfo.setNewMemberId(newMemberCardCard.getMemberId());
+                    recommendMemberCardInfo.setNewMemberCardId(newMemberCardCard.getId());
+                    recommendMemberCardInfo.setNewMemberCardExpireDate(newMemberCardCard.getExpireDate());
+                    recommendMemberCardInfo.setNewMemberCardExpireDateText(DateHelper.timestampToString(newMemberCardCard.getExpireDate(), "yyyy-MM-dd HH:mm:ss"));
+                    recommendMemberCardInfo.setReferrerCardNo(referrerCardCard.getCardNo());
+                    recommendMemberCardInfo.setReferrerId(referrerCardCard.getMemberId());
+                    recommendMemberCardInfo.setReferrerCardId(referrerCardCard.getId());
+                    recommendMemberCardInfo.setNewMemberName(newMemberCardCard.getMemberName());
+                    recommendMemberCardInfo.setReferrerCardCreateTime(referrerCardCard.getCreateTime());
+                    recommendMemberCardInfo.setReferrerCardEffectiveDate(referrerCardCard.getEffectiveDate());
+                    recommendMemberCardInfo.setReferrerCardEffectiveDateText(DateHelper.timestampToString(referrerCardCard.getEffectiveDate(), "yyyy-MM-dd HH:mm:ss"));
+                    recommendMemberCardInfo.setReferrerCardExpireDate(referrerCardCard.getExpireDate());
+                    recommendMemberCardInfo.setReferrerCardExpireDateText(DateHelper.timestampToString(referrerCardCard.getExpireDate(), "yyyy-MM-dd HH:mm:ss"));
+                    recommendMemberCardInfo.setReferrerName(referrerCardCard.getMemberName());
+                    recommendMemberCardInfo.setDisplayOrder(i);
+                    memberCardList.add(recommendMemberCardInfo);
+                }
+            }
+        }
+        JSONObject result = new JSONObject();
+        result.put("memberCardList", memberCardList);
+        result.put("exceptionMemberCardList", exceptionMemberCardList);
+        return result;
+    }
+
+    /**
+     * 获取新会员和推荐人会员卡信息列表
+     *
+     * @param allMemberCardCardNo
+     * @return
+     * @throws Exception
+     */
+    public List<ViewMemberCard> getViewMemberCardListByAllMemberCardSet(List<String> allMemberCardCardNo) throws Exception {
+        String joinedString = allMemberCardCardNo.stream()
+                .map(s -> "'" + s + "'")
+                .collect(Collectors.joining(", "));
+        String condition = String.format("member_name IN (%s) OR card_no IN (%s)", joinedString, joinedString);
+        return ViewMemberCardManager.getInstance().getList(condition);
+    }
+
+    /**
+     * 根据会员ID获取会员卡
+     *
+     * @param memberId
+     * @return
+     */
+    public ViewMemberCard getEntityByMemberId(Integer memberId) throws Exception {
+        String condition = String.format("member_id=%d and disabled is not true", memberId);
+        List<ViewMemberCard> lstViewMemberCard = this.getList(condition);
+        if (lstViewMemberCard != null && lstViewMemberCard.size() > 0) {
+            return lstViewMemberCard.get(0);
+        }
+        return null;
+    }
+
+    public ViewMemberCard getEntityByMemberId(SqlSession session, Integer memberId) throws Exception {
+        String condition = String.format("member_id=%d and disabled is not true", memberId);
+        List<ViewMemberCard> lstViewMemberCard = this.getList(session, condition);
+        if (lstViewMemberCard != null && lstViewMemberCard.size() > 0) {
+            return lstViewMemberCard.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * 根据会员卡号获取会员卡
+     *
+     * @param session
+     * @param companyId
+     * @param memberCardNo
+     * @return
+     */
+    public ViewMemberCard getEntityByMemberCardNo(SqlSession session, Integer companyId, String memberCardNo) {
+        String condition = String.format("card_no='%s' and company_id=%d", memberCardNo, companyId);
+        List<ViewMemberCard> lstViewMemberCard = this.getList(session, condition);
+        if (lstViewMemberCard != null && lstViewMemberCard.size() > 0) {
+            return lstViewMemberCard.get(0);
+        }
+        return null;
+    }
+}

@@ -1,0 +1,63 @@
+package BRP.service;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import strosoft.app.common.MyBatisManager;
+import strosoft.app.service.ServiceHandler;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class GetMemberBookboxTotalServiceHandler extends ServiceHandler {
+    public void process(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        JSONObject jData = this.getRequestData(request);
+        Integer companyId = jData.getInt("companyId");
+        String sql = String.format("SELECT \n" +
+                "\t\t SUM(CASE WHEN m.is_activated is true AND mc.expire_date > CURRENT_DATE() THEN 1 ELSE 0 END) AS valid_bookbox_count,\n" +
+                "\t\t SUM(CASE WHEN m.member_bookbox_status_code in ('Installed','WaitReady','AlReady')  THEN 1 ELSE 0 END) AS handled_bookbox_count,\n" +
+                "     SUM(CASE WHEN m.member_bookbox_status_code = 'Installed' THEN 1 ELSE 0 END) AS installed_bookbox_count,\n" +
+                "\t\t SUM(CASE WHEN m.member_bookbox_status_code in ('WaitReady','AlReady')  THEN 1 ELSE 0 END) AS not_installed_bookbox_count,\n" +
+                "\t\t SUM(CASE WHEN m.member_bookbox_status_code = 'Installed' AND mc.expire_date <= CURRENT_DATE() THEN 1 ELSE 0 END) AS \t\t\t        expire_bookbox_count,\n" +
+                "(SELECT ifnull(SUM(quantity),0) AS quantity FROM view_company_product_stocks WHERE company_id = %d AND product_code = 'Bookbox') AS surplus_bookbox_count\n" +
+                "    FROM member_card mc\t\n" +
+                "\t\tLEFT JOIN member m ON mc.member_id = m.id\n" +
+                "\t\twhere member_id is not null and disabled is not true and mc.company_id= %s", companyId, companyId, companyId);
+        ArrayList<LinkedHashMap<String, Object>> alData = MyBatisManager.getInstance().executeHashMapList(sql);
+        LinkedHashMap<String, Object> map = alData.get(0);
+        JSONArray jResult = new JSONArray();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            String name = this.getNameByKey(key);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("value", value);
+            jsonObject.put("name", name);
+            System.out.println("Key: " + key + ", Value: " + value);
+            jResult.add(jsonObject);
+        }
+        this.writeSuccessResponse(response, jResult);
+    }
+
+    private String getNameByKey(String key) {
+        switch (key) {
+            case "valid_bookbox_count":
+                return "有效书箱数";
+            case "handled_bookbox_count":
+                return "已办书箱数";
+            case "installed_bookbox_count":
+                return "已开通书箱数";
+            case "not_installed_bookbox_count":
+                return "办理未安装数";
+            case "expire_bookbox_count":
+                return "到期安装书箱数";
+            case "surplus_bookbox_count":
+                return "书箱剩余数";
+            default:
+                return "";
+        }
+    }
+}

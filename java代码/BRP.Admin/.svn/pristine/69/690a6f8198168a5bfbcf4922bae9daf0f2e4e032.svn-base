@@ -1,0 +1,336 @@
+<Configuration>
+    <ExportData Name="SysUser" TableName="view_sys_user"
+                Title="用户">
+        <Columns>
+            <Column TargetColumnName="用户ID" SourceColumnName="id"/>
+            <Column TargetColumnName="登录账号" SourceColumnName="login_name"/>
+            <Column TargetColumnName="密码" SourceColumnName="password"/>
+            <Column TargetColumnName="真实姓名" SourceColumnName="true_name"/>
+            <Column TargetColumnName="员工编号" SourceColumnName="employee_no"/>
+        </Columns>
+        <SearchItems>
+            <SearchItem FieldName="login_name" Operation="like"
+                        ParameterName="loginName"/>
+            <SearchItem FieldName="true_name" Operation="like"
+                        ParameterName="trueName"/>
+        </SearchItems>
+    </ExportData>
+    <ExportData Name="PayOrder" TableName="view_pay_order" orderBy="create_time desc"
+                Title="账单列表">
+        <Columns>
+            <Column TargetColumnName="会员名称" SourceColumnName="member_name"/>
+            <Column TargetColumnName="会员编号" SourceColumnName="member_no"/>
+            <Column TargetColumnName="账单编号" SourceColumnName="pay_order_no"/>
+            <Column TargetColumnName="支付金额" SourceColumnName="amount"/>
+            <Column TargetColumnName="付款方式" SourceColumnName="payment_method_name"/>
+            <Column TargetColumnName="付款项目" SourceColumnName="payment_item_name"/>
+            <Column TargetColumnName="支付时间" SourceColumnName="pay_time_text"/>
+            <Column TargetColumnName="账单类型" SourceColumnName="pay_order_type_name"/>
+            <Column TargetColumnName="操作人" SourceColumnName="operator_name"/>
+        </Columns>
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_id" ParameterName="memberId"></SearchItem>
+            <SearchItem Operation="like" FieldName="pay_order_no" ParameterName="payOrderNo"></SearchItem>
+            <SearchItem Operation="equal" FieldName="payment_method_code"
+                        ParameterName="paymentMethodCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="payment_item_code" ParameterName="paymentItemCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_paid" ParameterName="isPaid"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="business_date" BeginDateParameterName="businessDateBegin"
+                        EndDateParameterName="businessDateEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="pay_time" BeginDateParameterName="payTimeBegin"
+                        EndDateParameterName="payTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="pay_order_type_code" ParameterName="payOrderTypeCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_finished" ParameterName="isFinished"></SearchItem>
+            <SearchItem Operation="equal" FieldName="operator_id" ParameterName="operatorId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_refund" ParameterName="isRefund"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_no" ParameterName="memberNo"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_name" ParameterName="memberName"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_mobile_phone" ParameterName="memberMobilePhone"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_gender" ParameterName="memberGender"></SearchItem>
+        </SearchItems>
+    </ExportData>
+    <ExportData Name="StocksTotal"
+                TableName="view_book_sku"
+                Title="库存不足统计"
+                Condition="insufficient_inventory_count>0">
+        <Columns>
+            <Column SourceColumnName="book_name" TargetColumnName="书名"/>
+            <Column SourceColumnName="book_series_name" TargetColumnName="系列"/>
+            <Column SourceColumnName="author" TargetColumnName="作者"/>
+            <Column SourceColumnName="press" TargetColumnName="出版社"/>
+            <Column SourceColumnName="binding_type_name" TargetColumnName="备注"/>
+            <Column SourceColumnName="book_count_total" TargetColumnName="总册数"/>
+            <Column SourceColumnName="insufficient_inventory_count" TargetColumnName="库存不足次数"/>
+        </Columns>
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_name" ParameterName="bookName"></SearchItem>
+            <SearchItem Operation="like" FieldName="author" ParameterName="author"></SearchItem>
+            <SearchItem Operation="like" FieldName="press" ParameterName="press"></SearchItem>
+            <SearchItem Operation="like" FieldName="ISBN" ParameterName="ISBN"></SearchItem>
+            <SearchItem Operation="equal" FieldName="language_code" ParameterName="languageCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="binding_type_code" ParameterName="bindingTypeCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="remark" ParameterName="remark"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="approver_id" ParameterName="approverId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="approve_time" BeginDateParameterName="approveTimeBegin"
+                        EndDateParameterName="approveTimeEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="approve_status_code"
+                        ParameterName="approveStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_online" ParameterName="isOnline"></SearchItem>
+            <SearchItem Operation="equal" FieldName="book_series_id" ParameterName="bookSeriesId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="company_name" ParameterName="companyName"></SearchItem>
+            <SearchItem Operation="like" FieldName="book_series_name" ParameterName="bookSeriesName"></SearchItem>
+            <SearchItem Operation="like" FieldName="language_name" ParameterName="languageName"></SearchItem>
+            <SearchItem Operation="like" FieldName="binding_type_name" ParameterName="bindingTypeName"></SearchItem>
+            <SearchItem Operation="like" FieldName="approver_name" ParameterName="approverName"></SearchItem>
+            <SearchItem Operation="like" FieldName="approve_status_name" ParameterName="approveStatusName"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ExportData>
+
+    <ExportData Name="MemberCardData"
+                TableName="view_member_card"
+                Title="会员卡列表"
+                Condition="member_id is not null">
+        <Columns>
+            <Column SourceColumnName="card_no" TargetColumnName="会员卡号"/>
+            <Column SourceColumnName="member_name" TargetColumnName="会员姓名"/>
+            <Column SourceColumnName="mobile_phone" TargetColumnName="联系方式"/>
+            <Column SourceColumnName="birthday" TargetColumnName="出生日期"/>
+            <Column SourceColumnName="school" TargetColumnName="学校"/>
+            <Column SourceColumnName="gradeName" TargetColumnName="年级"/>
+            <Column SourceColumnName="className" TargetColumnName="班级"/>
+            <Column SourceColumnName="entrance_guard" TargetColumnName="门禁"/>
+            <Column SourceColumnName="address" TargetColumnName="地址"/>
+            <Column SourceColumnName="payment_method_name" TargetColumnName="支付方式"/>
+            <Column SourceColumnName="batch_name" TargetColumnName="会员卡批次"/>
+            <Column SourceColumnName="member_card_type_name" TargetColumnName="会员卡类型"/>
+        </Columns>
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_name" ParameterName="memberName"></SearchItem>
+            <SearchItem Operation="like" FieldName="card_no" ParameterName="cardNo"></SearchItem>
+            <SearchItem Operation="like" FieldName="address" ParameterName="address"></SearchItem>
+            <SearchItem Operation="like" FieldName="mobile_phone" ParameterName="mobilePhone"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_batch_id"
+                        ParameterName="memberCardBatchId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_type_id" ParameterName="memberCardTypeId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_expire" ParameterName="isExpire"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_book" ParameterName="isBook"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_card_status_code"
+                        ParameterName="memberCardStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="is_special" ParameterName="isSpecial"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="effective_date" BeginDateParameterName="effectiveDateBegin"
+                        EndDateParameterName="effectiveDateEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="expire_date" BeginDateParameterName="expireDateBegin"
+                        EndDateParameterName="expireDateEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="lock_date" BeginDateParameterName="lockDateBegin"
+                        EndDateParameterName="lockDateEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="last_communica_date"
+                        BeginDateParameterName="lastCommunicaDateBegin"
+                        EndDateParameterName="lastCommunicaDateEnd"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="birthday" BeginDateParameterName="birthdayBegin"
+                        EndDateParameterName="birthdayEnd"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ExportData>
+    <!--零售单-->
+    <ExportData Name="RetailOrder"
+                TableName="view_retail_order"
+                Title="零售单">
+        <Columns>
+            <Column SourceColumnName="company_no" TargetColumnName="门店编号"/>
+            <Column SourceColumnName="company_name" TargetColumnName="门店名称"/>
+            <Column SourceColumnName="member_name" TargetColumnName="会员名称"/>
+            <Column SourceColumnName="pay_time" TargetColumnName="支付时间"/>
+            <Column SourceColumnName="retail_order_type_name" TargetColumnName="交易类型"/>
+            <Column SourceColumnName="amount" TargetColumnName="支付金额"/>
+        </Columns>
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="id" ParameterName="id"></SearchItem>
+            <SearchItem Operation="equal" FieldName="retail_order_no" ParameterName="retailOrderNo"></SearchItem>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="member_id" ParameterName="memberId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="club_activity_id" ParameterName="clubActivityId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="story_video_id" ParameterName="storyVideoId"></SearchItem>
+            <SearchItem Operation="equal" FieldName="night_story_type_id" ParameterName="nightStoryTypeId"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="business_date" BeginDateParameterName="businessDateBegin"
+                        EndDateParameterName="businessDateEnd"></SearchItem>
+            <SearchItem Operation="equal" FieldName="pay_time" ParameterName="payTime"></SearchItem>
+            <SearchItem Operation="equal" FieldName="retail_order_type_code"
+                        ParameterName="retailOrderTypeCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="retail_order_status_code"
+                        ParameterName="retailOrderStatusCode"></SearchItem>
+            <SearchItem Operation="equal" FieldName="settled" ParameterName="settled"></SearchItem>
+            <SearchItem Operation="timespan" FieldName="create_time" BeginDateParameterName="createTimeBegin"
+                        EndDateParameterName="createTimeEnd"></SearchItem>
+            <SearchItem Operation="like" FieldName="company_name" ParameterName="companyName"></SearchItem>
+            <SearchItem Operation="like" FieldName="company_no" ParameterName="companyNo"></SearchItem>
+            <SearchItem Operation="like" FieldName="member_name" ParameterName="memberName"></SearchItem>
+            <SearchItem Operation="equal" FieldName="night_story_type_code"
+                        ParameterName="nightStoryTypeCode"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ExportData>
+
+    <ExportData Name="BookSn"
+                TableName="view_book"
+                Title="a">
+        <Columns>
+            <Column SourceColumnName="sn" TargetColumnName="书号"/>
+            <Column SourceColumnName="bookcase_name" TargetColumnName="书柜"/>
+            <Column SourceColumnName="book_name" TargetColumnName="书名"/>
+            <Column SourceColumnName="book_series_name" TargetColumnName="系列"/>
+            <Column SourceColumnName="binding_type_name" TargetColumnName="备注"/>
+            <Column SourceColumnName="author" TargetColumnName="作者"/>
+            <Column SourceColumnName="press" TargetColumnName="出版社"/>
+            <Column SourceColumnName="ISBN" TargetColumnName="ISBN"/>
+            <Column SourceColumnName="price" TargetColumnName="价格"/>
+        </Columns>
+        <SearchItems>
+            <SearchItem Operation="equal" FieldName="company_id" ParameterName="companyId"></SearchItem>
+        </SearchItems>
+        <PrimaryKeys></PrimaryKeys>
+    </ExportData>
+    <ExportData Name="DelivererTotal" Title="配送员工作量"
+                Type="BRP.model.ExportDelivererTotalHandler">
+        <Columns>
+            <Column TargetColumnName="配送员" SourceColumnName="name"/>
+            <Column TargetColumnName="配送路线" SourceColumnName="deliver_line_names_and_counts"/>
+            <Column TargetColumnName="数量"
+                    SourceColumnName="total_order_count"/>
+        </Columns>
+    </ExportData>
+    <ExportData Name="BookpickerTotal" Title="拣书员工作量"
+                Type="BRP.model.ExportBookpickerTotalHandler">
+        <Columns>
+            <Column TargetColumnName="拣书员" SourceColumnName="name"/>
+            <Column TargetColumnName="配送路线" SourceColumnName="deliver_line_names_and_counts"/>
+            <Column TargetColumnName="数量"
+                    SourceColumnName="total_order_count"/>
+        </Columns>
+    </ExportData>
+    <ExportData Name="MemberBorrowBookTotal"
+                Type="BRP.model.ExportMemberBorrowBookTotalHandler"
+                Title="会员借阅统计">
+        <Columns>
+            <Column SourceColumnName="member_name" TargetColumnName="会员名称"/>
+            <Column SourceColumnName="card_no" TargetColumnName="会员卡号"/>
+            <Column SourceColumnName="batch_name" TargetColumnName="会员卡批次"/>
+            <Column SourceColumnName="effective_date" TargetColumnName="开卡时间"/>
+            <Column SourceColumnName="expire_date" TargetColumnName="到期时间"/>
+            <Column SourceColumnName="mobile_phone" TargetColumnName="联系方式"/>
+            <Column SourceColumnName="total_borrow_count" TargetColumnName="借阅本书"/>
+            <Column SourceColumnName="order_borrow_count" TargetColumnName="借阅次数"/>
+            <Column SourceColumnName="total_price" TargetColumnName="节省借阅费（元）"/>
+        </Columns>
+    </ExportData>
+    <ExportData Name="BookBorrowTotal"
+                Type="BRP.model.ExportBookBorrowTotalHandler"
+                Title="图书借阅统计">
+        <Columns>
+            <Column SourceColumnName="book_name" TargetColumnName="书名"/>
+            <Column SourceColumnName="book_series_name" TargetColumnName="系列"/>
+            <Column SourceColumnName="binding_type_name" TargetColumnName="备注"/>
+            <Column SourceColumnName="author" TargetColumnName="作者"/>
+            <Column SourceColumnName="press" TargetColumnName="出版社"/>
+            <Column SourceColumnName="borrow_count" TargetColumnName="借阅次数"/>
+            <Column SourceColumnName="book_count" TargetColumnName="总册数"/>
+        </Columns>
+    </ExportData>
+    <ExportData Name="BorrowNoticeTotal"
+                Type="BRP.model.ExportBorrowNoticeTotalHandler"
+                Title="可借阅通知统计">
+        <Columns>
+            <Column SourceColumnName="book_name" TargetColumnName="书名"/>
+            <Column SourceColumnName="book_series_name" TargetColumnName="系列"/>
+            <Column SourceColumnName="author" TargetColumnName="作者"/>
+            <Column SourceColumnName="press" TargetColumnName="出版社"/>
+            <Column SourceColumnName="binding_type_name" TargetColumnName="备注"/>
+            <Column SourceColumnName="book_count" TargetColumnName="总册数"/>
+            <Column SourceColumnName="subscription_count" TargetColumnName="点击次数"/>
+        </Columns>
+    </ExportData>
+    <ExportData Name="BookStocksLogTotal"
+                Type="BRP.model.ExportBookStocksLogTotalHandler"
+                Title="图书库存不足统计">
+        <Columns>
+            <Column SourceColumnName="book_name" TargetColumnName="书名"/>
+            <Column SourceColumnName="book_series_name" TargetColumnName="系列"/>
+            <Column SourceColumnName="author" TargetColumnName="作者"/>
+            <Column SourceColumnName="press" TargetColumnName="出版社"/>
+            <Column SourceColumnName="binding_type_name" TargetColumnName="备注"/>
+            <Column SourceColumnName="book_count" TargetColumnName="总册数"/>
+            <Column SourceColumnName="understock_count" TargetColumnName="点击次数"/>
+        </Columns>
+    </ExportData>
+    <!--导出SKU-->
+    <ExportData Name="BookSku"
+                Type="BRP.model.ExportBookSkuHandler"
+                Title="图书SKU">
+        <Columns>
+            <Column SourceColumnName="bookName" TargetColumnName="书名"/>
+            <Column SourceColumnName="ISBN" TargetColumnName="ISBN"/>
+            <Column SourceColumnName="bookSeriesName" TargetColumnName="系列"/>
+            <Column SourceColumnName="author" TargetColumnName="作者"/>
+            <Column SourceColumnName="press" TargetColumnName="出版社"/>
+            <Column SourceColumnName="bindingTypeName" TargetColumnName="备注"/>
+            <Column SourceColumnName="bookTagNames" TargetColumnName="标签"/>
+            <Column SourceColumnName="ageGroupNames" TargetColumnName="年龄段"/>
+        </Columns>
+    </ExportData>
+    <!--导出会员-->
+    <ExportData Name="MemberInfoList"
+                Type="BRP.model.ExportMemberHandler"
+                Title="会员信息">
+        <Columns>
+            <Column SourceColumnName="card_no" TargetColumnName="会员卡号"/>
+            <Column SourceColumnName="member_name" TargetColumnName="会员姓名"/>
+            <Column SourceColumnName="mobile_phone" TargetColumnName="联系方式"/>
+            <Column SourceColumnName="gender_name" TargetColumnName="性别"/>
+            <Column SourceColumnName="school" TargetColumnName="学校"/>
+            <Column SourceColumnName="grade_name" TargetColumnName="年级"/>
+            <Column SourceColumnName="class_name" TargetColumnName="班级"/>
+            <Column SourceColumnName="member_score" TargetColumnName="积分"/>
+            <Column SourceColumnName="birthday" TargetColumnName="出生日期"/>
+            <Column SourceColumnName="membership_amount" TargetColumnName="会员费"/>
+            <Column SourceColumnName="bookbox_amount" TargetColumnName="书箱费"/>
+            <!--<Column SourceColumnName="security_deposit_amount" TargetColumnName="押金"/>-->
+            <Column SourceColumnName="batch_name" TargetColumnName="会员卡批次"/>
+            <Column SourceColumnName="member_card_type_name" TargetColumnName="会员卡类型"/>
+            <Column SourceColumnName="employee_time" TargetColumnName="办理日期"/>
+            <Column SourceColumnName="effective_date" TargetColumnName="开卡时间"/>
+            <Column SourceColumnName="expire_date" TargetColumnName="到期时间"/>
+            <Column SourceColumnName="member_bookbox_status_name" TargetColumnName="书箱状态"/>
+            <Column SourceColumnName="deliver_area_name" TargetColumnName="大区"/>
+            <Column SourceColumnName="entrance_guard" TargetColumnName="门禁"/>
+            <Column SourceColumnName="address" TargetColumnName="地址"/>
+            <Column SourceColumnName="referrer_remark" TargetColumnName="推荐人备注"/>
+            <Column SourceColumnName="referrer_card_no" TargetColumnName="推荐人卡号"/>
+            <Column SourceColumnName="employee_name" TargetColumnName="办理人"/>
+            <Column SourceColumnName="stop_card_name" TargetColumnName="是否停卡"/>
+            <Column SourceColumnName="member_card_disable_stop_date" TargetColumnName="停卡开始日期"/>
+            <Column SourceColumnName="member_card_disable_stop_end_date" TargetColumnName="停卡结束日期"/>
+        </Columns>
+    </ExportData>
+    <ExportData Name="MemberScoreRanking"
+                Type="BRP.model.ExportMemberScoreRankingHandler"
+                Title="积分排名">
+        <Columns>
+            <Column SourceColumnName="name" TargetColumnName="会员名称"/>
+            <Column SourceColumnName="card_no" TargetColumnName="会员卡号"/>
+            <Column SourceColumnName="add_score" TargetColumnName="获得积分"/>
+            <Column SourceColumnName="expend_score" TargetColumnName="使用积分"/>
+            <Column SourceColumnName="score" TargetColumnName="剩余积分"/>
+        </Columns>
+    </ExportData>
+</Configuration>

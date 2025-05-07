@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>站点管理</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/management.js"></script>
+<script type="text/javascript">
+	managementContext.dataName = "CmsSite";
+	managementContext.tableName = "cms_site";
+	managementContext.operationColumnWidth = 200;
+	managementContext.customTableColumns = [ {
+		field : 'name',
+		title : '名称',
+		fixed : true,
+		width : 150,
+		align : 'left'
+	}, {
+		field : 'typeName',
+		title : '站点类型',
+		fixed : true,
+		width : 80,
+		align : 'center'
+	}, {
+		field : 'path',
+		title : '根路径',
+		width : 100,
+		align : 'left'
+	}, {
+		field : 'description',
+		title : '描述',
+		width : 100,
+		align : 'left'
+	} ];
+
+	function bindControls() {
+		
+	}
+	function bindCmsIdNameComboTree(controlId, tableName, multiple) {
+	var condition = "1=1";
+	bindComboTree(controlId, tableName, 0, "id", "name", "parent_id", multiple,
+			condition);
+	}
+	/*
+	 取得请求参数
+	 */
+	function getParameters() {
+		var parameters = getParametersBase();
+		return parameters;
+	}
+
+	/*
+	取得操作按钮列表
+	 */
+	function getOperationButtonHtmlArray(dataItem) {
+		var arrOpeartionButtonHtml = getOperationButtonHtmlArrayBase(dataItem);
+		var lnkSetCurrentHtml = getGridButtonHtml(dataItem, "setCurrent",
+				"设为当前站点");
+		var currentCmsSiteId = getCookie("cmsSiteId");
+		if (currentCmsSiteId != dataItem.id) {
+			arrOpeartionButtonHtml.push(lnkSetCurrentHtml);
+		}
+		return arrOpeartionButtonHtml;
+	}
+	/*
+	设为当前站点
+	 */
+	function setCurrent(cmsSiteId) {
+		setCookie("cmsSiteId", cmsSiteId);
+		bindData();
+	}
+	function onEditSuccess(result) {
+		//alert(JSON.stringify(result));
+	}
+</script>
+</head>
+
+<body>
+	<div class="easyui-layout" style="width:100%;" fit="true">
+		<div id="content" region="center" style="padding:1px;">
+			<div class="toolbar_panel" id="divToolbar">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add"
+					plain="true" onclick="openAddDialog()" id="btnAdd">新增</a> <a href="#"
+					class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+					onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a id="lnkRefreshPage" href="#"
+					class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+					onclick="refreshPage()">刷新</a>
+			</div>
+			<div id="divSearchPanel" class="search_panel easyui-panel">
+				<div class="search_item">
+					<span class="search_item_caption">编号:</span> <input
+						id="txtSearchCode" class="search_item_textbox easyui-textbox">
+				</div>
+				<div class="search_item">
+					<span class="search_item_caption">名称:</span> <input
+						id="txtSearchName" class="search_item_textbox easyui-textbox">
+				</div>
+				<div class="search_item_command">
+					<a href="#" class="easyui-linkbutton" plain="true"
+						iconCls="icon-search" onclick="query()">查询</a>
+				</div>
+			</div>
+			<table id="tableGrid">
+			</table>
+			<!-- 基本信息 -->
+			<div id="divDetailDialog" class="easyui-dialog" style="width:450px"
+				closed="true" buttons="#dlg-buttons">
+				<form id="formDetail" method="post" novalidate
+					style="margin:0;padding:20px 20px">
+					<div title="基本信息" data-options="closable:false"
+						style="padding:10px">
+						<div style="margin-bottom:10px">
+							<input id="txtName" name="txtName" class="easyui-textbox"
+								label="名称:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="txtPath" name="txtPath" class="easyui-textbox"
+								label="根目录:" style="width:100%">
+						</div>
+						<div style="margin-bottom:10px">
+							<input id="txtDescription" name="txtDescription"
+								class="easyui-textbox" label="描述:" multiline="true"
+								labelPosition="left" style="width:100%;height:120px;">
+						</div>
+					</div>
+				</form>
+				<div id="dlg-buttons">
+					<a href="javascript:void(0)" class="easyui-linkbutton"
+						iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+					<a href="javascript:void(0)" class="easyui-linkbutton"
+						iconCls="icon-cancel" onclick="javascript:closeDetailDialog();"
+						style="width:90px">取消</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

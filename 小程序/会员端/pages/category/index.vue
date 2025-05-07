@@ -1,0 +1,433 @@
+<template>
+	<view>
+		<!-- 顶部内容 --> 	<!-- 顶部背景图片 --><!-- mode="widthFix" -->
+		<!-- <view class="" style="padding-top:0">
+		
+			<image class="topHeadbakimg" :src= "imageRootUrl + 'image/common/headerTopbg.png'" mode="widthFix"></image>
+			
+			<view class="head-content-fixed " :style="{'background':head_is_fixed == 1?'#FACC3F':''}"
+				style="border-bottom: 1rpx solid rgba(0,0,0,0.1);">
+				<view class="head-content-fixed-content ">
+					<view class="head-top-nav-title center">慧至半径童书馆</view>
+				</view>
+			</view>
+		</view> -->
+		<view class="container">
+			<view class="contentPanel" style="padding: 10rpx; border-radius: 24rpx;"> <!-- 搜索 -->
+				<view class="line70" style="height: 35px; line-height: 35px;">
+					<view class="top_search_btn_iamgePanel" style=""> 
+						<image :src= "imageRootUrl + 'image/common/scan.png'"  style="" @tap.stop="clickToRichScan()"></image>
+					</view>
+					<view class="top_search_btn_inputPanel" style="">  
+						<!-- <input class="top_search_btn_input" type="text" style="" placeholder="请输入书籍名称、系列、ISBN"/> -->
+						<uni-search-bar radius="5"  class="top_search_btn_input" v-model="searchContent" @confirm="confirm" @clear="clear"  cancelButton="none"  placeholder="请输入书籍名称、系列、ISBN、作者" >
+						</uni-search-bar>
+					</view>
+					<view class="top_search_btn f26"  @click="clickSearch()">搜索</view>
+				</view>
+			</view>
+			<view class="h20" style="height: 10px;"></view>
+			<view class="contentPanel ageType"> <!-- 年龄区间 -->
+				<view class="line60" style="height: 30px; line-height: 30px;">
+					<view v-for="(item,index) in ageTypeList" :key="index" class="f26 line60 left18 center age "  style="height: 30px; line-height: 30px;" :class="{ ageselected: ageTypeIndex === index }" @click="clickAgeType(index)">{{item.name}}
+					</view>
+				</view>
+			</view>
+			<view class="h20" style="height: 10px;"></view>
+			<view class="contentPanel category"  :style="{'height':rpxWindowHeight - 85 - 30  + 'px'}"> <!-- :style="{'height':rpxWindowHeight + 'rpx'}" -->
+				<scroll-view scroll-y="true" class="scroll-Y books_category_panel"  style="position: inherit; float: left;" :style="{'height':rpxWindowHeight - 85 - 30  + 'px'}">
+					<view class="books_category_item_panel " v-for="(item,index) in booksCategoryList" :key="index" :class="{ books_category_active: selectedCategoryIndex === index }" @click="clickBooksCategory(index,item.id)">
+						{{item.name | toCategoryName}}
+					</view>
+					<view class="books_category_item_panel">
+					</view>  
+				</scroll-view>
+				<scroll-view  scroll-y="true" class="scroll-Y"   @scrolltolower="lower" :style="{'height':rpxWindowHeight - 85 - 30  + 'px'}" style="width: calc(100% - 180rpx);  float: left;">
+					<block v-for="(item, index) in booksList" :key="index"> 
+						<view style="position: relative;overflow: hidden; width: 31%; float: left; margin-left: 2%;" @click="clickToBooksDetail(item)">
+							<view style="cursor: pointer;">
+								<image :src="item | toBookImageFilePath" mode="aspectFit" style=" height: 120rpx;display: block;width: 100% ;"></image>
+								<view class="h70 center f24 bookName">{{item.book_name}}</view>
+								<view class="outOnLoan" v-show="item.isBookAvailable !=1 ">已借出</view>
+							</view>
+						</view>  
+					</block>
+					<view class="loading-text">{{loadingText}}</view>
+				</scroll-view>
+				<!-- <view class="books_list_panel" style="    position: inherit;float: left;">
+					<view class="h10"></view>
+					
+					<view class="clear "></view>
+				</view> -->
+				<view class="clear"></view>
+			</view>
+			<view class="clear"></view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import common from "@/js/common.js";
+	import config from "@/js/config.js";
+	import util from "@/js/util.js";
+	let statusBarHeight = uni.getSystemInfoSync().statusBarHeight; // 状态栏 高度
+	let screenHeight = uni.getSystemInfoSync().screenHeight; // 屏幕 高度 screenHeight
+
+	let that = null;
+	export default {
+		data() {
+			return {
+				url: "http://admin.8630.net/WYB/UploadFile/headerTopbg.png",
+				imageRootUrl:config.imageRootUrl,//前端图片地址
+				adminRootUrl:config.adminRootUrl +"/",//后端图片地址
+				statusBarHeight, // 状态栏 高度
+				screenHeight, // 屏幕 高度
+				searchContent:'',
+				head_is_fixed: 0,
+				ageTypeList: [],//{code: 'all',name: '全部'}, {code: 'all',name: '0-2岁'}, {code: 'all',name: '3-6岁'}, {code: 'all',name: '7-10岁'}, {code: 'all',name: '11-14岁'},
+				ageTypeIndex: 0, //选中年龄类型index  默认为0 选中全部
+				ageID: '',//选中年龄ID
+				booksCategoryList: [],//{ id: 1,name: '全部'},{id: 2,name: '绘本认知'}, {id: 3,name: '绘本故事'}, {id: 4,name: '科普百科'}, {id: 5,name: '动漫卡通'}, {id: 6,name: '名人传记'}, {id: 7,name: '国学'},{ id: 8,name: '注音'}, {id: 9,name: '精装'},{id: 10,name: '获奖'}, {id: 11,name: '国际名师大作'}, {id: 11,name: '分级阅读'}, {id: 11,name: '幼儿园故事'}, {id: 11,name: '纸板书'}, {id: 11,name: '通话故事'}, {id: 11,name: '中国传统故事'}, {id: 11,name: '情绪管理'}
+				booksList: [],
+				selectedCategoryIndex: 0,//标签Index
+				selectedCategoryID: '',//选中标签ID
+				rpxWindowHeight: 0,//屏幕高度
+				loadingText: "正在加载...",
+				showLoadMore: false,
+				pageIndex: 0, //页数
+				pageSize: 20, //条数
+				pageCount: 0, //最大页数
+			};
+		},
+		onReady() {
+
+		},
+		onShow() {
+			const info = uni.getSystemInfoSync();
+			console.log(info);
+			console.log('屏幕的高度：' + info.windowHeight);
+			that.rpxWindowHeight = info.windowHeight
+			
+			
+			console.log(uni.getStorageSync("searchContent"))
+			if(uni.getStorageSync("searchContent")!=""){
+				console.log("搜索")
+				that.searchContent = uni.getStorageSync("searchContent")
+				that.pageIndex= 0
+				that.pageSize = 20
+				that.booksList=[]
+				that.bindData(); //绑定数据
+			}else{
+				// that.searchContent = ""
+			}
+			console.log(uni.getStorageSync("ageTypeIndex"))
+			if(uni.getStorageSync("ageTypeIndex")!=""){
+				console.log("年齡點擊")
+				that.selectedCategoryIndex= 0
+				that.selectedCategoryID= ''
+				that.pageIndex= 0
+				that.pageSize = 20
+				that.booksList=[]
+				that.bindData(); //绑定数据
+			}
+		},
+		onPageScroll(e) {
+			that.head_is_fixed = e.scrollTop > 0 ? 1 : 0
+		},
+		onLoad() {
+			that = this;
+			//that.searchContent = option.searchContent
+			// alert(new Date().format("yyyy-MM-dd hh:mm:ss:S"));
+			if(uni.getStorageSync("searchContent")=="" && uni.getStorageSync("ageTypeIndex")==""){
+				that.pageIndex= 0
+				that.pageSize = 20
+				that.booksList=[]
+				that.bindData(); //绑定数据
+			}
+		},
+		methods: {
+			
+			clickAgeType(index) { //年龄类型选中
+				that.pageIndex= 0
+				that.pageSize = 20
+				that.booksList=[]
+				that.ageTypeIndex = index
+				console.log(index)
+				that.bindGetViewBookSkuAgeGroupList();//绑定书签(分类)
+				that.selectedCategoryIndex= 0 
+				that.selectedCategoryID= ''
+				uni.setStorageSync("ageTypeIndex",index)
+			},
+			clickBooksCategory(index,id) { //书签(分类)选中
+				that.pageIndex= 0
+				that.pageSize = 20
+				that.booksList=[]
+				that.selectedCategoryIndex = index
+				that.selectedCategoryID = id
+				that.bindGetBookInfoList();//绑定图书列表
+			},
+			bindData() {
+				console.log("綁定數據1")
+				that.bindAgeGroupList(); //绑定年龄列表
+			},
+			bindAgeGroupList(){ //绑定年龄列表
+				console.log("綁定數據2")
+				that.ageTypeList=[]
+				var data = {};
+				data.enabled = true;
+				data.orderBy = 'display_order';
+				common.call("GetAgeGroupList", data, function(result) {
+					let ageData = {
+						id: -1,
+						name: "全部"
+					}
+					that.ageTypeList.push(ageData)
+					
+					for (let i = 0; i < result.data.dataList.length; i++) {
+						let ageDatas = {
+							id: result.data.dataList[i].id,
+							name: result.data.dataList[i].name,
+						}
+						that.ageTypeList.push(ageDatas)
+					}
+					that.ageTypeIndex = uni.getStorageSync("ageTypeIndex")
+					console.log("that.ageTypeIndex：" + that.ageTypeIndex)
+					// that.ageTypeList = result.data.dataList 
+					//console.log(that.ageTypeList)
+					that.bindGetViewBookSkuAgeGroupList();//绑定书签列表(分类列表)
+				})
+			},
+			bindGetViewBookSkuAgeGroupList(){//绑定书签列表(分类列表)
+				var data = {};
+				if(that.ageTypeIndex == ""){
+					that.ageTypeIndex = 0
+				}
+				data.ageGroupId = that.ageTypeList[that.ageTypeIndex].id;
+				data.companyId = common.getCommunityId()
+				data.pageSize = 10000
+				common.call("GetViewBookTagListByCondition", data, function(result) {
+					that.booksCategoryList=[]
+					let bookMarkData= {
+						id:0,name:'全部'
+					}
+					that.booksCategoryList.push(bookMarkData)
+					for (let i = 0; i < result.data.length; i++) {
+						let name = ""
+						if(result.data[i].frontName ==null || result.data[i].frontName == ""){
+							name = result.data[i].name
+						}else{
+							name = result.data[i].frontName
+						}
+						let bookMarkData = {
+							id:result.data[i].id,
+							name:name
+						}
+						that.booksCategoryList.push(bookMarkData)
+					}
+					//console.log(that.booksCategoryList)
+					that.bindGetBookInfoList();//绑定书签的图书
+				})
+			},
+			bindGetBookInfoList(){//绑定图书列表
+				var data = {};
+				
+				//ageGroupSelectValue   年龄段ID
+				//bookTagSelectValue    标签ID
+				if(that.ageTypeList[that.ageTypeIndex].id != -1){
+					data.ageGroupSelectValue = that.ageTypeList[that.ageTypeIndex].id//年龄段ID
+				}
+				if(that.selectedCategoryID!=""){ //标签ID
+					data.bookTagSelectValue = that.selectedCategoryID;
+				}
+				if(that.searchContent!=""){
+					data.searchContent = that.searchContent ;
+				}
+				data.pageIndex = that.pageIndex;
+				data.pageSize = that.pageSize;
+				data.orderBy = "create_time desc";
+				if(common.getCommunityId() == "" || common.getCommunityId() == null ){
+					 //data.condition = 'company_id=(SELECT id FROM company where is_default is true) and is_online is  true'
+				}else{
+					data.companyId = common.getCommunityId()
+				}
+				data.condition= "is_online is  true" //线上是否可见
+				common.call("GetViewBookSkuInfoList", data, function(result) {
+					console.log(result)
+					that.booksList.push(...result.data.dataList);
+					that.pageCount = result.data.pageCount;
+					that.pageIndex = result.data.pageIndex;
+					that.pageSize = result.data.pageSize;
+					if(that.booksList.length== 0 || that.booksList.length<=20){
+						that.loadingText="没有更多数据了" 
+					}
+					uni.removeStorageSync("searchContent");
+					uni.removeStorageSync("ageTypeIndex");
+				})
+			},
+			clickSearch(){//搜索
+				that.pageIndex= 0
+				that.pageSize = 20
+				that.booksList=[]
+				that.bindGetBookInfoList();//绑定图书列表
+			},
+			confirm(val){//软键盘搜索确认
+				console.log("软键盘搜索：" + val)
+				if(that.searchContent =="" || that.searchContent ==null){
+					uni.showToast({
+						title: '请输入搜索内容',
+						icon: "none",
+						duration:2500
+					});
+					return;
+				}
+				that.pageIndex= 0
+				that.pageSize = 20
+				that.booksList=[]
+				that.bindGetBookInfoList();//绑定图书列表
+			},
+			clear(res){
+				// uni.showToast({
+				// 	title: 'clear事件，清除值为：' + res.value,
+				// 	icon: 'none'
+				// })
+				that.searchContent =""
+				that.pageIndex= 0
+				that.pageSize = 20
+				that.booksList=[]
+				that.bindGetBookInfoList();//绑定图书列表
+			},
+			clickToBooksDetail(item){// 跳转到图书详情
+				uni.navigateTo({
+					url: "/pages/home/booksDetail?bookSkuID=" + item.id
+				})
+			}, 
+			lower(e){
+				console.log("滚动到底部")
+				if ((that.pageIndex + 1) == that.pageCount) {
+					that.loadingText = "没有更多数据了";
+				} else if ((that.pageIndex + 1) < that.pageCount) {
+					that.pageIndex = that.pageIndex + 1;
+					that.showLoadMore = true;
+					that.loadingText = "加载更多";
+					that.bindGetBookInfoList();//绑定数据
+				}
+			},
+			async clickToRichScan() {
+				uni.scanCode({
+					autoZoom:false,//是否启用自动放大，默认启用
+					onlyFromCamera:true,//是否只能从相机扫码，不允许从相册选择图片
+					hideAlbum:true,//是否隐藏相册（不允许从相册选择图片），只能从相机扫码。默认值为 false。
+					scanType: ['barCode'],//扫码类型  barCode:一维码  qrCode:二维码  datamatrix:Data Matrix 码  pdf417:PDF417 条码
+					success: (res) => { 
+						console.log(res)
+						console.log("res.result="+ res.result)
+						setTimeout(() => {
+							that.scanToBooksDetail(res.result);
+						}, 200); ;
+			
+					},
+					fail: (err) => {
+						// 需要注意的是小程序扫码不需要申请相机权限
+						console.log(err)
+					}
+				});
+			},
+			scanToBooksDetail(sn) { //扫码跳转图书详情
+				if(sn =="" || sn ==null){
+					uni.showToast({
+						title: '请重新扫码',
+						icon: "none",
+						duration:2500
+					});
+					return;
+				}
+				var data = {};
+				data.sn = sn;
+				data.companyId = common.getCommunityId()
+				common.call('GetViewBookInfoList', data, function(res) {
+					console.log(res.data)
+					if(res.data.dataList.length <= 0 ){
+						uni.showToast({
+							title: '请重新扫码',
+							icon: "none",
+							duration:2500
+						});
+						return;
+					}else{
+						setTimeout(() => {
+							uni.navigateTo({
+								url: "/pages/home/booksDetail?bookSkuID=" + res.data.dataList[0].bookSkuId
+							});
+						}, 200);
+					}
+				});
+			},
+		},
+		filters: {
+			toCategoryName: function(value) {
+				if (value != null || value != "") {
+					if(value.length >6){
+						return value.substring(0, 6) + ".."
+					}else{
+						return value
+					}
+				} else {
+					return "";
+				}
+			},
+			toBookImageFilePath(item){
+				if(item.smallImageFilePath !="" && item.smallImageFilePath !=null){
+					return that.adminRootUrl + "/" + item.smallImageFilePath
+				}else{
+					return "../../static/image/common/default.jpg"
+				}
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	@import url("/css/common.css");
+
+	page {
+		background: #5EAC59;
+	}
+	.ageType {
+		border-radius: 24rpx;
+		padding: 15rpx;
+	}
+
+	.category {
+		padding: 10rpx;
+		border-radius: 24rpx;
+		
+		
+	}
+	.outOnLoan{
+			content: "";
+		    display: inline-block;
+		    width: 80rpx;
+		    height: 35rpx;
+			line-height: 35rpx;
+		    background-size: 100% 100%;
+		    vertical-align: middle;
+		    position: absolute;
+		    z-index: 1;
+		    top: 0;
+		    right: 0;
+		    font-size: 24rpx;
+			background-color: #FE613D;
+			color: #ffffff;
+			text-align: center;
+			border-radius: 10rpx;
+	}
+	.bookName{
+		// white-space: nowrap;		// overflow: hidden;		// text-overflow: ellipsis;
+		
+		overflow: hidden; // 溢出的内容隐藏
+		text-overflow: ellipsis; // 溢出的部分用省略号...显示
+		-webkit-line-clamp: 2; // 行数
+		display: -webkit-box; // 将对象作为弹性伸缩盒子模型显示 
+		-webkit-box-orient: vertical; // 设置或检索伸缩盒对象的子元素的排列方式
+	}
+</style>

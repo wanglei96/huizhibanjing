@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>栏目匹配</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<link rel="stylesheet" type="text/css" href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/cms/cms.promission.js"></script>
+<link rel="stylesheet" href="../../css/CmsChannelDetial.css"
+	type="text/css">
+<script type="text/javascript" src="../../js/management.js"></script>
+
+<script type="text/javascript">
+	managementContext.dataName="CmsChannel";
+	managementContext.tableName="cms_Channel";
+	managementContext.primaryKeyName="id";
+	managementContext.isCms = true;
+	managementContext.gridType = "Tree";
+	managementContext.allowPaging = false;
+	managementContext.managementPermission = "CmsTemplateMatchingManagement";
+	/*
+	取得树的列
+	 */
+	function getTreeColumns(lstData) {
+		var treeColumns = [ [{
+			title : '栏目列表',
+			field : 'name',
+			align : 'left',
+			fixed : true,
+			width : 250
+		},{
+			field : 'cmsChannelTemplateName',
+			title : '栏目模板',
+			fixed : true,
+			width : 150
+		},{
+			field : 'cmsContentTemplateName',
+			title : '内容模板',
+			fixed : true,
+			width : 150
+		}] ];
+		return treeColumns;
+	}
+	
+	//绑定divUlData操作权限
+	$(function(){
+		var permissions = JSON.parse(localStorage.permissions);
+		var tableGridPermissions = $(".divUlData [id^='btn']");
+		for(var i=0;i<tableGridPermissions.length;i++){
+			var id=tableGridPermissions[i].id;
+			var permission = managementContext.managementPermission+id.split("_")[0].substr(3);
+			if(!checkIsFunctionPermission(permissions,permission)){
+				$("#"+id).hide();
+			}
+		}
+	})
+	/*
+	取得请求参数
+	 */
+	function getParameters() {
+		var parameters = getParametersBase();
+		//var cmsChannelId = getSelectedcmsChannelId();
+		var cmsSiteId = $.cookie("cmsSiteId");
+		parameters.condition = "cms_site_id='" + cmsSiteId + "'";
+		parameters.cmsLanguageCode = currentCmsLanguageCode;
+		parameters.operatorId = $.cookie("sysUserId");
+		/* if (cmsChannelId != 0) {
+			parameters.condition = "cms_channel_id=" + cmsChannelId + "";
+		} */
+		return parameters;
+	}
+	
+	/*
+	 * 输出树型列表
+	 */
+	function outputTreeGrid(dataList) {
+		var treeData = getGridTreeDataBase(dataList);
+		var treeColumns = getTreeColumns(dataList);
+		//alert(JSON.stringify(treeData));
+		// alert(JSON.stringify(treeColumns));
+		$('#tableGrid').treegrid({
+			idField : managementContext.primaryKeyName,
+			treeField : 'name',
+			checkbox : true,
+			fitColumns : true,
+			cascadeCheck : false,
+			columns : treeColumns
+		});
+		$('#tableGrid').treegrid("loadData", treeData);
+		//加载数据后展开树形列表
+		 if($("#txtSearchName").val()!=""){
+			$("#divCmschannel .tree-hit").trigger("click");
+		}else{
+			$("#divCmschannel .tree-hit").eq(0).trigger("click");
+		} 
+	}
+	/*
+	 * 取得树数据
+	 */
+	function getGridTreeDataBase(lstData) {
+		// alert(JSON.stringify(lstData));
+		if (managementContext.primaryKeyName == "id") {
+			var treeData = getGridTreeData(lstData, 0, "id", "parentId");
+			// alert(JSON.stringify(treeData));
+			return treeData;
+		} else if (managementContext.primaryKeyName == "code") {
+			var treeData = getGridTreeData(lstData, "", "code", "parent_code");
+			// alert(JSON.stringify(treeData));
+			return treeData;
+		}
+	}
+	/*
+	 * 绑定控件
+	 */
+	function bindControls() {
+		bindControlsBase();
+		//绑定栏目模板树形列表
+		var cmsChannelTemplatecondition = "cms_site_id=" + getCookie("cmsSiteId") + " and cms_template_type_code = 'channel'"
+		var cmsChannelTemplateTreeColumns = [ [{
+			field : 'ck',
+			checkbox : true,
+			title : 'id',
+			width : 30
+		},{
+			title : '栏目模板列表',
+			field : 'name',
+			align : 'left',
+			fixed : true,
+			width : 150,
+			formatter:function(value,row,index){
+                   if(row.is_system_default_channel_template == 1){
+						return value+"(默认栏目模板)";
+					}else{
+						return value;
+					}
+         }
+		}] ];
+		bindCmsTemplateNameTableGrid("ulChannelTemplate","cms_template",cmsChannelTemplatecondition,cmsChannelTemplateTreeColumns);
+		//绑定内容模板树形列表
+		var cmsContentTemplatecondition = "cms_site_id=" + getCookie("cmsSiteId") + " and cms_template_type_code = 'content'"
+		var cmsContentTemplateTreeColumns = [ [{
+			field : 'ck',
+			checkbox : true,
+			title : 'id',
+			width : 30
+		},{
+			title : '内容模板列表',
+			field : 'name',
+			align : 'left',
+			fixed : true,
+			width : 150,
+			formatter:function(value,row,index){
+                   if(row.is_system_default_content_template == 1){
+						return value+"(默认内容模板)";
+					}else{
+						return value;
+					}
+         }
+		}] ];
+		bindCmsTemplateNameTableGrid("ulContentTemplate","cms_template",cmsContentTemplatecondition,cmsContentTemplateTreeColumns);
+		//绑定首页模板树形列表
+		var cmsHomeTemplatecondition = "cms_site_id=" + getCookie("cmsSiteId") + " and cms_template_type_code = 'home'"
+		var cmsHomeTemplateTreeColumns = [ [{
+			field : 'ck',
+			checkbox : true,
+			title : 'id',
+			width : 30
+		},{
+			title : '首页模板列表',
+			field : 'name',
+			align : 'left',
+			fixed : true,
+			width : 150,
+			formatter:function(value,row,index){
+                   if(row.is_system_default_content_template == 1){
+						return value+"(默认栏目模板)";
+					}else{
+						return value;
+					}
+         }
+		}] ];
+		bindCmsTemplateNameTableGrid("ulHomeTemplate","cms_template",cmsHomeTemplatecondition,cmsHomeTemplateTreeColumns);
+	}
+	function bindCmsTemplateNameTableGrid(controlId,tableName,condition,tableColumns){
+		var data = new Object();
+		data.tableName = tableName;
+		data.condition = condition;
+		call("GetTable", data, function(result) {
+			//alert(JSON.stringify(result));
+			outputCmsTemplateListGrid(result.data,controlId,tableColumns);
+			$(".datagrid-pager").remove();
+		});
+	}
+	function outputCmsTemplateListGrid(dataList, gridControlId,tableColumns,getGridRowCallback,getTableColumnsCallback){
+			
+		$('#' + gridControlId).datagrid({
+			columns : tableColumns,
+			checkbox : true,
+			pagination : true,
+			singleSelect :true,
+			fitColumns : true
+		})
+		// 清空datagrid数据
+		$('#' + gridControlId).datagrid('loadData', {
+			total : 0,
+			rows : []
+		});
+		
+		for ( var i = 0; i < dataList.length; i++) {
+			var dataItem = dataList[i];
+			outputListItem(dataItem, gridControlId, getGridRowCallback);
+		}	
+		//隐藏标题的多选框
+		$("#divCms"+gridControlId.substr(2)+" input").eq(0).hide();
+	}
+	//匹配模板
+	function templateMatch(templateType){
+		var data = getTemplatAndChannelPageParameter();
+		if(!isPermittedList(data.cmsChannelList)){
+			alert("所选栏目包含未授权栏目");
+		}else{
+			data.templateType = templateType;
+			call("TemplateMatch", data, function(result) {
+				bindData();
+			});
+		}
+	}
+	//取消匹配
+	function cancelTemplateMatch(templateType){
+		var data = getTemplatAndChannelPageParameter();
+		if(!isPermittedList(data.cmsChannelList)){
+			alert("所选栏目包含未授权栏目");
+		}else{
+			data.templateType = templateType;
+			call("CancleTemplateMatch", data, function(result) {
+				bindData();
+			});
+		}
+	}
+	//获取页面参数
+	function getTemplatAndChannelPageParameter(){
+		var data = new Object();
+		data.cmsChannelList = [];
+		data.cmsChannelTemplateList = [];
+		data.cmsContentTemplateList = [];
+		data.cmsHomeTemplateList = [];
+		var cmsChannelList = $('#tableGrid').treegrid('getCheckedNodes');
+		for ( var i = 0; i < cmsChannelList.length; i++) {
+			data.cmsChannelList.push(cmsChannelList[i].id);
+		}
+		var cmsChannelTemplateList = $('#ulChannelTemplate').datagrid('getSelections');
+		for ( var i = 0; i < cmsChannelTemplateList.length; i++) {
+			data.cmsChannelTemplateList.push(cmsChannelTemplateList[i].id);
+		}
+		var cmsContentTemplateList = $('#ulContentTemplate').datagrid('getSelections');
+		for ( var i = 0; i < cmsContentTemplateList.length; i++) {
+			data.cmsContentTemplateList.push(cmsContentTemplateList[i].id);
+		}
+		var cmsHomeTemplateList = $('#ulHomeTemplate').datagrid('getSelections');
+		for ( var i = 0; i < cmsHomeTemplateList.length; i++) {
+			data.cmsHomeTemplateList.push(cmsHomeTemplateList[i].id);
+		}
+		return data;
+	}
+</script>
+<body>
+	<div id="divDetailDialog" class="easyui-layout" style="width:100%;overflow:auto;"
+	 closed="false" fit="true">
+			<div buttons="#dlg-buttons">
+				<form id="formDetail" method="post" novalidate
+					style="margin:0;padding:20px 50px">
+					<div style="margin-bottom:10px;width: 35%;height:730px;"class="divUlData">
+						<div style="width:100%;height:100%;border: 1px solid Gray;overflow:auto;" id="divCmschannel">
+							<table id="tableGrid" class="table table-bordered table-hover" style="height:auto;">
+							</table>
+						</div>
+					</div>
+					<div style="width:9%;height:730px;" class="divUlData" >
+						<div style="margin-top: 330px;margin-left: 30%;">
+							<input type="button" value="<-匹配" id="btnChannelMatch" onclick="templateMatch('channel')"/>
+							<div style="width: 100%;height:20px;"></div>
+							<input type="button" value="->取消 " id="btnCancelChannelMatch" onclick="cancelTemplateMatch('channel')"/>
+						</div>
+					</div>
+					<div style="margin-bottom:10px;width: 12%;height:730px;"class="divUlData">
+						<div style="width:100%;height:100%;border: 1px solid Gray;overflow:auto;" id="divCmsChannelTemplate">
+							<table id="ulChannelTemplate" class="table table-bordered table-hover" style="height:auto;">
+							</table>
+						</div>
+					</div>
+					<div style="width:9%;height:730px;" class="divUlData" >
+						<div style="margin-top: 330px;margin-left: 30%;">
+							<input type="button" value="<-匹配" id="btnContentMatch" onclick="templateMatch('content')"/>
+							<div style="width: 100%;height:20px;"></div>
+							<input type="button" value="->取消 " id="btnCancelContentMatch" onclick="cancelTemplateMatch('content')"/>
+						</div>
+					</div>
+					<div style="margin-bottom:10px;width: 12%;height:730px;"class="divUlData" >
+						<div style="width:100%;height:100%;border: 1px solid Gray;overflow:auto;" id="divCmsContentTemplate">
+							<table id="ulContentTemplate" class="table table-bordered table-hover" style="height:auto;">
+							</table>
+						</div>
+					</div><div style="width:9%;height:730px;" class="divUlData" >
+						<div style="margin-top: 330px;margin-left: 30%;">
+							<input type="button" value="<-匹配" id="btnHomeMatch" onclick="templateMatch('home')"/>
+							<div style="width: 100%;height:20px;"></div>
+							<input type="button" value="->取消 " id="btnCancelHomeMatch" onclick="cancelTemplateMatch('home')"/>
+						</div>
+					</div>
+					<div style="margin-bottom:10px;width: 12%;height:730px;"class="divUlData">
+						<div style="width:100%;height:100%;border: 1px solid Gray;overflow:auto;" id="divCmsHomeTemplate">
+							<table id="ulHomeTemplate" class="table table-bordered table-hover" style="height:auto;">
+							</table>
+						</div>
+					</div>
+				</form>
+			</div>	
+		</div>
+</body>
+</html>

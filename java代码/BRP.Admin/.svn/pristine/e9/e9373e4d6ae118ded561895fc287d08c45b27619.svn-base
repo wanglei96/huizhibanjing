@@ -1,0 +1,119 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import java.lang.Boolean;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+public class NightStoryType extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  String code;
+    private  String name;//名称;
+    private  Integer dayCount;//天数;
+    private  BigDecimal price;//价格;
+    private  Integer maxSubscribeCount;
+    private  Integer displayOrder;//排序;
+    private  Timestamp createTime;//创建时间;
+    private  Timestamp updateTime;//修改时间;
+    private  Boolean isDeleted;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setCode(String code)    
+    {
+        this.code = code;
+    }
+    public  String getCode()    
+    {
+        return code;
+    }
+    public  void setName(String name)    
+    {
+        this.name = name;
+    }
+    public  String getName()    
+    {
+        return name;
+    }
+    public  void setDayCount(Integer dayCount)    
+    {
+        this.dayCount = dayCount;
+    }
+    public  Integer getDayCount()    
+    {
+        return dayCount;
+    }
+    public  void setPrice(BigDecimal price)    
+    {
+        this.price = price;
+    }
+    public  BigDecimal getPrice()    
+    {
+        return price;
+    }
+    public  void setMaxSubscribeCount(Integer maxSubscribeCount)    
+    {
+        this.maxSubscribeCount = maxSubscribeCount;
+    }
+    public  Integer getMaxSubscribeCount()    
+    {
+        return maxSubscribeCount;
+    }
+    public  void setDisplayOrder(Integer displayOrder)    
+    {
+        this.displayOrder = displayOrder;
+    }
+    public  Integer getDisplayOrder()    
+    {
+        return displayOrder;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setUpdateTime(Timestamp updateTime)    
+    {
+        this.updateTime = updateTime;
+    }
+    public  Timestamp getUpdateTime()    
+    {
+        return updateTime;
+    }
+    public  void setIsDeleted(Boolean isDeleted)    
+    {
+        this.isDeleted = isDeleted;
+    }
+    public  Boolean getIsDeleted()    
+    {
+        return isDeleted;
+    }
+    public  NightStoryType copy()    
+    {
+        NightStoryType entity = null;
+        try        
+        {
+            entity = (NightStoryType) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

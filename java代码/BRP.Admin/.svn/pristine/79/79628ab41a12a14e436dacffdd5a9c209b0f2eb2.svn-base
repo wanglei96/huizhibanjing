@@ -1,0 +1,146 @@
+<html>
+<head>
+
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<link rel="stylesheet" href="../../themes/custom/easyui.css"
+	type="text/css"></link>
+<script>
+	$(function() {
+		//执行命令
+		$("#btnExecuteCommand").click(function() {
+			var data = new Object();
+			data.commandId = "SysUser.updateSysUser";
+			data.commandType = "update";
+			data.parameters = getEntityForUpdate();
+			call("ExecuteCommand", data, function(result) {
+				alert(JSON.stringify(result));
+			});
+		});
+		$("#btnGetTable").click(function() {
+			var data = new Object();
+			data.tableName = "sys_user";
+			data.orderBy = "login_name";
+			data.condition = "login_name != 'admin'";//可选
+			data.fields = "id, login_name, count(*) as count";//可选
+			data.groupBy = "id, login_name";//可选
+			call("GetTable", data, function(result) {
+				alert(JSON.stringify(result.data));
+			});
+		});
+		$("#btnQueryPager").click(function() {
+			var data = new Object();
+			data.tableName = "sys_user";
+			data.orderBy = "create_time desc";
+			data.condition = "login_name !='admin'";//可选
+			data.pageIndex = 0;//可选
+			data.pageSize = 10;//可选
+			call("GetTable", data, function(result) {
+				alert(JSON.stringify(result.data));
+			});
+		});
+		//查询列表
+		$("#btnQueryList").click(function() {
+			var data = new Object();
+			call("GetSysUserList", data, function(result) {
+				alert(JSON.stringify(result));
+			});
+		});
+		//查询一条数据
+		$("#btnQueryOne").click(function() {
+			var data = new Object();
+			data.id = 107;
+			call("GetSysUser", data, function(result) {
+				alert(JSON.stringify(result));
+			});
+		});
+		//登录
+		$("#btnLogin").click(function() {
+			var data = new Object();
+			data.loginName = "admin"
+			data.password = "admin";
+			call("Login", data, function(result) {
+				alert(JSON.stringify(result));
+			});
+		});
+
+		//添加用户
+		$("#btnAddSysUser").click(function() {
+			var data = getEntity();
+			call("AddSysUser", data, function(result) {
+				alert(JSON.stringify(result));
+			});
+		});
+		//修改用户
+		$("#btnUpdateSysUser").click(function() {
+			var data = getEntityForUpdate();
+			call("UpdateSysUser", data, function(result) {
+				alert(JSON.stringify(result));
+			});
+		});
+		//远程调用
+		$("#btnRemoteCall").click(function() {
+			var data = new Object();
+			data.serviceName = "GetTable";
+			data.tableName = "SysUser";
+			call("RemoteCall", data, function(result) {
+				alert(JSON.stringify(result));
+			});
+		});
+		//取服务器时间
+		$("#btnGetServerTime").click(function() {
+			var data = new Object();
+			data.serviceName = "GetServerTime";
+			call("RemoteCall", data, function(result) {
+				alert(JSON.stringify(result));
+			});
+		});
+		
+		//货运站登录
+		$("#btnHYZLogin").click(function() {
+			var data = new Object();
+			data.serviceName = "HYZCall";
+			data.SocketServiceName = "HYZLogin";
+			data.LoginName = "aaa";
+			data.Password = "bbb";
+			data.BusinessDate = "2019-12-1";
+			call("RemoteCall", data, function(result) {
+				alert(JSON.stringify(result));
+			});
+		});
+	});
+	function getEntity() {
+		var newSysUser = new Object();
+		newSysUser.loginName = Math.random().toString();
+		newSysUser.password = "ccc";
+		newSysUser.trueName = "在右在ccc";
+		return newSysUser;
+	}
+	function getEntityForUpdate() {
+		var newSysUser = new Object();
+		newSysUser.loginName = "sss";
+		newSysUser.trueName = "左右";
+		newSysUser.employeeNo = "33";
+		newSysUser.id = 98;
+		return newSysUser;
+	}
+</script>
+</head>
+<body>
+	<input id="btnExecuteCommand" value="执行命令" type="button" />
+	<input id="btnGetTable" value="查询表" type="button" />
+	<input id="btnQueryPager" value="分页查询" type="button" />
+	<input id="btnQueryList" value="查询列表" type="button" />
+	<input id="btnQueryOne" value="查询一条数据" type="button" />
+	<input id="btnLogin" value="登录" type="button" />
+	<input id="btnAddSysUser" value="添加用户" type="button" />
+	<input id="btnUpdateSysUser" value="修改用户" type="button" />
+	<input id="btnRemoteCall" value="远程调用" type="button" />
+	<input id="btnGetServerTime" value="取得服务器时间" type="button" />
+	<input id="btnHYZLogin" value="货运站登录" type="button" />
+</body>
+</html>

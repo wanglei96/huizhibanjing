@@ -1,0 +1,460 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import java.lang.Boolean;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+public class ViewBookOutOrder extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer bookOrderItemId;//会员卡号ID;
+    private  Integer bookcaseId;//出库位置;
+    private  String bookOutOrderStatusCode;//找书出库状态编码;
+    private  Timestamp createTime;//创建时间;
+    private  Timestamp updateTime;//修改时间;
+    private  String bookOutOrderStatusName;//出库单状态名称;
+    private  Integer bookOrderId;//借书单ID;
+    private  Integer bookId;//图书ID;
+    private  Boolean isDamage;//是否损坏;
+    private  String bookOrderBorrowStatusCode;//借阅状态编码;
+    private  String bookOrderNo;//单据编号;
+    private  Timestamp businessDate;//单据时间;
+    private  Timestamp deliverTime;//配送时间;
+    private  Integer companyId;//门店ID;
+    private  Integer memberId;//会员ID;
+    private  Boolean isOffline;//是否线下;
+    private  String errorRemark;//异常情况;
+    private  Integer bookpickerId;//拣书员ID;
+    private  Integer displayOrder;//配送单排序（配送员小程序）;
+    private  Integer deliverAreaNumber;//大区编号;
+    private  String bookSn;//条形码;
+    private  Integer bookSkuId;//skuID;
+    private  Integer bookBookcaseId;//书柜ID;
+    private  String borrowStatusCode;//借阅状态;
+    private  String imageFilePath;//路径;
+    private  String imageFileName;//图片名称;
+    private  String bookName;//书名;
+    private  String bindingTypeCode;//装订方式;
+    private  Integer bookSeriesId;//系列ID;
+    private  String bookSeriesName;//系列名称;
+    private  String bindingTypeName;//装订类型;
+    private  String memberName;//名称;
+    private  String memberNo;//会员编号;
+    private  String memberMobilePhone;//联系电话;
+    private  Integer deliverAreaId;//配送大区ID;
+    private  Integer deliverLineId;//配送线路ID;
+    private  Integer deliverPlaceId;//配送点ID;
+    private  String address;//地址;
+    private  Integer delivererId;//配送员ID;
+    private  String bookboxPlace;//书箱位置;
+    private  String cardNo;//会员卡号;
+    private  String bookcaseName;//书柜名称;
+    private  String bookOrderBorrowStatusName;//借阅状态;
+    private  String deliverAreaName;//配送大区;
+    private  String deliverLineName;//名称;
+    private  String deliverPlaceName;//名称;
+    private  String bookpickerName;//姓名;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setBookOrderItemId(Integer bookOrderItemId)    
+    {
+        this.bookOrderItemId = bookOrderItemId;
+    }
+    public  Integer getBookOrderItemId()    
+    {
+        return bookOrderItemId;
+    }
+    public  void setBookcaseId(Integer bookcaseId)    
+    {
+        this.bookcaseId = bookcaseId;
+    }
+    public  Integer getBookcaseId()    
+    {
+        return bookcaseId;
+    }
+    public  void setBookOutOrderStatusCode(String bookOutOrderStatusCode)    
+    {
+        this.bookOutOrderStatusCode = bookOutOrderStatusCode;
+    }
+    public  String getBookOutOrderStatusCode()    
+    {
+        return bookOutOrderStatusCode;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setUpdateTime(Timestamp updateTime)    
+    {
+        this.updateTime = updateTime;
+    }
+    public  Timestamp getUpdateTime()    
+    {
+        return updateTime;
+    }
+    public  void setBookOutOrderStatusName(String bookOutOrderStatusName)    
+    {
+        this.bookOutOrderStatusName = bookOutOrderStatusName;
+    }
+    public  String getBookOutOrderStatusName()    
+    {
+        return bookOutOrderStatusName;
+    }
+    public  void setBookOrderId(Integer bookOrderId)    
+    {
+        this.bookOrderId = bookOrderId;
+    }
+    public  Integer getBookOrderId()    
+    {
+        return bookOrderId;
+    }
+    public  void setBookId(Integer bookId)    
+    {
+        this.bookId = bookId;
+    }
+    public  Integer getBookId()    
+    {
+        return bookId;
+    }
+    public  void setIsDamage(Boolean isDamage)    
+    {
+        this.isDamage = isDamage;
+    }
+    public  Boolean getIsDamage()    
+    {
+        return isDamage;
+    }
+    public  void setBookOrderBorrowStatusCode(String bookOrderBorrowStatusCode)    
+    {
+        this.bookOrderBorrowStatusCode = bookOrderBorrowStatusCode;
+    }
+    public  String getBookOrderBorrowStatusCode()    
+    {
+        return bookOrderBorrowStatusCode;
+    }
+    public  void setBookOrderNo(String bookOrderNo)    
+    {
+        this.bookOrderNo = bookOrderNo;
+    }
+    public  String getBookOrderNo()    
+    {
+        return bookOrderNo;
+    }
+    public  void setBusinessDate(Timestamp businessDate)    
+    {
+        this.businessDate = businessDate;
+    }
+    public  Timestamp getBusinessDate()    
+    {
+        return businessDate;
+    }
+    public  void setDeliverTime(Timestamp deliverTime)    
+    {
+        this.deliverTime = deliverTime;
+    }
+    public  Timestamp getDeliverTime()    
+    {
+        return deliverTime;
+    }
+    public  void setCompanyId(Integer companyId)    
+    {
+        this.companyId = companyId;
+    }
+    public  Integer getCompanyId()    
+    {
+        return companyId;
+    }
+    public  void setMemberId(Integer memberId)    
+    {
+        this.memberId = memberId;
+    }
+    public  Integer getMemberId()    
+    {
+        return memberId;
+    }
+    public  void setIsOffline(Boolean isOffline)    
+    {
+        this.isOffline = isOffline;
+    }
+    public  Boolean getIsOffline()    
+    {
+        return isOffline;
+    }
+    public  void setErrorRemark(String errorRemark)    
+    {
+        this.errorRemark = errorRemark;
+    }
+    public  String getErrorRemark()    
+    {
+        return errorRemark;
+    }
+    public  void setBookpickerId(Integer bookpickerId)    
+    {
+        this.bookpickerId = bookpickerId;
+    }
+    public  Integer getBookpickerId()    
+    {
+        return bookpickerId;
+    }
+    public  void setDisplayOrder(Integer displayOrder)    
+    {
+        this.displayOrder = displayOrder;
+    }
+    public  Integer getDisplayOrder()    
+    {
+        return displayOrder;
+    }
+    public  void setDeliverAreaNumber(Integer deliverAreaNumber)    
+    {
+        this.deliverAreaNumber = deliverAreaNumber;
+    }
+    public  Integer getDeliverAreaNumber()    
+    {
+        return deliverAreaNumber;
+    }
+    public  void setBookSn(String bookSn)    
+    {
+        this.bookSn = bookSn;
+    }
+    public  String getBookSn()    
+    {
+        return bookSn;
+    }
+    public  void setBookSkuId(Integer bookSkuId)    
+    {
+        this.bookSkuId = bookSkuId;
+    }
+    public  Integer getBookSkuId()    
+    {
+        return bookSkuId;
+    }
+    public  void setBookBookcaseId(Integer bookBookcaseId)    
+    {
+        this.bookBookcaseId = bookBookcaseId;
+    }
+    public  Integer getBookBookcaseId()    
+    {
+        return bookBookcaseId;
+    }
+    public  void setBorrowStatusCode(String borrowStatusCode)    
+    {
+        this.borrowStatusCode = borrowStatusCode;
+    }
+    public  String getBorrowStatusCode()    
+    {
+        return borrowStatusCode;
+    }
+    public  void setImageFilePath(String imageFilePath)    
+    {
+        this.imageFilePath = imageFilePath;
+    }
+    public  String getImageFilePath()    
+    {
+        return imageFilePath;
+    }
+    public  void setImageFileName(String imageFileName)    
+    {
+        this.imageFileName = imageFileName;
+    }
+    public  String getImageFileName()    
+    {
+        return imageFileName;
+    }
+    public  void setBookName(String bookName)    
+    {
+        this.bookName = bookName;
+    }
+    public  String getBookName()    
+    {
+        return bookName;
+    }
+    public  void setBindingTypeCode(String bindingTypeCode)    
+    {
+        this.bindingTypeCode = bindingTypeCode;
+    }
+    public  String getBindingTypeCode()    
+    {
+        return bindingTypeCode;
+    }
+    public  void setBookSeriesId(Integer bookSeriesId)    
+    {
+        this.bookSeriesId = bookSeriesId;
+    }
+    public  Integer getBookSeriesId()    
+    {
+        return bookSeriesId;
+    }
+    public  void setBookSeriesName(String bookSeriesName)    
+    {
+        this.bookSeriesName = bookSeriesName;
+    }
+    public  String getBookSeriesName()    
+    {
+        return bookSeriesName;
+    }
+    public  void setBindingTypeName(String bindingTypeName)    
+    {
+        this.bindingTypeName = bindingTypeName;
+    }
+    public  String getBindingTypeName()    
+    {
+        return bindingTypeName;
+    }
+    public  void setMemberName(String memberName)    
+    {
+        this.memberName = memberName;
+    }
+    public  String getMemberName()    
+    {
+        return memberName;
+    }
+    public  void setMemberNo(String memberNo)    
+    {
+        this.memberNo = memberNo;
+    }
+    public  String getMemberNo()    
+    {
+        return memberNo;
+    }
+    public  void setMemberMobilePhone(String memberMobilePhone)    
+    {
+        this.memberMobilePhone = memberMobilePhone;
+    }
+    public  String getMemberMobilePhone()    
+    {
+        return memberMobilePhone;
+    }
+    public  void setDeliverAreaId(Integer deliverAreaId)    
+    {
+        this.deliverAreaId = deliverAreaId;
+    }
+    public  Integer getDeliverAreaId()    
+    {
+        return deliverAreaId;
+    }
+    public  void setDeliverLineId(Integer deliverLineId)    
+    {
+        this.deliverLineId = deliverLineId;
+    }
+    public  Integer getDeliverLineId()    
+    {
+        return deliverLineId;
+    }
+    public  void setDeliverPlaceId(Integer deliverPlaceId)    
+    {
+        this.deliverPlaceId = deliverPlaceId;
+    }
+    public  Integer getDeliverPlaceId()    
+    {
+        return deliverPlaceId;
+    }
+    public  void setAddress(String address)    
+    {
+        this.address = address;
+    }
+    public  String getAddress()    
+    {
+        return address;
+    }
+    public  void setDelivererId(Integer delivererId)    
+    {
+        this.delivererId = delivererId;
+    }
+    public  Integer getDelivererId()    
+    {
+        return delivererId;
+    }
+    public  void setBookboxPlace(String bookboxPlace)    
+    {
+        this.bookboxPlace = bookboxPlace;
+    }
+    public  String getBookboxPlace()    
+    {
+        return bookboxPlace;
+    }
+    public  void setCardNo(String cardNo)    
+    {
+        this.cardNo = cardNo;
+    }
+    public  String getCardNo()    
+    {
+        return cardNo;
+    }
+    public  void setBookcaseName(String bookcaseName)    
+    {
+        this.bookcaseName = bookcaseName;
+    }
+    public  String getBookcaseName()    
+    {
+        return bookcaseName;
+    }
+    public  void setBookOrderBorrowStatusName(String bookOrderBorrowStatusName)    
+    {
+        this.bookOrderBorrowStatusName = bookOrderBorrowStatusName;
+    }
+    public  String getBookOrderBorrowStatusName()    
+    {
+        return bookOrderBorrowStatusName;
+    }
+    public  void setDeliverAreaName(String deliverAreaName)    
+    {
+        this.deliverAreaName = deliverAreaName;
+    }
+    public  String getDeliverAreaName()    
+    {
+        return deliverAreaName;
+    }
+    public  void setDeliverLineName(String deliverLineName)    
+    {
+        this.deliverLineName = deliverLineName;
+    }
+    public  String getDeliverLineName()    
+    {
+        return deliverLineName;
+    }
+    public  void setDeliverPlaceName(String deliverPlaceName)    
+    {
+        this.deliverPlaceName = deliverPlaceName;
+    }
+    public  String getDeliverPlaceName()    
+    {
+        return deliverPlaceName;
+    }
+    public  void setBookpickerName(String bookpickerName)    
+    {
+        this.bookpickerName = bookpickerName;
+    }
+    public  String getBookpickerName()    
+    {
+        return bookpickerName;
+    }
+    public  ViewBookOutOrder copy()    
+    {
+        ViewBookOutOrder entity = null;
+        try        
+        {
+            entity = (ViewBookOutOrder) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

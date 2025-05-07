@@ -1,0 +1,1 @@
+<view class="content"><view class="page"><view class="pd_10"><rich-text nodes="{{content}}"></rich-text></view></view><view class="f14"></view><view class="indent f14"></view><view style="font-size:30rpx;font-weight:bold;"></view></view>

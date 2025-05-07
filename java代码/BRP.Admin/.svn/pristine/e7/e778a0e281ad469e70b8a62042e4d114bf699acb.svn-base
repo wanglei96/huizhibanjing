@@ -1,0 +1,144 @@
+package BRP.data;
+import net.sf.json.JSONObject;
+import java.lang.Integer;
+import strosoft.app.util.JsonHelper;
+import java.lang.String;
+import strosoft.app.data.DataEntity;
+import java.sql.Timestamp;
+public class ViewRequiredBook extends DataEntity implements Cloneable
+{
+    private  Integer id;//ID;
+    private  Integer bookSkuId;//图书ID;
+    private  Integer requiredBookCategoryId;//分类ID;
+    private  Timestamp createTime;//创建时间;
+    private  String ISBN;//ISBN;
+    private  String bookName;//书名;
+    private  Integer bookSeriesId;//ID;
+    private  String bookSeriesName;//系列名称;
+    private  String bookSkuImageFilePath;//图书封面路径;
+    private  String bookSkuSmallImageFilePath;
+    private  String requiredBookCategoryImageFilePath;//必读书单分类图片路径;
+    private  Integer companyId;//门店ID;
+    private  String requiredBookCategoryName;
+    public  void setId(Integer id)    
+    {
+        this.id = id;
+    }
+    public  Integer getId()    
+    {
+        return id;
+    }
+    public  void setBookSkuId(Integer bookSkuId)    
+    {
+        this.bookSkuId = bookSkuId;
+    }
+    public  Integer getBookSkuId()    
+    {
+        return bookSkuId;
+    }
+    public  void setRequiredBookCategoryId(Integer requiredBookCategoryId)    
+    {
+        this.requiredBookCategoryId = requiredBookCategoryId;
+    }
+    public  Integer getRequiredBookCategoryId()    
+    {
+        return requiredBookCategoryId;
+    }
+    public  void setCreateTime(Timestamp createTime)    
+    {
+        this.createTime = createTime;
+    }
+    public  Timestamp getCreateTime()    
+    {
+        return createTime;
+    }
+    public  void setISBN(String ISBN)    
+    {
+        this.ISBN = ISBN;
+    }
+    public  String getISBN()    
+    {
+        return ISBN;
+    }
+    public  void setBookName(String bookName)    
+    {
+        this.bookName = bookName;
+    }
+    public  String getBookName()    
+    {
+        return bookName;
+    }
+    public  void setBookSeriesId(Integer bookSeriesId)    
+    {
+        this.bookSeriesId = bookSeriesId;
+    }
+    public  Integer getBookSeriesId()    
+    {
+        return bookSeriesId;
+    }
+    public  void setBookSeriesName(String bookSeriesName)    
+    {
+        this.bookSeriesName = bookSeriesName;
+    }
+    public  String getBookSeriesName()    
+    {
+        return bookSeriesName;
+    }
+    public  void setBookSkuImageFilePath(String bookSkuImageFilePath)    
+    {
+        this.bookSkuImageFilePath = bookSkuImageFilePath;
+    }
+    public  String getBookSkuImageFilePath()    
+    {
+        return bookSkuImageFilePath;
+    }
+    public  void setBookSkuSmallImageFilePath(String bookSkuSmallImageFilePath)    
+    {
+        this.bookSkuSmallImageFilePath = bookSkuSmallImageFilePath;
+    }
+    public  String getBookSkuSmallImageFilePath()    
+    {
+        return bookSkuSmallImageFilePath;
+    }
+    public  void setRequiredBookCategoryImageFilePath(String requiredBookCategoryImageFilePath)    
+    {
+        this.requiredBookCategoryImageFilePath = requiredBookCategoryImageFilePath;
+    }
+    public  String getRequiredBookCategoryImageFilePath()    
+    {
+        return requiredBookCategoryImageFilePath;
+    }
+    public  void setCompanyId(Integer companyId)    
+    {
+        this.companyId = companyId;
+    }
+    public  Integer getCompanyId()    
+    {
+        return companyId;
+    }
+    public  void setRequiredBookCategoryName(String requiredBookCategoryName)    
+    {
+        this.requiredBookCategoryName = requiredBookCategoryName;
+    }
+    public  String getRequiredBookCategoryName()    
+    {
+        return requiredBookCategoryName;
+    }
+    public  ViewRequiredBook copy()    
+    {
+        ViewRequiredBook entity = null;
+        try        
+        {
+            entity = (ViewRequiredBook) super.clone();
+        }
+         catch (CloneNotSupportedException e)         
+        {
+            e.printStackTrace();
+        }
+        return entity;
+    }
+    public  JSONObject toJson()    
+    {
+        return JSONObject.fromObject(this,JsonHelper.getJsonConfig());
+    }
+}

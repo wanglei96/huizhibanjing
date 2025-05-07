@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>修改密码</title>
+
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<link rel="stylesheet" type="text/css" href="../../../themes/icon.css">
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<link rel="stylesheet" href="../../themes/custom/easyui.css"
+	type="text/css" />
+<link rel="stylesheet" href="../../css/main.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+
+<script type="text/javascript">
+	$(function() {
+		$("#spLoginName").html($.cookie("loginName"));
+	});
+
+	function save() {
+		var data = getSysUserEntity();
+		call("ChangePassword", data, function(result) {
+			$("#spOldPassword").html("");
+			$("#spPassword").html("");
+			$("#spRePassword").html("修改成功！");
+		});
+	}
+	/*
+	 *获取修改信息
+	 */
+	function getSysUserEntity() {
+
+		var id = $.cookie("sysUserId");
+		var loginName = $.cookie("loginName");
+		var oldPassword = $("#txtOldPassword").val();
+		var newPasswprd = $("#txtPassword").val();
+		var rePassword = $("#txtRePassword").val();
+
+		if (newPasswprd.length == 0) {
+			$("#spOldPassword").html("");
+			$("#spPassword").html("新密码不能为空！");
+			return;
+		}
+
+		if (newPasswprd != rePassword) {
+			$("#spOldPassword").html("");
+			$("#spPassword").html("");
+			$("#spRePassword").html("两次密码不一致！");
+			return;
+		}
+		var newSysUser = new Object();
+		newSysUser.sysUserId = id;
+		newSysUser.password = newPasswprd;
+		newSysUser.rePassword = rePassword;
+		newSysUser.loginName = loginName;
+		newSysUser.oldPassword = oldPassword;
+		return newSysUser;
+	}
+</script>
+<style type="text/css">
+.divClass {
+	margin-left: 10px;
+	margin-top: 20px;
+	width: 500px;
+	height: 400px;
+	border: 1px red so
+}
+
+.tdRight {
+	text-align: right;
+}
+
+.spanClass {
+	color: red;
+}
+
+.btnInput {
+	font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+	<div class="easyui-layout" style="width:100%;" fit="true">
+		<div id="content" region="center" style="padding:5px;">
+			<div class="divClass">
+				<table id="dataTable">
+					<tr>
+						<td class="tdRight">登陆账号：</td>
+						<td colspan="2"><span id="spLoginName"></span></td>
+					</tr>
+					<tr>
+						<td class="tdRight">原密码：</td>
+						<td><input type="password" id="txtOldPassword"
+							name="txtOldPassword" value="" class="easyui-textbox" /></td>
+						<td><span id="spOldPassword" class="spanClass"> </span></td>
+					</tr>
+					<tr>
+						<td class="tdRight">新密码：</td>
+						<td><input type="password" id="txtPassword"
+							name="txtPassword" value="" class="easyui-textbox " /></td>
+						<td><span id="spPassword" class="spanClass"> </span></td>
+					</tr>
+					<tr>
+						<td class="tdRight">再次输入新密码：</td>
+						<td><input type="password" id="txtRePassword"
+							name="txtRePassword" value="" class="easyui-textbox " /></td>
+						<td><span id="spRePassword" class="spanClass"> </span></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><input type="button" id="btnSave" onclick="save()"
+							value="修改密码" class="easyui-linkbutton btnInput" /></td>
+					<tr>
+				</table>
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>

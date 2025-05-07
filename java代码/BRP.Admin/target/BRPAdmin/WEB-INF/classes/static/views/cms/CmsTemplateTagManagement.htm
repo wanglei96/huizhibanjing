@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<link rel="stylesheet" type="text/css"
+	href="../../themes/custom/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+<script type="text/javascript" src="../../js/jquery.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/config.js"></script>
+<script type="text/javascript" src="../../js/json2.js"></script>
+<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../js/util.js?v=1"></script>
+<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../js/jquery.query.js"></script>
+<script type="text/javascript" src="../../js/jquery.uploader.js"></script>
+<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+<script type="text/javascript" src="../../js/management.js"></script>
+<script type="text/javascript">
+	managementContext.dataName="CmsTemplateTag";
+	managementContext.tableName="cms_template_tag";
+	managementContext.primaryKeyName="id";
+	managementContext.allowPaging = true;
+	
+	managementContext.customTableColumns =  [{
+					field : 'name',
+					title : '名称',
+					fixed : true,
+					width : 150,
+					align : 'left'
+				}, {
+					field : 'element_name',
+					title : 'Html元素名称',
+					fixed : true,
+					width : 180,
+					align : 'left'
+				},{
+					field : 'handler_name',
+					title : '处理类名称',
+					fixed : true,
+					width : 350,
+					align : 'center'
+				},{
+					field : 'description',
+					title : '描述',
+					fixed : true,
+					width : 780,
+					align : 'center'
+				}];
+				
+	/*
+	 * 绑定数据
+	 */
+	function bindData() {
+	
+		var requestParameters = getParameters();
+		 //alert(JSON.stringify(requestParameters));
+		
+		call(managementContext.getListServiceName, requestParameters, function(
+				result) {
+			outputData(result.data.dataList);
+			//设置权限
+			bindTableGridFunctionPermission();
+			// 设置分页
+			if (managementContext.allowPaging) {
+				setPager(result.data);
+			}
+		});
+	}
+	/*
+ * 取得参数
+ */
+function getParametersBase() {
+	var parameters = new Object();
+	// 当前页
+	parameters.pageIndex = managementContext.pageIndex;
+	// 分页大小
+	if (managementContext.pageSize != null) {
+		parameters.pageSize = managementContext.pageSize;
+	}
+	// 是否基础表
+	if (managementContext.isBasicTable) {
+		parameters.tableName = managementContext.tableName;
+	}
+	// 站点id
+	if (managementContext.isCms) {
+		parameters.cmsSiteId = getCookie("cmsSiteId");
+	}
+	parameterName = $("#sltTagMethod").val();
+	parameters[parameterName] = $("#divSearchPanel input[id*=txtSearch]").val();
+	return parameters;
+	}
+</script>
+
+</head>
+
+<body>
+<div class="page">
+		<div class="toolbar_panel" id="DivToolbar">
+			<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+				onclick="openAddDialog()" id="btnAdd">新增</a> <a href="#"
+				class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+				onclick="deleteDataItems()" id="btnBatchDelete">删除</a><a id="lnkRefreshPage" href="#"
+				class="easyui-linkbutton" iconCls="icon-reload" plain="true"
+				onclick="refreshPage()">刷新</a>
+		</div>
+		<div id="divSearchPanel" class="search_panel easyui-panel">
+			<div class="search_item">
+				<select id="sltTagMethod" style="font-size: 12px;border-radius: 4px;padding: 3px;position: relative;top: 3px;">
+					<option value="name">名称</option>
+					<option value="elementName">Html元素名</option>
+					<option value="handlerName">处理类名称</option>
+					<option value="description">描述</option>
+				</select>
+				<input id="txtSearchName" class="search_item_textbox easyui-textbox"/>
+			</div>
+				
+			<div class="search_item_command">
+				<a href="#" class="easyui-linkbutton" plain="true"
+					iconCls="icon-search" onclick="query()">查询</a>
+			</div>
+		</div>
+		<div class="data_panel">
+			<table id="tableGrid" class="table table-bordered table-hover"
+						style="height:auto;">
+					</table>
+		</div>
+		
+		
+		
+		
+		<div id="divDetailDialog" class="easyui-dialog" style="width:400px"
+			closed="true" buttons="#divDetailCommandBar">
+			<form id="formDetail" method="post" novalidate
+				style="margin:0;padding:20px 50px">
+				<div style="margin-bottom:10px">
+					<input id="txtName" name="txtName" class="easyui-textbox"
+						label="名称:" labelPosition="top" style="width:100%">
+				</div>
+				<div style="margin-bottom:10px">
+					<input id="txtElementName" name="txtElementName" class="easyui-textbox"
+						label="Html元素名称:" labelPosition="top" style="width:100%">
+				</div>
+				<div style="margin-bottom:10px">
+					<input id="txtHandlerName" name="txtHandlerName" class="easyui-textbox"
+						label="处理类名称:" labelPosition="top" style="width:100%">
+				</div>
+				<div style="margin-bottom:10px">
+					<input id="txtDescription" name="txtDescription"
+						class="easyui-textbox" label="描述:" multiline="true"
+						labelPosition="top" style="width:100%;height:120px;">
+				</div>
+			</form>
+		</div>
+		<div id="divDetailCommandBar" class="detail_commandbar">
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+				iconCls="icon-ok" onclick="save()" style="width:90px" id="btnSave">保存</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+				iconCls="icon-cancel"
+				onclick="javascript:$('#divDetailDialog').dialog('close')"
+				style="width:90px">取消</a>
+		</div>
+	</div>
+
+</body>
+</html>

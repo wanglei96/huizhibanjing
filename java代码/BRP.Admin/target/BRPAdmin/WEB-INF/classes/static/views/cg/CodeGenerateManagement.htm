@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title></title>
+	<link rel="stylesheet" type="text/css"
+		  href="../../themes/custom/easyui.css" />
+	<link rel="stylesheet" type="text/css" href="../../themes/icon.css" />
+	<script type="text/javascript" src="../../js/jquery.js"></script>
+	<script type="text/javascript" src="../../js/common.js"></script>
+	<script type="text/javascript" src="../../js/config.js"></script>
+	<script type="text/javascript" src="../../js/json2.js"></script>
+	<script type="text/javascript" src="../../js/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery.edatagrid.js"></script>
+	<script type="text/javascript" src="../../js/util.js?v=1"></script>
+	<script type="text/javascript" src="../../js/easyui-lang-zh_CN.js"></script>
+	<script type="text/javascript" src="../../js/jquery.query.js"></script>
+	<script type="text/javascript" src="../../js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="../../js/jquery.query.js"></script>
+	<script type="text/javascript" src="../../js/jquery.uploader.js"></script>
+	<link rel="stylesheet" href="../../css/common.css?v=2" type="text/css"></link>
+	<link rel="stylesheet" href="../../css/base.css" type="text/css"></link>
+	<link rel="stylesheet" href="../../css/codeGenerate.css" type="text/css"></link>
+	<script type="text/javascript" src="../../js/management.js"></script>
+	<script type="text/javascript" src="../../js/cg/codeGenerate.js"></script>
+	<script type="text/javascript" src="../../js/cg/addModule.js"></script>
+	<style>
+		.search_item_caption {
+			font-size: 12px;
+			width: 67px;
+			text-align: right;
+			display: inline-block;
+		}
+	</style>
+	<script>
+		managementContext.title = "代码生成";
+		/*
+         * 绑定数据
+         */
+		function bindControls(){
+			bindDatabaseListData();
+			bindDatabase();
+			setProjectCombobox();
+		}
+		function bindData() {
+			//bindProjectData();
+			//bindTableList("ModuleName_tableGrid","information_schema.tables","表名称",true,"table_schema='stro_cms' AND TABLE_TYPE='BASE TABLE'");
+			//bindTableList("sysTableGrid","information_schema.tables","视图名称",false,"table_schema='stro_cms' AND TABLE_TYPE='BASE TABLE'");
+
+		}
+
+
+
+	</script>
+</head>
+
+<body>
+<div class="page">
+	<div id="divOperation" class="toolbar_panel" id="divToolbar">
+		<a href="#" class="easyui-linkbutton" iconCls="icon-search"
+		   plain="true" onclick="openProject()">打开</a><a href="#"
+														 class="easyui-linkbutton" iconCls="icon-code-generate" plain="true"
+														 onclick="codeGenerate()">生成</a><a href="#"
+																						   class="easyui-linkbutton" iconCls="icon-edit" plain="true"
+																						   onclick="openProjectDialog('Update')">修改</a> <a href="#"
+																																		   class="easyui-linkbutton" iconCls="icon-add" plain="true"
+																																		   onclick="openProjectDialog('Add')">新增</a>  <a href="#"
+																																														 class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+																																														 onclick="removeProject()">删除</a> <a href="#"
+																																																							 class="easyui-linkbutton" iconCls="icon-reload" plain="true" id="refreshPageButton"
+																																																							 onclick="refreshPage()">刷新</a>
+		<div>
+			<span class="search_item_caption">请选择项目:</span>
+			<input id="cmbProjectName" class="search_item_combobox easyui-combobox" />
+		</div>
+	</div>
+	<div>
+		<div id="databasePanel" class="easyui-panel">
+			<div class="divDataBaseName">
+				<div class="search_item">
+					<span class="search_item_caption">项目数据库:</span> <input
+						id="cmbDataBaseName" class=" easyui-combobox" readonly="true"/>
+				</div>
+			</div>
+		</div>
+		<div id="tablePanel" class="easyui-panel">
+			<input type="hidden" id="selectedModuleName" />
+			<div class="divModule">
+				<div class="divModule_title">模块</div>
+				<div class="moduleList" id="moduleList">
+					<!-- <div class="module_item" id="moduleItem_cms">cms<div class="remove_module" id="removeModule_cms">x</div></div>
+                    <div class="module_item checked_module_item" id="moduleItem_sys">sys<div class="remove_module" id="removeModule_sys">x</div></div> -->
+				</div>
+				<div class="divModule_add" id="addmodule" onclick="">添加模块</div>
+			</div>
+		</div>
+		<div>
+			项目输出目录：<input type="text" class="output_directory" id="output_directory"/>
+		</div>
+		<div id="codeGenerateDialog"  closed="true" class="easyui-dialog codeGenerateDialog" style="height:500px;width:420px">
+			<table id="codeGenerateSelectGrid" class="table table-bordered table-hover" style="height:420px;width:400px">
+			</table>
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+			   iconCls="icon-cancel" onclick="javascript:closeDialog('codeGenerateDialog');"
+			   style="width:90px">取消</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton c6"
+			   iconCls="icon-ok" onclick="startCodeGenerate()" style="width:90px" id="btnSaveTable">确认生成</a>
+		</div>
+		<div id="divSysTableDialog">
+			<div id="sysTableDialog" closed="true" class="easyui-dialog sysTablePanel"
+				 style="width:470px; height:600px;" buttons="#dlg-buttons">
+				<input class="easyui-textbox" style="width:100px"
+					   id="searchKey" textField="text">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-search" id="searchTables" onclick="searchTables()">搜索</a>
+				<div>
+					<table id="sysTableGrid" class="table table-bordered table-hover" style="height:500px;">
+					</table>
+				</div>
+				<a href="javascript:void(0)" class="easyui-linkbutton c6"
+				   iconCls="icon-ok" onclick="saveTable()" style="width:90px" id="btnSaveTable">保存</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton"
+				   iconCls="icon-cancel" onclick="javascript:closeDialog('sysTableDialog');"
+				   style="width:90px">取消</a>
+			</div>
+		</div>
+		<div id="tableDetail" class="easyui-dialog " closed="true" style="padding:5px;height:auto;width:650px;height:600px;">
+			<div style="margin-bottom:5px" onclick="unSelectAll()">
+				<a href="#" class="easyui-linkbutton saveFeild" onclick="saveFeildDetail()" iconCls="icon-save" plain="true">保存字段设置</a>
+			</div>
+			<table id="tableDetailGrid"  class="easyui-datagrid table table-bordered table-hover" style="height:auto;">
+			</table>
+		</div>
+		<div id="moduleDetail" class="easyui-dialog " closed="true" style="padding:5px;height:auto;width:650px;height:600px;">
+			<input type="hidden" id="hiddenOriginaltModuleName"/>
+			<div class="form_item">
+				<input id="txtModuleName" name="txtModuleName" class="easyui-textbox"
+					   label="模块名称:" labelPosition="left" style="width:400px;">
+			</div>
+			<div class="form_item">
+				<input id="txtModuleDocument" name="txtModuleDocument" class="easyui-textbox"
+					   label="模块目录:" labelPosition="left" style="width:400px;"><h>模块目录层级关系用“.”分割<h>
+			</div>
+			<a href="javascript:void(0)" class="easyui-linkbutton c6"
+			   iconCls="icon-ok" onclick="saveModule()" style="width:90px" id="btnSaveModule">保存</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+			   iconCls="icon-cancel" onclick="javascript:closeDialog('moduleDetail');"
+			   style="width:90px">取消</a>
+		</div>
+		<div id="projectDetail" class="easyui-dialog " closed="true" style="padding:5px;height:auto;width:650px;height:600px;">
+			<input type="hidden" id="hiddenProjectAction" />
+			<input type="hidden" id="hiddenProjectId" />
+			<div class="form_item">
+				<input id="txtProjectName" name="txtProjectName" class="easyui-textbox"
+					   label="项目名称:" labelPosition="left" style="width:400px;">
+			</div>
+			<div class="form_item">
+				<input id="txtOutputDirectory" name="txtOutputDirectory" class="easyui-textbox"
+					   label="输出目录:" labelPosition="left" style="width:400px;">
+			</div>
+			<div class="form_item">
+				<input id="cmbDataBase" name="cmbDataBase" class="easyui-combobox"
+					   label="数据库:" labelPosition="left" style="width:400px;">
+			</div>
+			<a href="javascript:void(0)" class="easyui-linkbutton c6"
+			   iconCls="icon-ok" onclick="saveProject()" style="width:90px" id="btnSaveProject">保存</a>
+			<a href="javascript:void(0)" class="easyui-linkbutton"
+			   iconCls="icon-cancel" onclick="javascript:closeDialog('projectDetail');"
+			   style="width:90px">取消</a>
+		</div>
+	</div>
+</div>
+</body>
+</html>
